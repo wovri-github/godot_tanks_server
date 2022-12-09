@@ -36,13 +36,15 @@ func _peer_disconnected(player_id) -> void:
 #--------Stance--------
 func player_initiation(player_id: int):
 	playerS_last_time[player_id] = -INF
+	Transfer.send_init_data(player_id, get_playerS_name())
 	map_node.spawn_player(player_id)
-	#Transfer.send_init_data(player_id, get_playerS_name())
 
 func get_playerS_name() -> Array:
-	var a = $Map/Players.get_children()
-	print(a)
-	return a
+	var playerS = $Map/Players.get_children()
+	var playerS_name: Array
+	for player in playerS:
+		playerS_name.append(player.name)
+	return playerS_name
 
 func add_player_stance(player_id, player_stance):
 	# This number [T] IS ONLY for making chronology. Don't use it

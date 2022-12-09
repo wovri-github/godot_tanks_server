@@ -15,9 +15,6 @@ func send_init_data(player_id, init_data):
 
 
 
-
-
-
 #----- CORE GAME MECHANIC -----
 remote func recive_stance(player_stance: Dictionary):
 	var player_id = get_tree().get_rpc_sender_id()
