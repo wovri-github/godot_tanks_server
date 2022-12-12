@@ -849,7 +849,6 @@ config/icon="res://icon.png"
 [autoload]
 
 Transfer="*res://Singletons/Transfer.tscn"
-Verification="*res://Singletons/Verification.gd"
 
 [editor_plugins]
 

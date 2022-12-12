@@ -21,10 +21,9 @@ func _on_Processing_timer_timeout():
 	var playerS_stance = get_parent().playerS_stance
 	if playerS_stance.empty() == true:
 		return
-	playerS_stance[\"T\"] = OS.get_ticks_msec()
 	# Verification
 	# Anti-cheate
-	Transfer.send_world_stance(playerS_stance)
+	Transfer.send_world_stance(OS.get_ticks_msec(), playerS_stance)
 "
 
 [node name="Main" type="Node"]

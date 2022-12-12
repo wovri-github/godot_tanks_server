@@ -26,9 +26,6 @@ func _peer_conected(player_id) -> void:
 
 func _peer_disconnected(player_id) -> void:
 	print("[Main]: Player " + str(player_id) + " disconnected")
-	Transfer.send_depsawn_player(player_id) # [improve] set it by lacking player in playerS_stance
-	var _err = playerS_stance.erase(player_id)
-	_err = playerS_last_time.erase(player_id)
 	map_node.despawn_player(player_id)
 
 
@@ -36,12 +33,13 @@ func _peer_disconnected(player_id) -> void:
 #--------Stance--------
 func player_initiation(player_id: int):
 	playerS_last_time[player_id] = -INF
-	Transfer.send_init_data(player_id, get_playerS_name())
-	map_node.spawn_player(player_id)
+	var spawn_point = map_node.get_spawn_position()
+	Transfer.send_init_data(player_id, spawn_point,  get_playerS_name())
+	map_node.spawn_player(player_id, spawn_point)
 
 func get_playerS_name() -> Array:
 	var playerS = $Map/Players.get_children()
-	var playerS_name: Array
+	var playerS_name: Array = []
 	for player in playerS:
 		playerS_name.append(player.name)
 	return playerS_name
@@ -54,7 +52,12 @@ func add_player_stance(player_id, player_stance):
 		player_stance.erase("T")
 		playerS_stance[player_id] = player_stance
 
-
+func dc(player_id):
+	#warning-ignore:return_value_discarded
+	playerS_stance.erase(player_id)
+	#warning-ignore:return_value_discarded
+	playerS_last_time.erase(player_id)
+	network.disconnect_peer(player_id)
 #--------Shoot----------
 func player_shoot(player_id, player_stance, ammo_type):
 	map_node.update_player_position(player_id, player_stance)
