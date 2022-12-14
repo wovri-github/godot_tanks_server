@@ -858,10 +858,6 @@ enabled=PoolStringArray( "res://addons/gdUnit3/plugin.cfg" )
 
 settings/test/test_root_folder="unit_test"
 
-[global]
-
-search=false
-
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true
