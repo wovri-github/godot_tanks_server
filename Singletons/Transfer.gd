@@ -19,8 +19,8 @@ func send_new_player(player_id):
 
 #----- CORE GAME MECHANIC -----
 
-func send_player_destroyed(player_id, position, rotation):
-	rpc("recive_player_destroyed", player_id, position, rotation)
+func send_player_destroyed(player_id, position, rotation, projectile_name):
+	rpc("recive_player_destroyed", player_id, position, rotation, projectile_name)
 
 remote func recive_stance(player_stance: Dictionary):
 	var player_id = get_tree().get_rpc_sender_id()

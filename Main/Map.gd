@@ -29,7 +29,7 @@ func despawn_player(player_id):
 	if !$Players.has_node(str(player_id)):
 		return
 	var player_path: String = "Players/" + str(player_id)
-	get_node(player_path).die()
+	get_node(player_path).queue_free()
 
 func spawn_wall(object):
 	$Objects.call_deferred("add_child", object)
@@ -43,8 +43,8 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	var velocity = Vector2.UP.rotated(turret_rotation) * BULLET_SPEED
 	bullet_inst.position = spawn_position
 	bullet_inst.set_linear_velocity(velocity)
-	$Projectiles.add_child(bullet_inst)
-	return {"SP": spawn_position,"V": velocity, "AT": ammo_type}
+	$Projectiles.add_child(bullet_inst, true)
+	return {"Name": bullet_inst.name, "SP": spawn_position,"V": velocity, "AT": ammo_type}
 
 
 func _on_Processing_timer_timeout():
