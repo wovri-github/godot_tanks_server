@@ -43,6 +43,7 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	var velocity = Vector2.UP.rotated(turret_rotation) * BULLET_SPEED
 	bullet_inst.position = spawn_position
 	bullet_inst.set_linear_velocity(velocity)
+	bullet_inst.player_path = get_node("Players/" + str(player_id)).get_path()
 	$Projectiles.add_child(bullet_inst, true)
 	return {"Name": bullet_inst.name, "SP": spawn_position,"V": velocity, "AT": ammo_type}
 

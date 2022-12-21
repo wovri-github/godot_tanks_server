@@ -10,8 +10,8 @@ remote func recive_init_data():
 	main_node.player_initiation(player_id)
 	send_new_player(player_id)
 
-func send_init_data(player_id, spawn_point, players, walls):
-	rpc_id(player_id, "recive_init_data", spawn_point, players, walls)
+func send_init_data(player_id, spawn_point, players, walls, scores):
+	rpc_id(player_id, "recive_init_data", spawn_point, players, walls, scores)
 
 
 func send_new_player(player_id):
@@ -36,6 +36,9 @@ remote func recive_shoot(player_stance: Dictionary, ammo_type: int):
 
 func send_shoot(player_id, bullet_data):
 	rpc("recive_shoot", player_id, bullet_data)
+	
+func send_score_update(player_id: String, new_score: int):
+	rpc("recive_score_update", player_id, new_score)
 
 
 

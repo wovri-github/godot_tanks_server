@@ -3,7 +3,7 @@ extends KinematicBody2D
 onready var wall = $Hitbox.duplicate(true)
 onready var map_node = $"/root/Main/Map"
 
-
+var score = 0
 
 func set_stance(_position, _rotation):
 	position = _position

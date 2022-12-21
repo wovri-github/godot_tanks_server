@@ -34,7 +34,7 @@ func _peer_disconnected(player_id) -> void:
 func player_initiation(player_id: int):
 	playerS_last_time[player_id] = -INF
 	var spawn_point = map_node.get_spawn_position()
-	Transfer.send_init_data(player_id, spawn_point, get_playerS_name(), get_playerS_corpses())
+	Transfer.send_init_data(player_id, spawn_point, get_playerS_name(), get_playerS_corpses(), get_playerS_score())
 	map_node.spawn_player(player_id, spawn_point)
 
 func get_playerS_name() -> Array:
@@ -43,6 +43,13 @@ func get_playerS_name() -> Array:
 	for player in playerS:
 		playerS_name.append(player.name)
 	return playerS_name
+
+func get_playerS_score():
+	var playerS = $Map/Players.get_children()
+	var playerS_score: Array = []
+	for player in playerS:
+		playerS_score.append({"Name": player.name, "Score": player.score})
+	return playerS_score
 
 func get_playerS_corpses():
 	var playerS_corpses = $Map/Objects.get_children()
