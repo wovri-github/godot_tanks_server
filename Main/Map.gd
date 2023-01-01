@@ -19,9 +19,11 @@ func get_spawn_position() -> Vector2:
 	last_spawn_point %= spawn_pointS.size()
 	return spawn_point
 
-func spawn_player(player_id, spawn_point):
+func spawn_player(player_id, spawn_point, player_name):
 	var player_inst = player_model.instance()
 	player_inst.name = str(player_id)
+#	player_inst.player_name = "Player" + str(player_id) # temp
+	player_inst.player_name = player_name
 	player_inst.position = spawn_point
 	$Players.add_child(player_inst)
 

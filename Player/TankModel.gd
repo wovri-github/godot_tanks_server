@@ -4,6 +4,7 @@ onready var wall = $Hitbox.duplicate(true)
 onready var map_node = $"/root/Main/Map"
 
 var score = 0
+var player_name = "Player" # defined when spawning
 
 func set_stance(_position, _rotation):
 	position = _position
