@@ -3,7 +3,8 @@ extends KinematicBody2D
 onready var wall = $Hitbox.duplicate(true)
 onready var game_n = $"/root/Main/Game"
 
-
+var score = 0
+var player_name = "Player" # defined when spawning
 
 func set_stance(_position, _rotation):
 	position = _position

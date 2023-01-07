@@ -5,17 +5,17 @@ onready var main_n = $"/root/Main"
 
 
 #---- INIT DATA ----
-remote func recive_init_data():
+remote func recive_init_data(player_name):
 	var player_id = get_tree().get_rpc_sender_id()
-	main_n.player_initiation(player_id)
-	send_new_player(player_id)
+	main_n.player_initiation(player_id, player_name)
+	send_new_player(player_id, player_name) # main_n.get_node("Players/"+str(player_id)).player_name
 
-func send_init_data(player_id, spawn_point, players, walls):
-	rpc_id(player_id, "recive_init_data", spawn_point, players, walls)
+func send_init_data(player_id, spawn_point, players, walls, scores):
+	rpc_id(player_id, "recive_init_data", spawn_point, players, walls, scores)
 
 
-func send_new_player(player_id):
-	rpc("recive_new_player", player_id)
+func send_new_player(player_id, player_name):
+	rpc("recive_new_player", player_id, player_name)
 
 #----- CORE GAME MECHANIC -----
 
@@ -36,6 +36,9 @@ remote func recive_shoot(player_stance: Dictionary, ammo_type: int):
 
 func send_shoot(player_id, bullet_data):
 	rpc("recive_shoot", player_id, bullet_data)
+	
+func send_score_update(player_id: String, new_score: int):
+	rpc("recive_score_update", player_id, new_score)
 
 
 

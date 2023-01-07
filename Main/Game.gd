@@ -19,9 +19,11 @@ func get_spawn_position() -> Vector2:
 	last_spawn_point %= spawn_pointS.size()
 	return spawn_point
 
-func spawn_player(player_id, spawn_point):
+func spawn_player(player_id, spawn_point, player_name):
 	var player_inst = player_model.instance()
 	player_inst.name = str(player_id)
+#	player_inst.player_name = "Player" + str(player_id) # temp
+	player_inst.player_name = player_name
 	player_inst.position = spawn_point
 	$Players.add_child(player_inst)
 
@@ -43,6 +45,7 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	var velocity = Vector2.UP.rotated(turret_rotation) * BULLET_SPEED
 	bullet_inst.position = spawn_position
 	bullet_inst.set_linear_velocity(velocity)
+	bullet_inst.player_path = get_node("Players/" + str(player_id)).get_path()
 	$Projectiles.add_child(bullet_inst, true)
 	return {"Name": bullet_inst.name, "SP": spawn_position,"V": velocity, "AT": ammo_type}
 
