@@ -34,7 +34,8 @@ func _peer_disconnected(player_id) -> void:
 func player_initiation(player_id: int, player_name : String):
 	playerS_last_time[player_id] = -INF
 	var spawn_point = game_n.get_spawn_position()
-	Transfer.send_init_data(player_id, spawn_point, get_playerS_name(), get_playerS_corpses(), get_playerS_score())
+	# [improve] Change into dictionary
+	Transfer.send_init_data(player_id, spawn_point, get_playerS_name(), get_playerS_corpses(), get_playerS_score(), game_n.get_node("Map").get_mapset())
 	game_n.spawn_player(player_id, spawn_point, player_name)
 
 func get_playerS_name() -> Array:

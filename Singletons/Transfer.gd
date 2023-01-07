@@ -10,8 +10,8 @@ remote func recive_init_data(player_name):
 	main_n.player_initiation(player_id, player_name)
 	send_new_player(player_id, player_name) # main_n.get_node("Players/"+str(player_id)).player_name
 
-func send_init_data(player_id, spawn_point, players, walls, scores):
-	rpc_id(player_id, "recive_init_data", spawn_point, players, walls, scores)
+func send_init_data(player_id, spawn_point, players, walls, scores, mapset):
+	rpc_id(player_id, "recive_init_data", spawn_point, players, walls, scores, mapset)
 
 
 func send_new_player(player_id, player_name):
