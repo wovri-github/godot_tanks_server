@@ -11,6 +11,5 @@ func _on_LifeTime_timeout():
 
 func _on_Bullet_body_entered(body):
 	if body.is_in_group("Player"):
-		print("["+name+"]: ", position)
 		body.die(name)
 		queue_free()

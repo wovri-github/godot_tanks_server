@@ -7,7 +7,7 @@ var network = NetworkedMultiplayerENet.new()
 var playerS_last_time: Dictionary
 var playerS_stance: Dictionary
 
-onready var map_node = $"%Map"
+onready var game_n = $"%Game"
 
 
 
@@ -26,26 +26,26 @@ func _peer_conected(player_id) -> void:
 
 func _peer_disconnected(player_id) -> void:
 	print("[Main]: Player " + str(player_id) + " disconnected")
-	map_node.despawn_player(player_id)
+	game_n.despawn_player(player_id)
 
 
 
 #--------Stance--------
 func player_initiation(player_id: int):
 	playerS_last_time[player_id] = -INF
-	var spawn_point = map_node.get_spawn_position()
+	var spawn_point = game_n.get_spawn_position()
 	Transfer.send_init_data(player_id, spawn_point, get_playerS_name(), get_playerS_corpses())
-	map_node.spawn_player(player_id, spawn_point)
+	game_n.spawn_player(player_id, spawn_point)
 
 func get_playerS_name() -> Array:
-	var playerS = $Map/Players.get_children()
+	var playerS = $Game/Players.get_children()
 	var playerS_name: Array = []
 	for player in playerS:
 		playerS_name.append(player.name)
 	return playerS_name
 
 func get_playerS_corpses():
-	var playerS_corpses = $Map/Objects.get_children()
+	var playerS_corpses = $Game/Objects.get_children()
 	var playerS_corpses_dict: Array = []
 	for player_corpse in playerS_corpses:
 		playerS_corpses_dict.append({
@@ -72,6 +72,6 @@ func dc(player_id):
 
 #--------Shoot----------
 func player_shoot(player_id, player_stance, ammo_type):
-	map_node.update_player_position(player_id, player_stance)
-	var bullet_data = map_node.spawn_bullet(player_id, player_stance.TR, ammo_type)
+	game_n.update_player_position(player_id, player_stance)
+	var bullet_data = game_n.spawn_bullet(player_id, player_stance.TR, ammo_type)
 	Transfer.send_shoot(player_id, bullet_data)

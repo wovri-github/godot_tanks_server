@@ -1,7 +1,7 @@
 extends KinematicBody2D
 
 onready var wall = $Hitbox.duplicate(true)
-onready var map_node = $"/root/Main/Map"
+onready var game_n = $"/root/Main/Game"
 
 
 
@@ -23,6 +23,6 @@ func die(projectile_name):
 	Transfer.send_player_destroyed(\
 			int(name), static_body2d.position, static_body2d.rotation, projectile_name)
 	static_body2d.add_child(wall)
-	map_node.spawn_wall(static_body2d)
+	game_n.spawn_wall(static_body2d)
 	$"/root/Main".dc(int(name))
 	queue_free()

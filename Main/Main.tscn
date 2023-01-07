@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Main/Main.gd" type="Script" id=1]
-[ext_resource path="res://Main/Map.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Main/Game.tscn" type="PackedScene" id=2]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node
@@ -36,8 +36,8 @@ autostart = true
 [node name="Stance_process" type="Node" parent="."]
 script = SubResource( 1 )
 
-[node name="Map" parent="." instance=ExtResource( 2 )]
+[node name="Game" parent="." instance=ExtResource( 2 )]
 unique_name_in_owner = true
 
 [connection signal="timeout" from="Processing_timer" to="Stance_process" method="_on_Processing_timer_timeout"]
-[connection signal="timeout" from="Processing_timer" to="Map" method="_on_Processing_timer_timeout"]
+[connection signal="timeout" from="Processing_timer" to="Game" method="_on_Processing_timer_timeout"]
