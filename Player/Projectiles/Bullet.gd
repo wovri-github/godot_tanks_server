@@ -15,6 +15,5 @@ func _on_Bullet_body_entered(body):
 	if !(player == null):
 		player.score += 1
 		Transfer.send_score_update(player.name, player.score)
-	print("["+name+"]: ", position)
 	body.die(name)
 	queue_free()

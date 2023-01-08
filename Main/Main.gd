@@ -8,6 +8,7 @@ var playerS_last_time: Dictionary
 var playerS_stance: Dictionary
 
 onready var game_n = $"%Game"
+onready var map_n = game_n.get_node("Map")
 
 
 
@@ -26,31 +27,34 @@ func _peer_conected(player_id) -> void:
 
 func _peer_disconnected(player_id) -> void:
 	print("[Main]: Player " + str(player_id) + " disconnected")
-	game_n.despawn_player(player_id)
 
 
 
 #--------Stance--------
 func player_initiation(player_id: int, player_name : String):
 	playerS_last_time[player_id] = -INF
-	var spawn_point = game_n.get_spawn_position()
-	# [improve] Change into dictionary
-	Transfer.send_init_data(player_id, spawn_point, get_playerS_name(), get_playerS_corpses(), get_playerS_score(), game_n.get_node("Map").get_mapset())
+	var spawn_point = map_n.get_spawn_position()
+	var init_data = {
+		"SP": spawn_point,
+		"PlayerSTemplateData": get_playerS_data(),
+		"PlayerSCorpses": get_playerS_corpses(),
+		"MapSet": map_n.get_mapset(),
+	}
+	Transfer.send_init_data(player_id, init_data)
+	Transfer.send_new_player(player_id, player_name, spawn_point)
 	game_n.spawn_player(player_id, spawn_point, player_name)
 
-func get_playerS_name() -> Array:
+func get_playerS_data() -> Array:
 	var playerS = $Game/Players.get_children()
 	var playerS_name: Array = []
 	for player in playerS:
-		playerS_name.append({"ID": int(player.name), "PlayerName": player.player_name})
+		playerS_name.append({
+			"ID": int(player.name), 
+			"PlayerName": player.player_name, 
+			"SP": player.get_position(),
+			"Score": player.score
+		})
 	return playerS_name
-
-func get_playerS_score():
-	var playerS = $Game/Players.get_children()
-	var playerS_score: Array = []
-	for player in playerS:
-		playerS_score.append({"Name": player.name, "Score": player.score})
-	return playerS_score
 
 func get_playerS_corpses():
 	var playerS_corpses = $Game/Objects.get_children()
@@ -76,7 +80,8 @@ func dc(player_id):
 	playerS_stance.erase(player_id)
 	#warning-ignore:return_value_discarded
 	playerS_last_time.erase(player_id)
-	network.disconnect_peer(player_id)
+	if get_tree().multiplayer. get_network_connected_peers().has(player_id):
+		network.disconnect_peer(player_id)
 
 #--------Shoot----------
 func player_shoot(player_id, player_stance, ammo_type):

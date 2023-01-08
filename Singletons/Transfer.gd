@@ -8,14 +8,13 @@ onready var main_n = $"/root/Main"
 remote func recive_init_data(player_name):
 	var player_id = get_tree().get_rpc_sender_id()
 	main_n.player_initiation(player_id, player_name)
-	send_new_player(player_id, player_name) # main_n.get_node("Players/"+str(player_id)).player_name
 
-func send_init_data(player_id, spawn_point, players, walls, scores, mapset):
-	rpc_id(player_id, "recive_init_data", spawn_point, players, walls, scores, mapset)
+func send_init_data(player_id, init_data):
+	rpc_id(player_id, "recive_init_data", init_data)
 
 
-func send_new_player(player_id, player_name):
-	rpc("recive_new_player", player_id, player_name)
+func send_new_player(player_id, player_name, spawn_point):
+	rpc("recive_new_player", player_id, player_name, spawn_point)
 
 #----- CORE GAME MECHANIC -----
 
