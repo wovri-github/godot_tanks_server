@@ -3,6 +3,7 @@
 [ext_resource path="res://Player/Projectiles/Bullet.gd" type="Script" id=1]
 
 [sub_resource type="PhysicsMaterial" id=3]
+friction = 0.0
 bounce = 1.0
 
 [sub_resource type="CircleShape2D" id=2]
