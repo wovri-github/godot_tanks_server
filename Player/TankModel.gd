@@ -3,6 +3,11 @@ extends KinematicBody2D
 onready var wall = $Hitbox.duplicate(true)
 onready var game_n = $"/root/Main/Game"
 
+var special_ammo = {
+	Ammunition.TYPES.BULLET : INF,
+	Ammunition.TYPES.ROCKET : 0,
+	Ammunition.TYPES.FRAG_BOMB : 0
+}
 var score = 0
 var player_name = "Player" # defined when spawning
 

@@ -5,7 +5,7 @@
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 24, 32 )
 
-[node name="Tank" type="KinematicBody2D" groups=["Player"]]
+[node name="Tank" type="KinematicBody2D" groups=["Players"]]
 collision_mask = 0
 script = ExtResource( 1 )
 

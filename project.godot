@@ -10,12 +10,24 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Reference",
+"class": "Ammunition",
+"language": "GDScript",
+"path": "res://Singletons/Ammunition.gd"
+}, {
+"base": "Reference",
 "class": "Dir",
 "language": "GDScript",
 "path": "res://Singletons/Paths.gd"
+}, {
+"base": "RigidBody2D",
+"class": "Projectile",
+"language": "GDScript",
+"path": "res://Player/Projectiles/Projectile.gd"
 } ]
 _global_script_class_icons={
-"Dir": ""
+"Ammunition": "",
+"Dir": "",
+"Projectile": ""
 }
 
 [application]
@@ -41,6 +53,7 @@ common/drop_mouse_on_gui_input_disabled=true
 2d_physics/layer_1="player"
 2d_physics/layer_2="projectile"
 2d_physics/layer_3="object"
+2d_physics/layer_4="ammo_box"
 "<<<<<<<HEAD[locale]locale_filter"=[ 0, [  ] ]
 
 [locale]

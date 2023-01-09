@@ -38,7 +38,7 @@ func player_initiation(player_id: int, player_name : String):
 		"SP": spawn_point,
 		"PlayerSTemplateData": get_playerS_data(),
 		"PlayerSCorpses": get_playerS_corpses(),
-		"MapSet": map_n.get_mapset(),
+		"MapData": map_n.get_map_data(),
 	}
 	Transfer.send_init_data(player_id, init_data)
 	Transfer.send_new_player(player_id, player_name, spawn_point)
@@ -87,4 +87,5 @@ func dc(player_id):
 func player_shoot(player_id, player_stance, ammo_type):
 	game_n.update_player_position(player_id, player_stance)
 	var bullet_data = game_n.spawn_bullet(player_id, player_stance.TR, ammo_type)
-	Transfer.send_shoot(player_id, bullet_data)
+	if bullet_data != null:
+		Transfer.send_shoot(player_id, bullet_data)
