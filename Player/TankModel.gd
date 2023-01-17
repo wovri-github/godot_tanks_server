@@ -8,7 +8,8 @@ onready var game_n = $"/root/Main/Game"
 var special_ammo = {
 	Ammunition.TYPES.BULLET : INF,
 	Ammunition.TYPES.ROCKET : 0,
-	Ammunition.TYPES.FRAG_BOMB : 0
+	Ammunition.TYPES.FRAG_BOMB : 0,
+	Ammunition.TYPES.LASER: INF
 }
 var score = 0
 var player_name = "Player" # defined when spawning
@@ -20,8 +21,8 @@ func set_stance(_position, _rotation):
 func rotate_turret(turret_rotation):
 	$"%Turret".rotation = turret_rotation
 
-func get_bullet_spawn() -> Vector2:
-	return $"%BulletSpawn".get_global_position()
+#func get_bullet_spawn() -> Vector2:
+#	return $"%BulletSpawn".get_global_position()
 
 func die(projectile_name):
 	var static_body2d = StaticBody2D.new()

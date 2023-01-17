@@ -19,3 +19,7 @@ unique_name_in_owner = true
 [node name="BulletSpawn" type="Position2D" parent="Turret"]
 unique_name_in_owner = true
 position = Vector2( 0, -60 )
+
+[node name="LaserSpawn" type="Position2D" parent="Turret"]
+unique_name_in_owner = true
+position = Vector2( 0, -47 )
