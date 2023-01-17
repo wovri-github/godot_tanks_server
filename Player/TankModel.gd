@@ -2,7 +2,6 @@ extends KinematicBody2D
 
 const CORPSE_LIFE_TIME = 20
 
-onready var wall = $Hitbox.duplicate(true)
 onready var game_n = $"/root/Main/Game"
 
 var special_ammo = {
@@ -12,6 +11,8 @@ var special_ammo = {
 }
 var score = 0
 var player_name = "Player" # defined when spawning
+
+
 
 func set_stance(_position, _rotation):
 	position = _position
@@ -37,7 +38,7 @@ func die(projectile_name):
 	
 	Transfer.send_player_destroyed(\
 			int(name), static_body2d.position, static_body2d.rotation, projectile_name)
-	static_body2d.add_child(wall)
+	static_body2d.add_child($Hitbox.duplicate(true))
 	game_n.spawn_wall(static_body2d)
 	$"/root/Main".dc(int(name))
 	queue_free()

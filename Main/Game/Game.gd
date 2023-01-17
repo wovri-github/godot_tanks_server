@@ -9,10 +9,10 @@ var projectiles_modelS = {
 }
 const BULLET_SPEED = 200
 
-func spawn_player(player_id, spawn_point, player_name):
+func spawn_player(player_id, spawn_point):
 	var player_inst = player_model.instance()
 	player_inst.name = str(player_id)
-	player_inst.player_name = player_name
+	player_inst.player_name = "No_Need"
 	player_inst.position = spawn_point
 	$Players.add_child(player_inst)
 
@@ -44,7 +44,7 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	return {"Name": bullet_inst.name, "SP": spawn_position,"V": velocity, "AT": ammo_type}
 
 
-func _on_Processing_timer_timeout():
+func _physics_process(delta):
 	var playerS_stance = get_parent().playerS_stance
 	if playerS_stance.empty() == true:
 		return

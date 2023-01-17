@@ -9,14 +9,17 @@ remote func recive_init_data(player_name):
 	var player_id = get_tree().get_rpc_sender_id()
 	main_n.player_initiation(player_id, player_name)
 
+
 func send_init_data(player_id, init_data):
 	rpc_id(player_id, "recive_init_data", init_data)
 
 
-func send_new_player(player_id, player_name, spawn_point):
-	rpc("recive_new_player", player_id, player_name, spawn_point)
+func send_new_player(player_id, spawn_point):
+	rpc("recive_new_player", player_id, spawn_point)
 
-#----- CORE GAME MECHANIC -----
+func send_new_battle(new_game_data):
+	rpc("recive_new_battle", new_game_data)
+#---- CORE GAME MECHANIC -----
 
 func send_player_destroyed(player_id, position, rotation, projectile_name):
 	rpc("recive_player_destroyed", player_id, position, rotation, projectile_name)
