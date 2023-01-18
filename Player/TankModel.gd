@@ -29,6 +29,7 @@ func die(projectile_name):
 	static_body2d.name = name
 	static_body2d.position = get_global_position()
 	static_body2d.rotation = $Hitbox.get_global_rotation()
+	static_body2d.add_to_group("Corpse")
 	
 	var lifeTime = Timer.new()
 	lifeTime.wait_time = CORPSE_LIFE_TIME
@@ -40,5 +41,5 @@ func die(projectile_name):
 			int(name), static_body2d.position, static_body2d.rotation, projectile_name)
 	static_body2d.add_child(wall)
 	game_n.spawn_wall(static_body2d)
-	$"/root/Main".dc(int(name))
+#	$"/root/Main".dc(int(name))
 	queue_free()

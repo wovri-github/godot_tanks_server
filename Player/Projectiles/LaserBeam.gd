@@ -48,6 +48,9 @@ func cast_laser():
 			collider.die(name)
 			break
 		
+		if collider.is_in_group("Corpse"):
+			break
+		
 		if collision_normal == Vector2.ZERO:
 			break
 			
