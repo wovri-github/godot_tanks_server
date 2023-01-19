@@ -36,7 +36,7 @@ func _peer_disconnected(player_id) -> void:
 	player_data.erase(player_id)
 	var player_n = get_node_or_null("/root/Main/Game/Players/" + str(player_id))
 	if player_n:
-		player_n.die(null)
+		player_n.die(null, null)
 
 
 
@@ -45,7 +45,10 @@ func player_initiation(player_id: int, player_name : String):
 	player_data[player_id] = {
 		"ID": player_id,
 		"Nick": player_name,
-		"Score": 0,
+		"Score": {
+			"Wins": 0,
+			"Kills": 0,
+		},
 		"SP": -1,
 	}
 	playerS_last_time[player_id] = -INF
@@ -61,7 +64,19 @@ func player_initiation(player_id: int, player_name : String):
 #[info] when somebody die or connect then calculate how many second left of battle
 #func battle_timer_logick():
 #	$EndOfBattle.start()
-	
+
+func get_playerS_data() -> Array:
+	var playerS = $Game/Players.get_children()
+	var playerS_name: Array = []
+	for player in playerS:
+		var player_id = int(player.name)
+		playerS_name.append({
+			"ID": player_id, 
+			"Nick": player_data[player_id].Nick, 
+			"SP": player.get_position(),
+			"Score": player_data[player_id].Score,
+		})
+	return playerS_name
 
 func start_new_game():
 	var time_of_game_start = OS.get_ticks_msec() + NEW_BATTLE_START_WAITING
@@ -77,18 +92,6 @@ func start_new_game():
 	Transfer.send_new_battle(new_game_data)
 	print("[Main]: Time left for start new game: ", time_of_game_start - OS.get_ticks_msec())
 
-func get_playerS_data() -> Array:
-	var playerS = $Game/Players.get_children()
-	var playerS_name: Array = []
-	for player in playerS:
-		var player_id = int(player.name)
-		playerS_name.append({
-			"ID": player_id, 
-			"Nick": player_data[player_id].Nick, 
-			"SP": player.get_position(),
-			"Score": player_data[player_id].Score,
-		})
-	return playerS_name
 
 func get_playerS_corpses():
 	var playerS_corpses = $Game/Objects.get_children()

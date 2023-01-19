@@ -21,8 +21,8 @@ func send_new_battle(new_game_data):
 	rpc("recive_new_battle", new_game_data)
 #---- CORE GAME MECHANIC -----
 
-func send_player_destroyed(player_id, position, rotation, projectile_name):
-	rpc("recive_player_destroyed", player_id, position, rotation, projectile_name)
+func send_player_destroyed(player_id, position, rotation, slayer_id, projectile_name):
+	rpc("recive_player_destroyed", player_id, position, rotation, slayer_id, projectile_name)
 
 remote func recive_stance(player_stance: Dictionary):
 	var player_id = get_tree().get_rpc_sender_id()
@@ -38,9 +38,3 @@ remote func recive_shoot(player_stance: Dictionary, ammo_type: int):
 
 func send_shoot(player_id, bullet_data):
 	rpc("recive_shoot", player_id, bullet_data)
-	
-func send_score_update(player_id: String, new_score: int):
-	rpc("recive_score_update", player_id, new_score)
-
-
-

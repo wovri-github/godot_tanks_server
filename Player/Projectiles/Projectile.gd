@@ -1,7 +1,9 @@
 extends RigidBody2D
 class_name Projectile
 
-var player_path = NodePath("")
+var owner_id = NAN
+var is_frag_bomb_frag = false
+onready var main_n = $"/root/Main"
 
 
 # [info] Server doesn't have ammo_left property
@@ -14,9 +16,10 @@ func die():
 
 func _on_Projectile_body_entered(body):
 	if !body.is_in_group("Players"): return
-	var player = get_node_or_null(player_path)
-	if !(player == null):
-		player.score += 1
-		Transfer.send_score_update(player.name, player.score)
-	body.die(name)
+	if owner_id != int(body.name) and main_n.player_data.has(owner_id):
+		main_n.player_data[int(owner_id)].Score.Kills += 1
+	var _name = name
+	if is_frag_bomb_frag:
+		_name = null
+	body.die(_name, owner_id)
 	queue_free()

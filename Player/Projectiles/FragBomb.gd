@@ -16,6 +16,8 @@ func spawn_frag(rotation):
 	var velocity = Vector2.UP.rotated(rotation)
 	frag_inst.position = position + 1 * velocity # separate frags from each other
 	frag_inst.set_linear_velocity(velocity * FRAG_SPEED)
+	frag_inst.owner_id = owner_id
+	frag_inst.is_frag_bomb_frag = true
 	get_node("/root/Main/Game/Projectiles").add_child(frag_inst)
 	
 func explode():
