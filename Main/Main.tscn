@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Main/Main.gd" type="Script" id=1]
 [ext_resource path="res://Main/Game/Game.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Spectator/Spectator.tscn" type="PackedScene" id=3]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Node
@@ -37,6 +38,9 @@ autostart = true
 script = SubResource( 1 )
 
 [node name="Game" parent="." instance=ExtResource( 2 )]
+
+[node name="Spectator" parent="Game" instance=ExtResource( 3 )]
+position = Vector2( 572, 383 )
 
 [node name="Button" type="Button" parent="."]
 margin_left = 127.0

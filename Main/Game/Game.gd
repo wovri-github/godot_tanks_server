@@ -1,11 +1,12 @@
 extends Node2D
 
 var player_model = preload("res://Player/TankModel.tscn")
-enum AMMO_TYPES {BULLET, ROCKET, FRAG_BOMB}
+enum AMMO_TYPES {BULLET, ROCKET, FRAG_BOMB, LASER}
 var projectiles_modelS = {
 	AMMO_TYPES.BULLET: preload("res://Player/Projectiles/Bullet.tscn"),
 	AMMO_TYPES.ROCKET: preload("res://Player/Projectiles/Rocket.tscn"),
 	AMMO_TYPES.FRAG_BOMB: preload("res://Player/Projectiles/FragBomb.tscn"),
+	AMMO_TYPES.LASER: preload("res://Player/Projectiles/LaserBeam.tscn")
 }
 const BULLET_SPEED = 200
 
@@ -34,14 +35,18 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 		return null
 	player_n.special_ammo[ammo_type] -= 1
 	player_n.rotate_turret(turret_rotation)
-	var spawn_position = player_n.get_bullet_spawn()
+#	var spawn_position = player_n.get_bullet_spawn()
 	var bullet_inst = projectiles_modelS[ammo_type].instance()
-	var velocity = Vector2.UP.rotated(turret_rotation) * BULLET_SPEED
-	bullet_inst.position = spawn_position
-	bullet_inst.set_linear_velocity(velocity)
-	bullet_inst.owner_id = player_id
+#	var velocity = Vector2.UP.rotated(turret_rotation) * BULLET_SPEED
+#	bullet_inst.position = spawn_position
+#	bullet_inst.set_linear_velocity(velocity)
+#	bullet_inst.player_path = player_n.get_path()
+	var bullet_data : Dictionary = bullet_inst.setup(player_n)
 	$Projectiles.add_child(bullet_inst, true)
-	return {"Name": bullet_inst.name, "SP": spawn_position,"V": velocity, "AT": ammo_type}
+	bullet_data["Name"] = bullet_inst.name
+	bullet_data["AT"] = ammo_type
+	return bullet_data
+#	return {"Name": bullet_inst.name, "SP": spawn_position,"V": velocity, "AT": ammo_type}
 
 
 func _physics_process(delta):
