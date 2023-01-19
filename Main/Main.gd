@@ -131,9 +131,9 @@ func end_of_battle():
 	start_new_game()
 
 #--------Shoot----------
-func player_shoot(player_id, player_stance, ammo_type):
+func player_shoot(player_id, player_stance, ammo_slot):
 	game_n.update_player_position(player_id, player_stance)
-	var bullet_data = game_n.spawn_bullet(player_id, player_stance.TR, ammo_type)
+	var bullet_data = game_n.spawn_bullet(player_id, player_stance.TR, ammo_slot)
 	if bullet_data != null:
 		Transfer.send_shoot(player_id, bullet_data)
 

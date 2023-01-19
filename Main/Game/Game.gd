@@ -26,27 +26,26 @@ func despawn_player(player_id):
 func spawn_wall(object):
 	$Objects.call_deferred("add_child", object)
 
-func spawn_bullet(player_id, turret_rotation, ammo_type):
+func spawn_bullet(player_id, turret_rotation, ammo_slot):
 	if !is_player_alive(player_id):
 		return
 	var player_n = get_node("Players/" + str(player_id))
-	if player_n.special_ammo[ammo_type] == 0:
+	if player_n.special_ammo.size() <= ammo_slot:
 		print("[Game]: Player ", player_id, " want to shoot without ammo!")
 		return null
-	player_n.special_ammo[ammo_type] -= 1
+	
 	player_n.rotate_turret(turret_rotation)
-#	var spawn_position = player_n.get_bullet_spawn()
-	var bullet_inst = projectiles_modelS[ammo_type].instance()
-#	var velocity = Vector2.UP.rotated(turret_rotation) * BULLET_SPEED
-#	bullet_inst.position = spawn_position
-#	bullet_inst.set_linear_velocity(velocity)
-#	bullet_inst.player_path = player_n.get_path()
+	var bullet_inst = projectiles_modelS[player_n.special_ammo[ammo_slot].type].instance()
 	var bullet_data : Dictionary = bullet_inst.setup(player_n)
 	$Projectiles.add_child(bullet_inst, true)
 	bullet_data["Name"] = bullet_inst.name
-	bullet_data["AT"] = ammo_type
+	bullet_data["AT"] = player_n.special_ammo[ammo_slot].type
+	
+	player_n.special_ammo[ammo_slot].amount -= 1
+	if player_n.special_ammo[ammo_slot].amount == 0:
+		player_n.special_ammo.pop_at(ammo_slot)
+	
 	return bullet_data
-#	return {"Name": bullet_inst.name, "SP": spawn_position,"V": velocity, "AT": ammo_type}
 
 
 func _physics_process(delta):

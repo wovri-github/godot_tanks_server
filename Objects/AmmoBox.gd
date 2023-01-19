@@ -13,7 +13,7 @@ func set_type(_type):
 func _on_AmmoBox_body_entered(body):
 	if !body.is_in_group("Players"):
 		return
-	body.special_ammo[type] += 1
-	queue_free()
+	if body.pick_up_ammo_box(type):
+			queue_free()
 
 

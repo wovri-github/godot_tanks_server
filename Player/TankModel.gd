@@ -1,20 +1,27 @@
 extends KinematicBody2D
 
 const CORPSE_LIFE_TIME = 20
+const MAX_AMMO_TYPES = 3 # including default bullet
 
 onready var main_n = $"/root/Main"
 onready var game_n = $"/root/Main/Game"
 
-var special_ammo = {
-	Ammunition.TYPES.BULLET : INF,
-	Ammunition.TYPES.ROCKET : 0,
-	Ammunition.TYPES.FRAG_BOMB : 0,
-	Ammunition.TYPES.LASER: INF
-}
+var special_ammo = [
+	 {"type" : Ammunition.TYPES.BULLET, "amount" : INF}
+]
 var player_name = "Player" # defined when spawning
 
-
-	
+func pick_up_ammo_box(type):
+	var type_slot = {}
+	for slot in special_ammo.size():
+		type_slot[special_ammo[slot].type] = slot
+	if type_slot.has(type):
+		special_ammo[type_slot[type]].amount += 1
+		return true
+	elif special_ammo.size() < MAX_AMMO_TYPES:
+		special_ammo.push_back({"type" : int(type), "amount" : 1})
+		return true
+	return false
 
 func set_stance(_position, _rotation):
 	position = _position
@@ -22,9 +29,6 @@ func set_stance(_position, _rotation):
 
 func rotate_turret(turret_rotation):
 	$"%Turret".rotation = turret_rotation
-
-#func get_bullet_spawn() -> Vector2:
-#	return $"%BulletSpawn".get_global_position()
 
 func die(projectile_name, slayer_id):
 	var static_body2d = StaticBody2D.new()
