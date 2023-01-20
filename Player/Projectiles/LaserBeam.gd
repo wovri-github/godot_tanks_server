@@ -6,13 +6,15 @@ const MAX_WIDTH = 5
 
 onready var ray = $RayCast2D
 
-var player_path = NodePath("")
+var owner_id = NAN
 var point : Position2D = null
+
+onready var main_n = $"/root/Main"
 
 
 func setup(player : KinematicBody2D) -> Dictionary:
 	point = player.get_node("%LaserSpawn")
-	player_path = player.get_path()
+	owner_id = int(player.name)
 	return {"SP": point.global_position, "R": point.global_rotation}
 	
 func _ready():
@@ -41,11 +43,9 @@ func cast_laser():
 		add_point(to_local(ray.get_collision_point()))
 		
 		if collider.is_in_group("Players"):
-			var player = get_node_or_null(player_path)
-			if !(player == null):
-				player.score += 1
-				Transfer.send_score_update(player.name, player.score)
-			collider.die(name)
+			if owner_id != int(collider.name) and main_n.player_data.has(owner_id):
+				main_n.player_data[int(owner_id)].Score.Kills += 1
+			collider.die(null, owner_id) # name as null bcs we cant destroy it
 			break
 		
 		if collider.is_in_group("Corpse"):
