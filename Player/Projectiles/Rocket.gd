@@ -4,11 +4,11 @@ const SPEED = 200
 const FOLLOW_SPEED = 5
 
 var target : KinematicBody2D = null
-
+var started_targeting = false
 
 
 func _on_StartTargeting_timeout():
-	_set_target()
+	started_targeting = true
 	
 func _set_target():
 	var t = null
@@ -23,8 +23,11 @@ func _set_target():
 	target = t
 
 func _integrate_forces(_state):
-	if !target:
+	if !started_targeting:
 		rotation = linear_velocity.angle()
+		return
+	elif target == null or !is_instance_valid(target) or !target.is_in_group("Players"):
+		_set_target()
 		return
 	rotation = global_transform.origin.angle_to_point(target.global_transform.origin) + PI
 	linear_velocity = linear_velocity.linear_interpolate(\
