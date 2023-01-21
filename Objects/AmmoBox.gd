@@ -4,6 +4,9 @@ extends Area2D
 export(Ammunition.TYPES) var type = Ammunition.TYPES.ROCKET setget set_type
 onready var sprite = $"%TypeSprite"
 
+func _ready():
+	if !Engine.editor_hint:
+		sprite.texture = Ammunition.get_box_texture(type)
 
 func set_type(_type):
 	type = _type

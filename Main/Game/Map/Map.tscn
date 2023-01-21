@@ -1,18 +1,25 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://textures/square64.png" type="Texture" id=1]
 [ext_resource path="res://Main/Game/Map/Map.gd" type="Script" id=2]
-[ext_resource path="res://Objects/AmmoBox.tscn" type="PackedScene" id=3]
-[ext_resource path="res://textures/laser_box.png" type="Texture" id=4]
-[ext_resource path="res://Main/Game/Map/CreateMapCollision.gd" type="Script" id=5]
+[ext_resource path="res://textures/map_autotile.png" type="Texture" id=6]
+[ext_resource path="res://Main/Game/Map/GenerateMap.gd" type="Script" id=7]
 
-[sub_resource type="TileSet" id=1]
-0/name = "square64.png 0"
-0/texture = ExtResource( 1 )
+[sub_resource type="TileSet" id=2]
+0/name = "map_autotile.png 0"
+0/texture = ExtResource( 6 )
 0/tex_offset = Vector2( 0, 0 )
 0/modulate = Color( 1, 1, 1, 1 )
-0/region = Rect2( 0, 0, 64, 64 )
-0/tile_mode = 0
+0/region = Rect2( 0, 0, 512, 384 )
+0/tile_mode = 1
+0/autotile/bitmask_mode = 1
+0/autotile/bitmask_flags = [ Vector2( 0, 0 ), 432, Vector2( 0, 1 ), 438, Vector2( 0, 2 ), 54, Vector2( 0, 3 ), 48, Vector2( 0, 4 ), 182, Vector2( 0, 5 ), 434, Vector2( 1, 0 ), 504, Vector2( 1, 1 ), 511, Vector2( 1, 2 ), 63, Vector2( 1, 3 ), 56, Vector2( 1, 4 ), 155, Vector2( 1, 5 ), 218, Vector2( 2, 0 ), 216, Vector2( 2, 1 ), 219, Vector2( 2, 2 ), 27, Vector2( 2, 3 ), 24, Vector2( 2, 4 ), 127, Vector2( 2, 5 ), 505, Vector2( 3, 0 ), 144, Vector2( 3, 1 ), 146, Vector2( 3, 2 ), 18, Vector2( 3, 3 ), 16, Vector2( 3, 4 ), 319, Vector2( 3, 5 ), 508, Vector2( 4, 0 ), 255, Vector2( 4, 1 ), 507, Vector2( 4, 2 ), 176, Vector2( 4, 3 ), 50, Vector2( 4, 4 ), 443, Vector2( 4, 5 ), 254, Vector2( 5, 0 ), 447, Vector2( 5, 1 ), 510, Vector2( 5, 2 ), 152, Vector2( 5, 3 ), 26, Vector2( 5, 4 ), 442, Vector2( 5, 5 ), 190, Vector2( 6, 0 ), 506, Vector2( 6, 1 ), 446, Vector2( 6, 2 ), 184, Vector2( 6, 3 ), 58, Vector2( 6, 4 ), 250, Vector2( 6, 5 ), 187, Vector2( 7, 0 ), 191, Vector2( 7, 1 ), 251, Vector2( 7, 2 ), 178, Vector2( 7, 3 ), 154, Vector2( 7, 4 ), 186 ]
+0/autotile/icon_coordinate = Vector2( 3, 3 )
+0/autotile/tile_size = Vector2( 64, 64 )
+0/autotile/spacing = 0
+0/autotile/occluder_map = [  ]
+0/autotile/navpoly_map = [  ]
+0/autotile/priority_map = [  ]
+0/autotile/z_index_map = [  ]
 0/occluder_offset = Vector2( 0, 0 )
 0/navigation_offset = Vector2( 0, 0 )
 0/shape_offset = Vector2( 0, 0 )
@@ -27,44 +34,15 @@ script = ExtResource( 2 )
 
 [node name="TileMap" type="TileMap" parent="."]
 unique_name_in_owner = true
-tile_set = SubResource( 1 )
-collision_layer = 4
-collision_mask = 0
+scale = Vector2( 1.5, 1.5 )
+tile_set = SubResource( 2 )
 format = 1
-tile_data = PoolIntArray( 0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0, 6, 0, 0, 7, 0, 0, 8, 0, 0, 9, 0, 0, 10, 0, 0, 11, 0, 0, 12, 0, 0, 13, 0, 0, 14, 0, 0, 15, 0, 0, 16, 0, 0, 17, 0, 0, 65536, 0, 0, 65542, 0, 0, 65553, 0, 0, 131072, 0, 0, 131089, 0, 0, 196608, 0, 0, 196611, 0, 0, 196612, 0, 0, 196616, 0, 0, 196617, 0, 0, 196618, 0, 0, 196621, 0, 0, 196622, 0, 0, 196625, 0, 0, 262144, 0, 0, 262147, 0, 0, 262148, 0, 0, 262152, 0, 0, 262153, 0, 0, 262154, 0, 0, 262157, 0, 0, 262158, 0, 0, 262161, 0, 0, 327680, 0, 0, 327683, 0, 0, 327684, 0, 0, 327687, 0, 0, 327688, 0, 0, 327689, 0, 0, 327690, 0, 0, 327697, 0, 0, 393216, 0, 0, 393223, 0, 0, 393224, 0, 0, 393225, 0, 0, 393226, 0, 0, 393229, 0, 0, 393230, 0, 0, 393231, 0, 0, 393233, 0, 0, 458752, 0, 0, 458759, 0, 0, 458760, 0, 0, 458761, 0, 0, 458762, 0, 0, 458765, 0, 0, 458769, 0, 0, 524288, 0, 0, 524292, 0, 0, 524293, 0, 0, 524298, 0, 0, 524301, 0, 0, 524305, 0, 0, 589824, 0, 0, 589828, 0, 0, 589841, 0, 0, 655360, 0, 0, 655364, 0, 0, 655377, 0, 0, 720896, 0, 0, 720897, 0, 0, 720898, 0, 0, 720899, 0, 0, 720900, 0, 0, 720901, 0, 0, 720902, 0, 0, 720903, 0, 0, 720904, 0, 0, 720905, 0, 0, 720906, 0, 0, 720907, 0, 0, 720908, 0, 0, 720909, 0, 0, 720910, 0, 0, 720911, 0, 0, 720912, 0, 0, 720913, 0, 0 )
-script = ExtResource( 5 )
+script = ExtResource( 7 )
 
 [node name="StaticBody2D" type="StaticBody2D" parent="TileMap"]
-collision_layer = 4
-collision_mask = 0
 
 [node name="SpawnPoints" type="Node" parent="."]
 unique_name_in_owner = true
 
-[node name="SP1" type="Position2D" parent="SpawnPoints"]
-position = Vector2( 158, 616 )
-
-[node name="SP2" type="Position2D" parent="SpawnPoints"]
-position = Vector2( 487, 641 )
-
-[node name="SP3" type="Position2D" parent="SpawnPoints"]
-position = Vector2( 973, 524 )
-
-[node name="SP4" type="Position2D" parent="SpawnPoints"]
-position = Vector2( 1024, 112 )
-
 [node name="AmmoBoxes" type="Node" parent="."]
 unique_name_in_owner = true
-
-[node name="AmmoBox" parent="AmmoBoxes" instance=ExtResource( 3 )]
-position = Vector2( 415, 228 )
-type = 3
-
-[node name="TypeSprite" parent="AmmoBoxes/AmmoBox" index="2"]
-texture = ExtResource( 4 )
-
-[node name="AmmoBox2" parent="AmmoBoxes" instance=ExtResource( 3 )]
-position = Vector2( 767, 325 )
-
-[editable path="AmmoBoxes/AmmoBox"]
-[editable path="AmmoBoxes/AmmoBox2"]

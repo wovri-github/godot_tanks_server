@@ -28,6 +28,7 @@ func get_ammo_boxes():
 func get_map_data():
 	var map_data = {
 		"MapSet": tilemap_n.get_used_cells(),
-		"AB": get_ammo_boxes()
+		"AB": get_ammo_boxes(),
+		"Scale": tilemap_n.scale
 	}
 	return map_data
