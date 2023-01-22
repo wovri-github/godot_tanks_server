@@ -21,6 +21,9 @@ func send_new_battle(new_game_data):
 	rpc("recive_new_battle", new_game_data)
 #---- CORE GAME MECHANIC -----
 
+func send_new_battle_time(left_sec):
+	rpc("recive_new_battle_time", left_sec)
+
 func send_player_destroyed(player_id, position, rotation, slayer_id, projectile_name):
 	rpc("recive_player_destroyed", player_id, position, rotation, slayer_id, projectile_name)
 

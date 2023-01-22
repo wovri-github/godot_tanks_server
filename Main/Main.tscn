@@ -47,7 +47,6 @@ margin_bottom = 197.0
 text = "End of battle"
 
 [node name="EndOfBattle" type="Timer" parent="."]
-wait_time = 10.0
 one_shot = true
 
 [node name="Spectator" parent="." instance=ExtResource( 3 )]

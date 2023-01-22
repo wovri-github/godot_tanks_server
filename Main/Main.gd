@@ -59,11 +59,21 @@ func player_initiation(player_id: int, player_name : String):
 		"MapData": map_n.get_map_data(),
 	}
 	Transfer.send_init_data(player_id, init_data)
-#	battle_timer_logick()
+	battle_timer_logick(0)
 
 #[info] when somebody die or connect then calculate how many second left of battle
-#func battle_timer_logick():
-#	$EndOfBattle.start()
+func battle_timer_logick(substract_players):
+	#[info] it counts before player dies
+	var num_players_in_game = game_n.get_node("Players").get_child_count() - substract_players
+	var left_sec = num_players_in_game * 60
+	var actual_time = int($EndOfBattle.get_time_left())
+	print("[Main]: Battle time left: ", $EndOfBattle.get_time_left(), ", New time left: ", left_sec)
+	if actual_time > left_sec or actual_time == 0:
+		Transfer.send_new_battle_time(left_sec)
+		$EndOfBattle.start(left_sec)
+		if left_sec == 0:
+			$EndOfBattle.stop()
+			_on_EndOfBattle_timeout()
 
 func get_playerS_data() -> Array:
 	var playerS = $Game/Players.get_children()
@@ -112,16 +122,7 @@ func add_player_stance(player_id, player_stance):
 		player_stance.erase("T")
 		playerS_stance[player_id] = player_stance
 
-func dc(player_id):
-	#warning-ignore:return_value_discarded
-	playerS_stance.erase(player_id)
-	#warning-ignore:return_value_discarded
-	playerS_last_time.erase(player_id)
-	if get_tree().multiplayer.get_network_connected_peers().has(player_id):
-		network.disconnect_peer(player_id)
-
 func end_of_battle():
-#	processing_timer.stop()
 	game_n.queue_free()
 	yield(game_n, "tree_exited")
 	var game_inst = game_tscn.instance()
@@ -139,8 +140,10 @@ func player_shoot(player_id, player_stance, ammo_slot):
 
 
 func _on_Button_pressed():
+	$EndOfBattle.stop()
 	end_of_battle()
 
 
 func _on_EndOfBattle_timeout():
+	print("END OF BATTLE: ", OS.get_ticks_msec())
 	end_of_battle()
