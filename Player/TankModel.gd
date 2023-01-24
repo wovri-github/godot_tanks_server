@@ -45,5 +45,6 @@ func die(projectile_name, slayer_id):
 			int(name), static_body2d.position, static_body2d.rotation, slayer_id, projectile_name)
 	static_body2d.add_child($Hitbox.duplicate(true))
 	game_n.spawn_wall(static_body2d)
-	main_n.battle_timer_logick(1)
+	get_parent().remove_child(self)
+	main_n.battle_timer_logick()
 	queue_free()

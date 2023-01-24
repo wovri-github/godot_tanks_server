@@ -59,14 +59,15 @@ func player_initiation(player_id: int, player_name : String):
 		"MapData": map_n.get_map_data(),
 	}
 	Transfer.send_init_data(player_id, init_data)
-	battle_timer_logick(0)
+	battle_timer_logick()
 
 #[info] when somebody die or connect then calculate how many second left of battle
-func battle_timer_logick(substract_players):
-	#[info] it counts before player dies
-	var num_players_in_game = game_n.get_node("Players").get_child_count() - substract_players
+func battle_timer_logick():
+	var num_players_in_game = game_n.get_node("Players").get_child_count()
 	var left_sec = num_players_in_game * 60
 	var actual_time = int($EndOfBattle.get_time_left())
+	if num_players_in_game == 1:
+		left_sec = 7
 	print("[Main]: Battle time left: ", $EndOfBattle.get_time_left(), ", New time left: ", left_sec)
 	if actual_time > left_sec or actual_time == 0:
 		Transfer.send_new_battle_time(left_sec)
@@ -123,6 +124,10 @@ func add_player_stance(player_id, player_stance):
 		playerS_stance[player_id] = player_stance
 
 func end_of_battle():
+	var players_in_game = game_n.get_node("Players").get_children()
+	if players_in_game.size() == 1:
+		var player_id = int(players_in_game[0].name)
+		player_data[player_id].Score.Wins += 1
 	game_n.queue_free()
 	yield(game_n, "tree_exited")
 	var game_inst = game_tscn.instance()
