@@ -1,12 +1,13 @@
 extends Node2D
 
 var player_model = preload("res://Player/TankModel.tscn")
-enum AMMO_TYPES {BULLET, ROCKET, FRAG_BOMB, LASER}
+enum AMMO_TYPES {BULLET, ROCKET, FRAG_BOMB, LASER, LASER_BULLET}
 var projectiles_modelS = {
 	AMMO_TYPES.BULLET: preload("res://Player/Projectiles/Bullet.tscn"),
 	AMMO_TYPES.ROCKET: preload("res://Player/Projectiles/Rocket.tscn"),
 	AMMO_TYPES.FRAG_BOMB: preload("res://Player/Projectiles/FragBomb.tscn"),
-	AMMO_TYPES.LASER: preload("res://Player/Projectiles/LaserBeam.tscn")
+	AMMO_TYPES.LASER: preload("res://Player/Projectiles/LaserBeam.tscn"),
+	AMMO_TYPES.LASER_BULLET: preload("res://Player/Projectiles/LaserBullet.tscn")
 }
 const BULLET_SPEED = 200
 
