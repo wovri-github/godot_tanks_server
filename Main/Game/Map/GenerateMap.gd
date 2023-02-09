@@ -2,6 +2,7 @@ extends TileMap
 
 # ---- settings ----
 export(int, 0, 100) var MAX_PLAYERS = 16
+export(int, 0, 100) var PLAYER_SPAWN_MIN_DISTANCE = 2
 export(int, 0, 100) var START_AMMO_BOXES_AMOUNT = 32
 export(Vector2) var MAP_SIZE = Vector2(50, 30)
 export(float, 0, 1) var EMPTY_CELLS_DENSITY = 0.2
@@ -41,9 +42,9 @@ func _generate_map_shape():
 		rng.seed = GENERATOR_SEED
 	
 	var visited_cells = []
-	for y in range(1, MAP_SIZE.y + 1, 2):
+	for _y in range(1, MAP_SIZE.y + 1, 2):
 		var row = []
-		for x in range(1, MAP_SIZE.x + 1, 2):
+		for _x in range(1, MAP_SIZE.x + 1, 2):
 			row.push_back(false)
 		visited_cells.push_back(row)
 	for y in range(MAP_SIZE.y + 1):
@@ -198,34 +199,44 @@ func _generate_player_spawn_points_and_start_ammo_boxes():
 	var available_spots = []
 	for y in range(1, MAP_SIZE.y + 1, 2):
 		for x in range(1, MAP_SIZE.x + 1, 2):
-			available_spots.push_back(Vector2((x+0.5)*TILESIZE*scale.x,(y+0.5)*TILESIZE*scale.y))
-			
+			available_spots.push_back(Vector2(x, y))
+	
 	_generate_player_spawn_points(available_spots)
 	_generate_start_ammo_boxes(available_spots)
+		
 	
 func _generate_player_spawn_points(available_spots):
-	for p in range(MAX_PLAYERS):
+	for _p in range(MAX_PLAYERS):
 		if available_spots.empty():
+			print("Not enough space for player spawns!")
 			break
 		var index = rng.randi_range(0, available_spots.size() - 1)
-		var pos = available_spots.pop_at(index)
+		var tile_pos = available_spots.pop_at(index)
+		
+		for y in range(2 * PLAYER_SPAWN_MIN_DISTANCE + 1):
+			for x in range(2 * PLAYER_SPAWN_MIN_DISTANCE + 1):
+				available_spots.erase(Vector2(tile_pos.x - (PLAYER_SPAWN_MIN_DISTANCE - x) * 2, tile_pos.y - (PLAYER_SPAWN_MIN_DISTANCE - y) * 2))
+		
+		var pos = Vector2((tile_pos.x+0.5)*TILESIZE*scale.x,(tile_pos.y+0.5)*TILESIZE*scale.y)
 		
 		var new_spawn_point = Position2D.new()
 		new_spawn_point.position = pos
 		new_spawn_point.name = "SP"
 		spawn_points_n.add_child(new_spawn_point, true)
-		
+
 		var player_spawn_marker = player_spawn_marker_tscn.instance()
 		player_spawn_marker.position = pos
 		player_spawn_marker.name = "SP"
 		get_parent().call_deferred("add_child", player_spawn_marker, true)
 		
 func _generate_start_ammo_boxes(available_spots):
-	for b in range(START_AMMO_BOXES_AMOUNT):
+	for _b in range(START_AMMO_BOXES_AMOUNT):
 		if available_spots.empty():
+			print("Not enough space for default ammo boxes!")
 			break
 		var index = rng.randi_range(0, available_spots.size() - 1)
-		var pos = available_spots.pop_at(index)
+		var tile_pos = available_spots.pop_at(index)
+		var pos = Vector2((tile_pos.x+0.5)*TILESIZE*scale.x,(tile_pos.y+0.5)*TILESIZE*scale.y)
 		
 		var ammo_box = ammo_box_tscn.instance()
 		ammo_box.position = pos
