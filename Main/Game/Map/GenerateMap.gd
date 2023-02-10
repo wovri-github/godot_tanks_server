@@ -29,6 +29,8 @@ onready var ammo_boxes_n = $"%AmmoBoxes"
 var rng = RandomNumberGenerator.new()
 
 func _ready():
+	MAP_SIZE.x += int(MAP_SIZE.x) % 2
+	MAP_SIZE.y += int(MAP_SIZE.y) % 2
 	_generate_map_shape()
 	_generate_collision_shape()
 	_generate_player_spawn_points_and_start_ammo_boxes()
