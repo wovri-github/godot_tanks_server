@@ -40,4 +40,7 @@ remote func recive_shoot(player_stance: Dictionary, ammo_slot: int):
 	main_n.player_shoot(player_id, player_stance, ammo_slot)
 
 func send_shoot(player_id, bullet_data):
-	rpc("recive_shoot", player_id, bullet_data)
+	rpc("recive_shoot", player_id, bullet_data, OS.get_ticks_msec())
+
+func send_shoot_bounce_state(bulletS_state, time):
+	rpc_unreliable("recive_shoot_bounce_state", bulletS_state, time)

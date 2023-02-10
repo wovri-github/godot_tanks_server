@@ -9,6 +9,7 @@ var network = NetworkedMultiplayerENet.new()
 
 var playerS_last_time: Dictionary
 var playerS_stance: Dictionary
+var bulletS_stance: Array
 var player_data: Dictionary
 var game_tscn = preload("res://Main/Game/Game.tscn")
 
@@ -123,6 +124,14 @@ func add_player_stance(player_id, player_stance):
 		player_stance.erase("T")
 		playerS_stance[player_id] = player_stance
 
+func add_bullet_stance(bullet_stance):
+	bulletS_stance.append(bullet_stance)
+	#[info] When two bullets collide its better to send it in one file
+	yield(get_tree(), "idle_frame")
+	if bulletS_stance.empty() == false:
+		Transfer.send_shoot_bounce_state(bulletS_stance, OS.get_ticks_msec())
+		bulletS_stance.clear()
+
 func end_of_battle():
 	var players_in_game = game_n.get_node("Players").get_children()
 	if players_in_game.size() == 1:
@@ -138,6 +147,7 @@ func end_of_battle():
 
 #--------Shoot----------
 func player_shoot(player_id, player_stance, ammo_slot):
+	yield(get_tree().create_timer(0), "timeout")
 	game_n.update_player_position(player_id, player_stance)
 	var bullet_data = game_n.spawn_bullet(player_id, player_stance.TR, ammo_slot)
 	if bullet_data != null:

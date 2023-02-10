@@ -3,7 +3,7 @@ extends TileMap
 # ---- settings ----
 export(int, 0, 100) var MAX_PLAYERS = 16
 export(int, 0, 100) var START_AMMO_BOXES_AMOUNT = 32
-export(Vector2) var MAP_SIZE = Vector2(50, 30)
+export(Vector2) var MAP_SIZE = Vector2(20, 18)
 export(float, 0, 1) var EMPTY_CELLS_DENSITY = 0.2
 export(float, 0, 1) var EMPTY_RECT_DENSITY = 0.03
 export(Vector2) var EMPTY_RECT_MIN_SIZE = Vector2(2,2)

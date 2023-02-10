@@ -18,7 +18,6 @@ func stop_timer():
 
 
 func _on_Processing_timer_timeout():
-	# [improve] Make time running according to game state (Playing/ waiting)
 	var playerS_stance = get_parent().playerS_stance
 	if playerS_stance.empty() == true:
 		return

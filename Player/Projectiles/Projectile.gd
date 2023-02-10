@@ -2,8 +2,11 @@ extends RigidBody2D
 class_name Projectile
 
 const BULLET_SPEED = 200
+#Base name
+const BASE_NAME = "Bullet"
 var owner_id = NAN
 var is_frag_bomb_frag = false
+var position_1 = position
 onready var main_n = $"/root/Main"
 
 
@@ -15,16 +18,27 @@ func setup(player : KinematicBody2D) -> Dictionary:
 	position = point.global_position
 	var velocity = Vector2.UP.rotated(point.global_rotation) * BULLET_SPEED
 	set_linear_velocity(velocity)
-	return {"SP": position,"V": velocity}
+#	print("[Bullet", name, "]: 'Beginning' Pos ", position, " | Time: ", OS.get_ticks_msec())
+	return {"SP": position, "V": velocity}
 
 func _on_LifeTime_timeout():
 	die()
 
 func die():
+	print("[Bullet", name, "]: Pos ", position, " | Time: ", OS.get_ticks_msec())
 	queue_free()
 
 func _on_Projectile_body_entered(body):
-	if !body.is_in_group("Players"): 
+#	print("Position: ", position, "| Time: ", OS.get_ticks_msec())
+	if !body.is_in_group("Players"):
+		if is_frag_bomb_frag:
+			return
+		var bullet_stance = {
+			"Name": name, 
+			"Pos": get_position(), 
+			"LV": get_linear_velocity(),
+		}
+		main_n.add_bullet_stance(bullet_stance)
 		return
 	if owner_id != int(body.name) and main_n.player_data.has(owner_id):
 		main_n.player_data[int(owner_id)].Score.Kills += 1

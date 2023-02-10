@@ -28,23 +28,22 @@ func spawn_wall(object):
 
 func spawn_bullet(player_id, turret_rotation, ammo_slot):
 	if !is_player_alive(player_id):
-		return
+		return null
 	var player_n = get_node("Players/" + str(player_id))
 	if player_n.special_ammo.size() <= ammo_slot:
 		print("[Game]: Player ", player_id, " want to shoot without ammo!")
 		return null
-	
 	player_n.rotate_turret(turret_rotation)
 	var bullet_inst = projectiles_modelS[player_n.special_ammo[ammo_slot].type].instance()
 	var bullet_data : Dictionary = bullet_inst.setup(player_n)
-	$Projectiles.add_child(bullet_inst, true)
 	bullet_data["Name"] = bullet_inst.name
 	bullet_data["AT"] = player_n.special_ammo[ammo_slot].type
-	
+	bullet_data["ST"] = OS.get_ticks_msec() #Spawn Time
 	player_n.special_ammo[ammo_slot].amount -= 1
 	if player_n.special_ammo[ammo_slot].amount == 0:
 		player_n.special_ammo.pop_at(ammo_slot)
 	
+	$Projectiles.add_child(bullet_inst, true)
 	return bullet_data
 
 
