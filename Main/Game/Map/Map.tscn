@@ -38,6 +38,9 @@ scale = Vector2( 1.5, 1.5 )
 tile_set = SubResource( 2 )
 format = 1
 script = ExtResource( 7 )
+MAX_PLAYERS = 4
+START_AMMO_BOXES_AMOUNT = 0
+MAP_SIZE = Vector2( 15, 15 )
 
 [node name="StaticBody2D" type="StaticBody2D" parent="TileMap"]
 

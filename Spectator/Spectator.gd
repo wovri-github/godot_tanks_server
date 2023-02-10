@@ -2,13 +2,17 @@ extends Camera2D
 
 const ZOOM_SPEED = 0.3
 const MOVE_SPEED = 50
+const MAX_ZOOM_IN = Vector2(0.1, 0.1)
 
 var following = false
 
 func zoom_point(zoom_diff, mouse_position):
 	var viewport_size = get_viewport().size
 	var previous_zoom = zoom
-	zoom += zoom_diff
+	if (zoom + zoom_diff) < MAX_ZOOM_IN:
+		zoom = MAX_ZOOM_IN
+	else:
+		zoom = zoom + zoom_diff
 	position += ((viewport_size * 0.5) - mouse_position) * (zoom - previous_zoom)
 
 func _unhandled_input(event):
