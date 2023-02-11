@@ -27,8 +27,9 @@ func despawn_player(player_id):
 	var player_path: String = "Players/" + str(player_id)
 	get_node(player_path).queue_free()
 
-func spawn_wall(object):
-	$Objects.call_deferred("add_child", object)
+func spawn_wall(corpse_inst):
+	$Objects.call_deferred("add_child", corpse_inst)
+#	$Objects.add_child(corpse_inst, true)
 
 func spawn_bullet(player_id, turret_rotation, ammo_slot):
 	if !is_player_alive(player_id):

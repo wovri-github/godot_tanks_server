@@ -1,7 +1,7 @@
 extends KinematicBody2D
 
-const CORPSE_LIFE_TIME = 20
 const MAX_AMMO_TYPES = 3 # including default bullet
+const CORPSE_TSCN = preload("res://Player/Corpse.tscn")
 
 onready var main_n = $"/root/Main"
 onready var game_n = $"/root/Main/Game"
@@ -32,20 +32,15 @@ func rotate_turret(turret_rotation):
 	$"%Turret".rotation = turret_rotation
 
 func die(projectile_name, slayer_id): #TODO
-	var static_body2d = StaticBody2D.new()
-	static_body2d.name = name
-	static_body2d.position = get_global_position()
-	static_body2d.rotation = $Hitbox.get_global_rotation()
-	static_body2d.add_to_group("Corpse")
-	var lifeTime = Timer.new()
-	lifeTime.wait_time = CORPSE_LIFE_TIME
-	lifeTime.autostart = true
-	static_body2d.add_child(lifeTime)
-	lifeTime.connect("timeout",static_body2d,"queue_free")
-	Transfer.send_player_destroyed(\
-			int(name), static_body2d.position, static_body2d.rotation, slayer_id, projectile_name)
-	static_body2d.add_child($Hitbox.duplicate(true))
-	game_n.spawn_wall(static_body2d)
+	var corpse_inst = CORPSE_TSCN.instance()
+	var corps_data = {
+		"Name": int(name),
+		"Position": get_global_position(),
+		"Rotation": $Hitbox.get_global_rotation()
+	}
+	corpse_inst.setup(corps_data)
+	game_n.spawn_wall(corpse_inst)
+	Transfer.send_player_destroyed(corps_data, slayer_id, projectile_name)
 	get_parent().remove_child(self)
 	battle_timer_n.calculate_time()
 	queue_free()
