@@ -9,17 +9,18 @@ var network = NetworkedMultiplayerENet.new()
 
 var playerS_last_time: Dictionary
 var playerS_stance: Dictionary
-var bulletS_stance: Array
+var bulletS_stance_on_collision: Array
 var player_data: Dictionary
 var game_tscn = preload("res://Main/Game/Game.tscn")
 
 onready var processing_timer = $Processing_timer
-onready var game_n = $Game
-onready var map_n = game_n.get_node("Map")
+onready var battle_timer_n = $BattleTimer
+onready var game_n = get_node(Dir.GAME)
+onready var map_n = get_node(Dir.MAP)
 
 
 
-func _ready() -> void:
+func _enter_tree() -> void:
 	_start_server()
 	network.connect("peer_connected", self, "_peer_conected")
 	network.connect("peer_disconnected", self, "_peer_disconnected")
@@ -39,9 +40,10 @@ func _peer_disconnected(player_id) -> void:
 	if player_n:
 		player_n.die(null, null)
 
+func _ready():
+	battle_timer_n._ready()
 
 
-#--------Stance--------
 func player_initiation(player_id: int, player_name : String):
 	player_data[player_id] = {
 		"ID": player_id,
@@ -60,22 +62,7 @@ func player_initiation(player_id: int, player_name : String):
 		"MapData": map_n.get_map_data(),
 	}
 	Transfer.send_init_data(player_id, init_data)
-	battle_timer_logick()
-
-#[info] when somebody die or connect then calculate how many second left of battle
-func battle_timer_logick():
-	var num_players_in_game = game_n.get_node("Players").get_child_count()
-	var left_sec = num_players_in_game * 60
-	var actual_time = int($EndOfBattle.get_time_left())
-	if num_players_in_game == 1:
-		left_sec = 7
-	print("[Main]: Battle time left: ", $EndOfBattle.get_time_left(), ", New time left: ", left_sec)
-	if actual_time > left_sec or actual_time == 0:
-		Transfer.send_new_battle_time(left_sec)
-		$EndOfBattle.start(left_sec)
-		if left_sec == 0:
-			$EndOfBattle.stop()
-			_on_EndOfBattle_timeout()
+	battle_timer_n.calculate_time()
 
 func get_playerS_data() -> Array:
 	var playerS = $Game/Players.get_children()
@@ -89,6 +76,21 @@ func get_playerS_data() -> Array:
 			"Score": player_data[player_id].Score,
 		})
 	return playerS_name
+
+func get_playerS_corpses():
+	var playerS_corpses = $Game/Objects.get_children()
+	var playerS_corpses_dict: Array = []
+	for player_corpse in playerS_corpses:
+		playerS_corpses_dict.append({
+			"Name": player_corpse.name,
+			"P": player_corpse.get_global_position(),
+			"R": player_corpse.get_global_rotation(),
+		})
+	return playerS_corpses_dict
+
+
+func battle_timer_logick():
+	print("Moved")
 
 func start_new_game():
 	var time_of_game_start = OS.get_ticks_msec() + NEW_BATTLE_START_WAITING
@@ -104,48 +106,26 @@ func start_new_game():
 	Transfer.send_new_battle(new_game_data)
 	print("[Main]: Time left for start new game: ", time_of_game_start - OS.get_ticks_msec())
 
-
-func get_playerS_corpses():
-	var playerS_corpses = $Game/Objects.get_children()
-	var playerS_corpses_dict: Array = []
-	for player_corpse in playerS_corpses:
-		playerS_corpses_dict.append({
-			"Name": player_corpse.name,
-			"P": player_corpse.get_global_position(),
-			"R": player_corpse.get_global_rotation(),
-		})
-	return playerS_corpses_dict
-
-func add_player_stance(player_id, player_stance):
-	# This number [T] IS ONLY for making chronology. Don't use it
-	# [improve] How to drop data when player_id is not in playerS_last_time???
-	if playerS_last_time[player_id] < player_stance["T"]: 
-		playerS_last_time[player_id] = player_stance["T"]
-		player_stance.erase("T")
-		playerS_stance[player_id] = player_stance
-
-func add_bullet_stance(bullet_stance):
-	bulletS_stance.append(bullet_stance)
-	#[info] When two bullets collide its better to send it in one file
-	yield(get_tree(), "idle_frame")
-	if bulletS_stance.empty() == false:
-		Transfer.send_shoot_bounce_state(bulletS_stance, OS.get_ticks_msec())
-		bulletS_stance.clear()
-
 func end_of_battle():
 	var players_in_game = game_n.get_node("Players").get_children()
 	if players_in_game.size() == 1:
 		var player_id = int(players_in_game[0].name)
 		player_data[player_id].Score.Wins += 1
 	game_n.queue_free()
-	yield(game_n, "tree_exited")
 	var game_inst = game_tscn.instance()
-	add_child(game_inst)
-	game_n = get_node(Dir.GAME)
-	map_n = get_node(Dir.MAP)
+	yield(game_n, "tree_exited")
+	add_child(game_inst, true)
+	_ready()
 	start_new_game()
 
-#--------Shoot----------
+
+func add_player_stance(player_id, player_stance):
+	# [info] This number [T] IS ONLY for making chronology. Don't use it
+	if playerS_last_time[player_id] < player_stance["T"]: 
+		playerS_last_time[player_id] = player_stance["T"]
+		player_stance.erase("T")
+		playerS_stance[player_id] = player_stance
+
 func player_shoot(player_id, player_stance, ammo_slot):
 	yield(get_tree().create_timer(0), "timeout")
 	game_n.update_player_position(player_id, player_stance)
@@ -153,12 +133,16 @@ func player_shoot(player_id, player_stance, ammo_slot):
 	if bullet_data != null:
 		Transfer.send_shoot(player_id, bullet_data)
 
+func add_bullet_stance_on_collision(bullet_stance_on_collision):
+	bulletS_stance_on_collision.append(bullet_stance_on_collision)
+	#[info] When two bullets collide its better to send it in one file
+	yield(get_tree(), "idle_frame")
+	if bulletS_stance_on_collision.empty() == false:
+		Transfer.send_shoot_bounce_state(bulletS_stance_on_collision, OS.get_ticks_msec())
+		bulletS_stance_on_collision.clear()
+
 
 func _on_Button_pressed():
-	$EndOfBattle.stop()
-	end_of_battle()
-
-
-func _on_EndOfBattle_timeout():
-	print("END OF BATTLE: ", OS.get_ticks_msec())
+	# [info] only for testing purposes
+	$BattleTimer.stop()
 	end_of_battle()

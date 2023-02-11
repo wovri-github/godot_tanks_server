@@ -5,6 +5,7 @@ const MAX_AMMO_TYPES = 3 # including default bullet
 
 onready var main_n = $"/root/Main"
 onready var game_n = $"/root/Main/Game"
+onready var battle_timer_n = get_node("/root/Main/BattleTimer")
 
 var special_ammo = [
 	 {"type" : Ammunition.TYPES.BULLET, "amount" : INF}
@@ -30,7 +31,7 @@ func set_stance(_position, _rotation):
 func rotate_turret(turret_rotation):
 	$"%Turret".rotation = turret_rotation
 
-func die(projectile_name, slayer_id):
+func die(projectile_name, slayer_id): #TODO
 	var static_body2d = StaticBody2D.new()
 	static_body2d.name = name
 	static_body2d.position = get_global_position()
@@ -46,5 +47,5 @@ func die(projectile_name, slayer_id):
 	static_body2d.add_child($Hitbox.duplicate(true))
 	game_n.spawn_wall(static_body2d)
 	get_parent().remove_child(self)
-	main_n.battle_timer_logick()
+	battle_timer_n.calculate_time()
 	queue_free()

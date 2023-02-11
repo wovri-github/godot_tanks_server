@@ -12,6 +12,8 @@ var projectiles_modelS = {
 }
 const BULLET_SPEED = 200
 
+
+
 func spawn_player(player_id, spawn_point):
 	var player_inst = player_model.instance()
 	player_inst.name = str(player_id)

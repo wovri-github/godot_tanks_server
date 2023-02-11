@@ -17,7 +17,7 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "Dir",
 "language": "GDScript",
-"path": "res://Singletons/Paths.gd"
+"path": "res://Singletons/Dir.gd"
 }, {
 "base": "RigidBody2D",
 "class": "Projectile",
