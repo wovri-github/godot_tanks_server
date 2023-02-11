@@ -29,7 +29,6 @@ func despawn_player(player_id):
 
 func spawn_wall(corpse_inst):
 	$Objects.call_deferred("add_child", corpse_inst)
-#	$Objects.add_child(corpse_inst, true)
 
 func spawn_bullet(player_id, turret_rotation, ammo_slot):
 	if !is_player_alive(player_id):

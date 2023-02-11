@@ -6,9 +6,9 @@ onready var life_timer_n = $LifeTimer
 
 
 func setup(data):
-	name = str(data.Name)
-	set_position(data.Position)
-	set_rotation(data.Rotation)
+	name = str(data.ID)
+	set_position(data.Pos)
+	set_rotation(data.Rot)
 
 func _ready():
 	life_timer_n.start(CORPSE_LIFE_TIME)

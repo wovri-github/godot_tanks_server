@@ -1,7 +1,7 @@
 extends KinematicBody2D
 
 const MAX_AMMO_TYPES = 3 # including default bullet
-const CORPSE_TSCN = preload("res://Player/Corpse.tscn")
+const CORPSE_TSCN = preload("res://Objects/Corpse.tscn")
 
 onready var main_n = $"/root/Main"
 onready var game_n = $"/root/Main/Game"
@@ -33,14 +33,14 @@ func rotate_turret(turret_rotation):
 
 func die(projectile_name, slayer_id): #TODO
 	var corpse_inst = CORPSE_TSCN.instance()
-	var corps_data = {
-		"Name": int(name),
-		"Position": get_global_position(),
-		"Rotation": $Hitbox.get_global_rotation()
+	var corpse_data = {
+		"ID": int(name),
+		"Pos": get_global_position(),
+		"Rot": $Hitbox.get_global_rotation()
 	}
-	corpse_inst.setup(corps_data)
+	corpse_inst.setup(corpse_data)
 	game_n.spawn_wall(corpse_inst)
-	Transfer.send_player_destroyed(corps_data, slayer_id, projectile_name)
+	Transfer.send_player_destroyed(corpse_data, slayer_id, projectile_name)
 	get_parent().remove_child(self)
 	battle_timer_n.calculate_time()
 	queue_free()

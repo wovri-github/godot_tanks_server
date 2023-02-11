@@ -82,9 +82,9 @@ func get_playerS_corpses():
 	var playerS_corpses_dict: Array = []
 	for player_corpse in playerS_corpses:
 		playerS_corpses_dict.append({
-			"Name": player_corpse.name,
-			"P": player_corpse.get_global_position(),
-			"R": player_corpse.get_global_rotation(),
+			"ID": int(player_corpse.name),
+			"Pos": player_corpse.get_global_position(),
+			"Rot": player_corpse.get_global_rotation(),
 		})
 	return playerS_corpses_dict
 
