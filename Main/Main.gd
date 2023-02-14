@@ -46,13 +46,13 @@ func _ready():
 
 func player_initiation(player_id: int, player_name : String):
 	player_data[player_id] = {
-		"ID": player_id,
-		"Nick": player_name,
-		"Score": {
-			"Wins": 0,
-			"Kills": 0,
-		},
-		"SP": -1,
+			"ID": player_id,
+			"Nick": player_name,
+			"Score": {
+				"Wins": 0,
+				"Kills": 0,
+			},
+			"SP": -1,
 	}
 	playerS_last_time[player_id] = -INF
 	var spawn_point = map_n.get_spawn_position()
@@ -62,7 +62,7 @@ func player_initiation(player_id: int, player_name : String):
 		"MapData": map_n.get_map_data(),
 	}
 	Transfer.send_init_data(player_id, init_data)
-	battle_timer_n.calculate_time()
+	battle_timer_n.start_battle_timer()
 
 func get_playerS_data() -> Array:
 	var playerS = $Game/Players.get_children()

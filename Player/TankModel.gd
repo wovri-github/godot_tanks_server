@@ -42,5 +42,5 @@ func die(projectile_name, slayer_id): #TODO
 	game_n.spawn_wall(corpse_inst)
 	Transfer.send_player_destroyed(corpse_data, slayer_id, projectile_name)
 	get_parent().remove_child(self)
-	battle_timer_n.calculate_time()
+	battle_timer_n.start_battle_timer()
 	queue_free()
