@@ -39,13 +39,6 @@ script = SubResource( 1 )
 
 [node name="Game" parent="." instance=ExtResource( 2 )]
 
-[node name="Button" type="Button" parent="."]
-margin_left = 127.0
-margin_top = 144.0
-margin_right = 259.0
-margin_bottom = 197.0
-text = "End of battle"
-
 [node name="BattleTimer" type="Timer" parent="."]
 one_shot = true
 script = ExtResource( 4 )
@@ -53,6 +46,13 @@ script = ExtResource( 4 )
 [node name="Spectator" parent="." instance=ExtResource( 3 )]
 position = Vector2( 572, 383 )
 
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Button" type="Button" parent="CanvasLayer"]
+margin_right = 119.0
+margin_bottom = 33.0
+text = "End of battle"
+
 [connection signal="timeout" from="Processing_timer" to="Stance_process" method="_on_Processing_timer_timeout"]
-[connection signal="pressed" from="Button" to="." method="_on_Button_pressed"]
 [connection signal="timeout" from="BattleTimer" to="BattleTimer" method="_on_BattleTimer_timeout"]
+[connection signal="pressed" from="CanvasLayer/Button" to="." method="_on_Button_pressed"]

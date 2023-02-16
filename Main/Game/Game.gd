@@ -51,7 +51,7 @@ func spawn_bullet(player_id, turret_rotation, ammo_slot):
 	return bullet_data
 
 
-func _physics_process(delta):
+func _physics_process(_delta):
 	var playerS_stance = get_parent().playerS_stance
 	if playerS_stance.empty() == true:
 		return

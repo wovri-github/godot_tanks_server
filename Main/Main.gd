@@ -35,7 +35,7 @@ func _peer_conected(player_id) -> void:
 
 func _peer_disconnected(player_id) -> void:
 	print("[Main]: Player " + str(player_id) + " disconnected")
-	player_data.erase(player_id)
+	var _err = player_data.erase(player_id)
 	var player_n = get_node_or_null("/root/Main/Game/Players/" + str(player_id))
 	if player_n:
 		player_n.die(null, null)

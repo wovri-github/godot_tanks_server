@@ -83,7 +83,6 @@ func _ready():
 
 func set_values_logick():
 	MAX_PLAYERS = get_node("/root/Main").player_data.size()
-	MAX_PLAYERS = 16
 	define_map_size()
 	define_removing_cell()
 
@@ -92,12 +91,11 @@ func define_map_size():
 	if MAX_PLAYERS < 4:
 		side = 9 + repetition
 	else:
-		side = floor(sqrt(MAX_PLAYERS-1) * 6) + repetition
+		side = floor(1.3*MAX_PLAYERS + 3) + repetition
 	MAP_SIZE = Vector2(side, side)
 	MAP_SIZE += Vector2(rng.randi_range(0, min(MAX_PLAYERS, 10)), rng.randi_range(0, min(MAX_PLAYERS, 10)))
 	MAP_SIZE.x += int(MAP_SIZE.x) % 2
 	MAP_SIZE.y += int(MAP_SIZE.y) % 2
-	print(MAP_SIZE, "Rep: ", repetition)
 
 func define_removing_cell():
 	EMPTY_CELLS_DENSITY = 0.02 * MAX_PLAYERS
@@ -142,9 +140,9 @@ func _remove_long_walls():
 
 func create_matrix(rows, cols):
 	var matrix = []
-	for i in range(rows):
+	for _i in range(rows):
 		var row = []
-		for j in range(cols):
+		for _j in range(cols):
 			row.append(0)
 		matrix.append(row)
 	return matrix
@@ -156,12 +154,12 @@ func fill_matrix_inner_wall(matrix, positions: Array, rows, cols):
 
 func look_for_complex_walls(_matrix, rows, cols) -> Array:
 	var matrix = _matrix.duplicate(true)
-	var complexes: Array
-	var check_positions: Array
+	var complexes: Array = []
+	var check_positions: Array = []
 	for y in range(rows):
 		for x in range(cols):
 			if matrix[y][x] == 1:
-				var positions_vector: PoolVector2Array
+				var positions_vector: PoolVector2Array = []
 				check_positions.append(Vector2(y, x))
 				while check_positions.empty() == false:
 					var pos = check_positions.pop_front()
@@ -182,7 +180,7 @@ func destroy_complex(matrix, complex: PoolVector2Array):
 	var size = complex.size()
 	var number_of_cuts = size / MAX_WALL_LENGTH
 	var step_size = size / (number_of_cuts+1)
-	var middle_indexes: Array
+	var middle_indexes: Array = []
 	for i in range(number_of_cuts):
 		i += 1
 		middle_indexes.append(round(step_size * i))
@@ -397,7 +395,6 @@ func _generate_start_ammo_boxes(available_spots):
 	while available_spots.empty() == false:
 		var index = rng.randi_range(0, available_spots.size() - 1)
 		var tile_pos = available_spots.pop_at(index)
-		var pos = Vector2((tile_pos.x+0.5)*TILESIZE*scale.x,(tile_pos.y+0.5)*TILESIZE*scale.y)
 		set_cellv(tile_pos, 2)
 		remove_avilable_places_until_wall(tile_pos, available_spots, INF)
 		remove_avilable_places_in_range(tile_pos, available_spots)
