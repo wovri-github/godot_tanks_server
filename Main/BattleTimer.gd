@@ -5,7 +5,7 @@ onready var game_n = $"../Game"
 
 
 
-func start_battle_timer():
+func check_battle_timer():
 	var left_sec = calculate_time()
 	if left_sec == -1:
 		return
@@ -18,11 +18,10 @@ func calculate_time() -> int:
 	var actual_time = int(get_time_left())
 	if num_players_in_game == 1:
 		left_sec = 7
-	if actual_time < left_sec:
+	if actual_time < left_sec && !is_stopped():
 		return -1
 	return left_sec
 
 
 func _on_BattleTimer_timeout():
-	print(1)
 	get_parent().end_of_battle()

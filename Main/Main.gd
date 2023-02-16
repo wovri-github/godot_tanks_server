@@ -55,14 +55,13 @@ func player_initiation(player_id: int, player_name : String):
 			"SP": -1,
 	}
 	playerS_last_time[player_id] = -INF
-	var spawn_point = map_n.get_spawn_position()
 	var init_data = {
-		"PlayerSTemplateData": get_playerS_data(),
+		"PlayerSData": get_playerS_data(),
 		"PlayerSCorpses": get_playerS_corpses(),
 		"MapData": map_n.get_map_data(),
 	}
 	Transfer.send_init_data(player_id, init_data)
-	battle_timer_n.start_battle_timer()
+	battle_timer_n.check_battle_timer()
 
 func get_playerS_data() -> Array:
 	var playerS = $Game/Players.get_children()
@@ -88,11 +87,8 @@ func get_playerS_corpses():
 		})
 	return playerS_corpses_dict
 
-
-func battle_timer_logick():
-	print("Moved")
-
 func start_new_game():
+	_ready()
 	var time_of_game_start = OS.get_ticks_msec() + NEW_BATTLE_START_WAITING
 	for player_id in player_data.keys():
 		var spawn_point = map_n.get_spawn_position()
@@ -104,18 +100,20 @@ func start_new_game():
 		"TimeOfNewGame": time_of_game_start,
 	}
 	Transfer.send_new_battle(new_game_data)
+	network.set_refuse_new_connections(false)
 	print("[Main]: Time left for start new game: ", time_of_game_start - OS.get_ticks_msec())
 
 func end_of_battle():
+	network.set_refuse_new_connections(true)
 	var players_in_game = game_n.get_node("Players").get_children()
 	if players_in_game.size() == 1:
 		var player_id = int(players_in_game[0].name)
 		player_data[player_id].Score.Wins += 1
 	game_n.queue_free()
 	var game_inst = game_tscn.instance()
+#	game_inst.get_node("Map").connect("map_created", self, "start_new_game")
 	yield(game_n, "tree_exited")
 	add_child(game_inst, true)
-	_ready()
 	start_new_game()
 
 

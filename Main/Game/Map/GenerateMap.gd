@@ -1,17 +1,22 @@
 extends TileMap
+# [INFORMATION]:
+# This node contains only possible places for objects.
+# Object existance should be in other place.
+# Only walls could be generated there!
+
 
 # ---- settings ----
 export(int, 0, 100) var MAX_PLAYERS = 16
 export(int, 0, 100) var PLAYER_SPAWN_MIN_DISTANCE = 2
-export(int, 0, 100) var START_AMMO_BOXES_AMOUNT = 32
+export(int, 0, 100) var AMMOBOX_MIN_DISTANCE = 1
 export(Vector2) var MAP_SIZE = Vector2(50, 30)
 export(float, 0, 1) var EMPTY_CELLS_DENSITY = 0.2
 export(float, 0, 1) var EMPTY_RECT_DENSITY = 0.03
 export(Vector2) var EMPTY_RECT_MIN_SIZE = Vector2(2,2)
 export(Vector2) var EMPTY_RECT_MAX_SIZE = Vector2(4,4)
+export(int, 0, 100) var MAX_WALL_LENGTH = 9
 export(int) var GENERATOR_SEED = 0
 # ------------------
-
 enum TURN{FOWARD, LEFT, BACKWARD, RIGHT, FULL}
 var TILESIZE = cell_size.x # tiles must be square!!!
 const SEQUENCE = [\
@@ -20,29 +25,89 @@ const SEQUENCE = [\
 		TURN.RIGHT,\
 		TURN.BACKWARD]
 var collision_points = []
-
-const player_spawn_marker_tscn = preload("res://Main/Game/Map/PlayerSpawnMarker.tscn")
-const ammo_box_tscn = preload("res://Objects/AmmoBox.tscn")
-onready var spawn_points_n = $"%SpawnPoints"
-onready var ammo_boxes_n = $"%AmmoBoxes"
-
 var rng = RandomNumberGenerator.new()
+#---
+const TILE_TYPE = MapGlobal.TILE_TYPE
+const SIMPLE_DIRECTION = [
+	Vector2.UP, 
+	Vector2.RIGHT,
+	Vector2.DOWN,
+	Vector2.LEFT,
+]
+const DIRECTIONS: Array = [
+	Vector2.UP, 
+	Vector2.UP + Vector2.RIGHT,
+	Vector2.RIGHT,
+	Vector2.DOWN + Vector2.RIGHT,
+	Vector2.DOWN,
+	Vector2.DOWN + Vector2.LEFT,
+	Vector2.LEFT,
+	Vector2.UP + Vector2.LEFT
+]
+var points: Dictionary setget set_points
+var enough_players = false
+var repetition = 0
+
+
+
+func set_points(tile_type):
+	points[tile_type] = get_used_cells_by_id(tile_type)
+	
+
+func get_random_point(tile_type):
+	var pointS = points[tile_type]
+	var pos = rng.randi_range(0, pointS.size()-1)
+	var glob_pos = map_to_world(pointS.pop_at(pos)) + Vector2(TILESIZE * 0.5, TILESIZE * 0.5)
+	return glob_pos
+
 
 func _ready():
-	MAP_SIZE.x += int(MAP_SIZE.x) % 2
-	MAP_SIZE.y += int(MAP_SIZE.y) % 2
-	_generate_map_shape()
-	_generate_collision_shape()
-	_generate_player_spawn_points_and_start_ammo_boxes()
-
-# ---- generate shape of the map ----
-
-func _generate_map_shape():
 	if !GENERATOR_SEED:
 		rng.randomize()
 	else:
 		rng.seed = GENERATOR_SEED
+	set_values_logick()
+	_generate_map_shape()
+	_generate_player_spawn_points_and_start_ammo_boxes()
+	if enough_players == false:
+		repetition += 1
+		clear()
+		_ready()
+		return
+	_generate_collision_shape()
+	for tile_type in TILE_TYPE.values():
+		if tile_type == TILE_TYPE.WALL:
+			continue
+		set_points(tile_type)
+
+
+func set_values_logick():
+	MAX_PLAYERS = get_node("/root/Main").player_data.size()
+	MAX_PLAYERS = 16
+	define_map_size()
+	define_removing_cell()
+
+func define_map_size():
+	var side
+	if MAX_PLAYERS < 4:
+		side = 9 + repetition
+	else:
+		side = floor(sqrt(MAX_PLAYERS-1) * 6) + repetition
+	MAP_SIZE = Vector2(side, side)
+	MAP_SIZE += Vector2(rng.randi_range(0, min(MAX_PLAYERS, 10)), rng.randi_range(0, min(MAX_PLAYERS, 10)))
+	MAP_SIZE.x += int(MAP_SIZE.x) % 2
+	MAP_SIZE.y += int(MAP_SIZE.y) % 2
+	print(MAP_SIZE, "Rep: ", repetition)
+
+func define_removing_cell():
+	EMPTY_CELLS_DENSITY = 0.02 * MAX_PLAYERS
+	EMPTY_RECT_DENSITY = 0.003 * MAX_PLAYERS
+	EMPTY_RECT_MIN_SIZE = Vector2(2, 2)
+	EMPTY_RECT_MAX_SIZE = Vector2(int(MAP_SIZE.x/10 + 3),  int(MAP_SIZE.y/10 + 3))
 	
+# ---- generate shape of the map ----
+
+func _generate_map_shape():
 	var visited_cells = []
 	for _y in range(1, MAP_SIZE.y + 1, 2):
 		var row = []
@@ -53,13 +118,87 @@ func _generate_map_shape():
 		for x in range(MAP_SIZE.x + 1):
 			if x * y % 2 == 0:
 				set_cell(x,y,0)
-				
 	_generate_maze(visited_cells)
 	_generate_empty_rects(visited_cells)
 	_generate_empty_cells(visited_cells)
-	
+	for _i in range(10):
+		if !_remove_long_walls():
+			break
 	update_bitmask_region(Vector2.ZERO, MAP_SIZE)
-	
+
+func _remove_long_walls():
+	var check_again: bool = false
+	var rect = get_used_rect()
+	var rows = rect.size.y
+	var cols = rect.size.x
+	var matrix = create_matrix(rows, cols)
+	fill_matrix_inner_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL), rows, cols)
+	var complexs = look_for_complex_walls(matrix, rows, cols)
+	for complex in complexs:
+		if complex.size() > MAX_WALL_LENGTH:
+			check_again = true
+			destroy_complex(matrix, complex)
+	return check_again
+
+func create_matrix(rows, cols):
+	var matrix = []
+	for i in range(rows):
+		var row = []
+		for j in range(cols):
+			row.append(0)
+		matrix.append(row)
+	return matrix
+
+func fill_matrix_inner_wall(matrix, positions: Array, rows, cols):
+	for pos in positions:
+		if pos.x != 0 and pos.y != 0 and pos.y != rows - 1 and pos.x != cols - 1:
+			matrix[pos.y][pos.x] = 1
+
+func look_for_complex_walls(_matrix, rows, cols) -> Array:
+	var matrix = _matrix.duplicate(true)
+	var complexes: Array
+	var check_positions: Array
+	for y in range(rows):
+		for x in range(cols):
+			if matrix[y][x] == 1:
+				var positions_vector: PoolVector2Array
+				check_positions.append(Vector2(y, x))
+				while check_positions.empty() == false:
+					var pos = check_positions.pop_front()
+					positions_vector.append(pos)
+					hunt_element(matrix, pos, check_positions)
+				complexes.append(positions_vector)
+	return complexes
+
+func hunt_element(matrix, pos, check_positions):
+	matrix[pos.x][pos.y] = 0
+	for dir in DIRECTIONS:
+		var new_pos = pos + dir
+		if matrix[new_pos.x][new_pos.y] == 1:
+			if !check_positions.has(new_pos):
+				check_positions.append(new_pos)
+
+func destroy_complex(matrix, complex: PoolVector2Array):
+	var size = complex.size()
+	var number_of_cuts = size / MAX_WALL_LENGTH
+	var step_size = size / (number_of_cuts+1)
+	var middle_indexes: Array
+	for i in range(number_of_cuts):
+		i += 1
+		middle_indexes.append(round(step_size * i))
+	find_cut_position(matrix, complex, middle_indexes)
+
+func find_cut_position(matrix, complex, middle_indexes):
+	for index in middle_indexes:
+		var cut_proposition = complex[index]
+		set_cell(cut_proposition.y, cut_proposition.x, -1)
+		for dir in SIMPLE_DIRECTION:
+			var second_cut_position = cut_proposition + dir
+			if matrix[second_cut_position.x][second_cut_position.y] == 1:
+				break
+				set_cell(cut_proposition.y, cut_proposition.x, -1)
+
+
 func _generate_empty_rects(visited_cells : Array):
 	for row in visited_cells.size():
 		for col in visited_cells[0].size():
@@ -118,21 +257,6 @@ func _generate_maze(visited_cells : Array):
 			stack.push_back(chosen_cell)
 			
 # ---- generate collision shapes ----
-
-func _matrix_map(map, up_left_corners, rect):
-	for y in range(rect.position.y, rect.end.y):
-		var row = []
-		for x in range(rect.position.x, rect.end.x):
-			row.push_back(get_cell(x,y)+1)
-			if y <= 0 or x <= 0:
-				continue
-			if row[-1] == 1 and get_cell(x,y-1)+1 == 0 and get_cell(x-1,y)+1 == 0:
-				up_left_corners.push_back(Vector2(x,y))
-		map.push_back(row)
-	# [info] make first block as 0 and put nextone as corner
-	map[0][0] = 0
-	up_left_corners.push_back(Vector2(1,0))
-
 func _turn(current_pos: Vector2, step):
 	for _i in range(step):
 		current_pos = current_pos.tangent()
@@ -174,21 +298,42 @@ func step(map, last_direction, current_field, corners, pointer):
 	corners.push_back(pointer)
 	return []
 
+func fill_matrix_wall(matrix, positions: Array):
+	for pos in positions:
+		var x = pos.y
+		var y = pos.x
+		matrix[x][y] = 1
+	matrix[0][0] = 0
+
+func find_up_left_corners(matrix, rows, cols, up_left_corners):
+	up_left_corners.push_back(Vector2(1,0))
+	for y in rows:
+		for x in cols:
+			if matrix[y][x] == 1:
+				if x <= 0 or y <= 0:
+					continue
+				if get_cell(x,y-1) != TILE_TYPE.WALL and get_cell(x-1,y) != TILE_TYPE.WALL:
+					up_left_corners.push_back(Vector2(x,y))
+	
+
 func _generate_collision_shape():
-	var map = []
 	var up_left_corners = []
 	var rect = get_used_rect()
-	_matrix_map(map, up_left_corners, rect)
+	var rows = rect.size.y
+	var cols = rect.size.x
+	var matrix2 = create_matrix(rows, cols)
+	fill_matrix_wall(matrix2, get_used_cells_by_id(TILE_TYPE.WALL))
+	find_up_left_corners(matrix2, rows, cols, up_left_corners)
 	while !up_left_corners.empty():
 		var current_tile = up_left_corners.pop_front()
-		if map[current_tile.y][current_tile.x] != 1:
+		if matrix2[current_tile.y][current_tile.x] != 1:
 			continue
 		var corners = []
 		var last_direction = Vector2.RIGHT
 		var pointer = (current_tile + rect.position) * TILESIZE
-		var varibles = step(map, last_direction, current_tile, corners, pointer)
+		var varibles = step(matrix2, last_direction, current_tile, corners, pointer)
 		while !varibles.empty():
-			varibles = step(map, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
+			varibles = step(matrix2, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
 		corners.pop_back()
 		var pool = PoolVector2Array(corners)
 		var poly = CollisionPolygon2D.new()
@@ -198,51 +343,61 @@ func _generate_collision_shape():
 
 # ---- generate player spawn points and start ammo boxes----
 func _generate_player_spawn_points_and_start_ammo_boxes():
+	var available_spots = find_available_spots()
+	var available_ammo_boxes = available_spots
+	var available_spawn_points = available_spots.duplicate(true)
+	enough_players = _generate_player_spawn_points(available_spawn_points, available_ammo_boxes)
+	_generate_start_ammo_boxes(available_ammo_boxes)
+
+func find_available_spots() -> Array:
 	var available_spots = []
 	for y in range(1, MAP_SIZE.y + 1, 2):
 		for x in range(1, MAP_SIZE.x + 1, 2):
 			available_spots.push_back(Vector2(x, y))
-	
-	_generate_player_spawn_points(available_spots)
-	_generate_start_ammo_boxes(available_spots)
-		
-	
-func _generate_player_spawn_points(available_spots):
-	for _p in range(MAX_PLAYERS):
-		if available_spots.empty():
-			print("Not enough space for player spawns!")
-			break
-		var index = rng.randi_range(0, available_spots.size() - 1)
-		var tile_pos = available_spots.pop_at(index)
-		
-		for y in range(2 * PLAYER_SPAWN_MIN_DISTANCE + 1):
-			for x in range(2 * PLAYER_SPAWN_MIN_DISTANCE + 1):
-				available_spots.erase(Vector2(tile_pos.x - (PLAYER_SPAWN_MIN_DISTANCE - x) * 2, tile_pos.y - (PLAYER_SPAWN_MIN_DISTANCE - y) * 2))
-		
-		var pos = Vector2((tile_pos.x+0.5)*TILESIZE*scale.x,(tile_pos.y+0.5)*TILESIZE*scale.y)
-		
-		var new_spawn_point = Position2D.new()
-		new_spawn_point.position = pos
-		new_spawn_point.name = "SP"
-		spawn_points_n.add_child(new_spawn_point, true)
+	return available_spots
 
-		var player_spawn_marker = player_spawn_marker_tscn.instance()
-		player_spawn_marker.position = pos
-		player_spawn_marker.name = "SP"
-		get_parent().call_deferred("add_child", player_spawn_marker, true)
-		
+func _generate_player_spawn_points(available_spawn_points, available_ammo_boxes: Array) -> bool:
+	for _i in range(MAX_PLAYERS):
+		if available_spawn_points.empty():
+			return false
+		var index
+		var tile_pos
+		index = rng.randi_range(0, available_spawn_points.size() - 1)
+		tile_pos = available_spawn_points.pop_at(index)
+		available_ammo_boxes.erase(tile_pos)
+		set_cellv(tile_pos, TILE_TYPE.SPAWN)
+		remove_avilable_places_until_wall(tile_pos, available_spawn_points, INF)
+		remove_avilable_places_in_range(tile_pos, available_spawn_points)
+		remove_avilable_places_until_wall(tile_pos, available_ammo_boxes, AMMOBOX_MIN_DISTANCE * 2)
+	return true
+
+# -----------------
+# And should not be able to see directly (without wall between) each other
+func remove_avilable_places_until_wall(tile_pos, available_spots, distance_to_run):
+	for direction in DIRECTIONS:
+		var dynamic_distance_to_run = distance_to_run
+		var dynamic_tile_pos = tile_pos
+		while dynamic_distance_to_run:
+			dynamic_distance_to_run -= 1
+			dynamic_tile_pos += direction
+			var cell = get_cellv(dynamic_tile_pos)
+			if cell == TILE_TYPE.WALL:
+				break
+			available_spots.erase(dynamic_tile_pos)
+
+# Logick is that player should not be next to each other
+func remove_avilable_places_in_range(tile_pos, available_spots):
+	var min_distance_vector = Vector2(PLAYER_SPAWN_MIN_DISTANCE, PLAYER_SPAWN_MIN_DISTANCE)
+	for y in range(2 * PLAYER_SPAWN_MIN_DISTANCE + 1):
+		for x in range(2 * PLAYER_SPAWN_MIN_DISTANCE + 1):
+			var vector = Vector2(x, y)
+			available_spots.erase(tile_pos - (min_distance_vector - vector) * 2)
+
 func _generate_start_ammo_boxes(available_spots):
-	for _b in range(START_AMMO_BOXES_AMOUNT):
-		if available_spots.empty():
-			print("Not enough space for default ammo boxes!")
-			break
+	while available_spots.empty() == false:
 		var index = rng.randi_range(0, available_spots.size() - 1)
 		var tile_pos = available_spots.pop_at(index)
 		var pos = Vector2((tile_pos.x+0.5)*TILESIZE*scale.x,(tile_pos.y+0.5)*TILESIZE*scale.y)
-		
-		var ammo_box = ammo_box_tscn.instance()
-		ammo_box.position = pos
-		ammo_boxes_n.add_child(ammo_box, true)
-		ammo_box.set_type(rng.randi_range(1, Ammunition.TYPES.size()-1))
-		
-		
+		set_cellv(tile_pos, 2)
+		remove_avilable_places_until_wall(tile_pos, available_spots, INF)
+		remove_avilable_places_in_range(tile_pos, available_spots)

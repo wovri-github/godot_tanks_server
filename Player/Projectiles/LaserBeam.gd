@@ -30,7 +30,7 @@ func cast_laser():
 	ray.cast_to = Vector2.UP.rotated(point.global_rotation) * length_left
 	ray.force_raycast_update()
 	
-	for i in range(MAX_BOUNCES):	# limit bounces
+	for _i in range(MAX_BOUNCES):	# limit bounces
 		
 		if !ray.is_colliding():
 			add_point(ray.cast_to + ray.position)
