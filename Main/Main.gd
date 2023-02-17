@@ -41,6 +41,7 @@ func _peer_disconnected(player_id) -> void:
 	if player_n:
 		player_n.die(null, null)
 
+
 func _ready():
 	battle_timer_n._ready()
 

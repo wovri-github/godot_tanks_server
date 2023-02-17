@@ -1,6 +1,6 @@
 extends StaticBody2D
 
-const CORPSE_LIFE_TIME = 20
+var s = Settings.TANK
 onready var life_timer_n = $LifeTimer
 
 
@@ -11,7 +11,7 @@ func setup(data):
 	set_rotation(data.Rot)
 
 func _ready():
-	life_timer_n.start(CORPSE_LIFE_TIME)
+	life_timer_n.start(s.CORPSE_LIFE_TIME)
 
 func _on_LifeTimer_timeout():
 	queue_free()
