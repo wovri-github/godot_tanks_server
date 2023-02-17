@@ -15,7 +15,6 @@ func check_battle_timer():
 		set_paused(false)
 		start(left_sec)
 	else:
-		print(get_time_left())
 		set_paused(true)
 		Transfer.send_new_battle_time(INF)
 
@@ -24,8 +23,6 @@ func calculate_time(num_players_in_game) -> int:
 	var actual_time = int(get_time_left())
 	if num_players_in_game == 1:
 		left_sec = 7
-	print(is_stopped())
-	print(actual_time, " vs ", left_sec)
 	if actual_time <= left_sec && !is_stopped():
 		set_paused(false)
 		return -1
