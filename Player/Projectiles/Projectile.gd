@@ -43,5 +43,4 @@ func _on_LifeTime_timeout():
 	die()
 
 func die():
-	print("[Bullet", name, "]: Pos ", position, " | Time: ", OS.get_ticks_msec())
 	queue_free()

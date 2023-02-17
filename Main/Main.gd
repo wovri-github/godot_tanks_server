@@ -34,6 +34,7 @@ func _peer_conected(player_id) -> void:
 	print("[Main]: Player " + str(player_id) + " connected")
 
 func _peer_disconnected(player_id) -> void:
+	battle_timer_n.check_battle_timer()
 	print("[Main]: Player " + str(player_id) + " disconnected")
 	var _err = player_data.erase(player_id)
 	var player_n = get_node_or_null("/root/Main/Game/Players/" + str(player_id))
@@ -107,24 +108,23 @@ func begin_battle():
 	print("[Main]: Battle has begun")
 	get_tree().set_pause(false)
 	processing_timer.start_timer()
-	network.set_refuse_new_connections(false)
+#	network.set_refuse_new_connections(false)
 
 func end_of_battle():
 	print("[Main]: End of battle")
 	processing_timer.stop_timer()
-	network.set_refuse_new_connections(true)
+#	network.set_refuse_new_connections(true)
 	var players_in_game = game_n.get_node("Players").get_children()
 	if players_in_game.size() == 1:
 		var player_id = int(players_in_game[0].name)
 		player_data[player_id].Score.Wins += 1
 	game_n.queue_free()
 	var game_inst = game_tscn.instance()
-#	game_inst.set_physics_process(false)
 	yield(game_n, "tree_exited")
+	playerS_stance.clear()
 	add_child(game_inst, true)
 	get_tree().set_pause(true)
 	start_new_game()
-
 
 func add_player_stance(player_id, player_stance):
 	if !get_tree().is_paused(): 

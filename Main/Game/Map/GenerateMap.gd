@@ -6,16 +6,22 @@ extends TileMap
 
 
 # ---- settings ----
-export(int, 0, 100) var MAX_PLAYERS = 16
+#export(int, 0, 100) var MAX_PLAYERS = 16
+#export(Vector2) var MAP_SIZE = Vector2(50, 30)
+#export(float, 0, 1) var EMPTY_CELLS_DENSITY = 0.2
+#export(float, 0, 1) var EMPTY_RECT_DENSITY = 0.03
+#export(Vector2) var EMPTY_RECT_MIN_SIZE = Vector2(2,2)
+#export(Vector2) var EMPTY_RECT_MAX_SIZE = Vector2(4,4)
 export(int, 0, 100) var PLAYER_SPAWN_MIN_DISTANCE = 2
 export(int, 0, 100) var AMMOBOX_MIN_DISTANCE = 1
-export(Vector2) var MAP_SIZE = Vector2(50, 30)
-export(float, 0, 1) var EMPTY_CELLS_DENSITY = 0.2
-export(float, 0, 1) var EMPTY_RECT_DENSITY = 0.03
-export(Vector2) var EMPTY_RECT_MIN_SIZE = Vector2(2,2)
-export(Vector2) var EMPTY_RECT_MAX_SIZE = Vector2(4,4)
 export(int, 0, 100) var MAX_WALL_LENGTH = 9
 export(int) var GENERATOR_SEED = 0
+var MAX_PLAYERS
+var MAP_SIZE
+var EMPTY_CELLS_DENSITY
+var EMPTY_RECT_DENSITY
+var EMPTY_RECT_MIN_SIZE
+var EMPTY_RECT_MAX_SIZE 
 # ------------------
 enum TURN{FOWARD, LEFT, BACKWARD, RIGHT, FULL}
 var TILESIZE = cell_size.x # tiles must be square!!!
