@@ -3,7 +3,7 @@ extends Node
 const DEFALUT_PORT = 42521
 const MAX_CLIENTS = 16
 
-const NEW_BATTLE_START_WAITING = 5000 # ms
+const NEW_BATTLE_START_WAITING = 500 # ms
 
 var network = NetworkedMultiplayerENet.new()
 
@@ -34,12 +34,12 @@ func _peer_conected(player_id) -> void:
 	print("[Main]: Player " + str(player_id) + " connected")
 
 func _peer_disconnected(player_id) -> void:
-	battle_timer_n.check_battle_timer()
 	print("[Main]: Player " + str(player_id) + " disconnected")
 	var _err = player_data.erase(player_id)
 	var player_n = get_node_or_null("/root/Main/Game/Players/" + str(player_id))
 	if player_n:
 		player_n.die(null, null)
+	battle_timer_n.check_battle_timer()
 
 
 func _ready():
@@ -54,13 +54,14 @@ func player_initiation(player_id: int, player_name : String):
 				"Wins": 0,
 				"Kills": 0,
 			},
-			"SP": -1,
+			"SP": null,
 	}
 	playerS_last_time[player_id] = -INF
 	var init_data = {
 		"PlayerSData": get_playerS_data(),
 		"PlayerSCorpses": get_playerS_corpses(),
 		"MapData": map_n.get_map_data(),
+		"TimeLeft": int(battle_timer_n.get_time_left())
 	}
 	Transfer.send_init_data(player_id, init_data)
 	battle_timer_n.check_battle_timer()
@@ -68,14 +69,10 @@ func player_initiation(player_id: int, player_name : String):
 func get_playerS_data() -> Array:
 	var playerS = $Game/Players.get_children()
 	var playerS_name: Array = []
-	for player in playerS:
-		var player_id = int(player.name)
-		playerS_name.append({
-			"ID": player_id, 
-			"Nick": player_data[player_id].Nick, 
-			"SP": player.get_position(),
-			"Score": player_data[player_id].Score,
-		})
+	for player in player_data.values():
+		if player.SP == null:
+			continue
+		playerS_name.append(player)
 	return playerS_name
 
 func get_playerS_corpses():
@@ -130,18 +127,20 @@ func end_of_battle():
 func add_player_stance(player_id, player_stance):
 	if !get_tree().is_paused(): 
 		# [info] This number [T] IS ONLY for making chronology. Don't use it
-		if playerS_last_time[player_id] < player_stance["T"]: 
+		if playerS_last_time[player_id] < player_stance["T"] && \
+				$Game/Players.has_node(str(player_id)): 
 			playerS_last_time[player_id] = player_stance["T"]
 			player_stance.erase("T")
+			player_stance.ID = player_id
 			playerS_stance[player_id] = player_stance
 
-func player_shoot(player_id, player_stance, ammo_slot):
+func player_shoot(player_stance, ammo_slot):
 	if !get_tree().is_paused(): 
 		yield(get_tree().create_timer(0), "timeout")
-		game_n.update_player_position(player_id, player_stance)
-		var bullet_data = game_n.spawn_bullet(player_id, player_stance.TR, ammo_slot)
+		game_n.update_player_position(player_stance)
+		var bullet_data = game_n.spawn_bullet(player_stance.ID, player_stance.TR, ammo_slot)
 		if bullet_data != null:
-			Transfer.send_shoot(player_id, bullet_data)
+			Transfer.send_shoot(player_stance.ID, bullet_data)
 
 func add_bullet_stance_on_collision(bullet_stance_on_collision):
 	bulletS_stance_on_collision.append(bullet_stance_on_collision)

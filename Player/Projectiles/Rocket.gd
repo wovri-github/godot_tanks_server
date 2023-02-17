@@ -11,7 +11,7 @@ func _on_StartTargeting_timeout():
 
 func _integrate_forces(_state):
 	if !started_targeting:
-		rotation = linear_velocity.angle()
+#		rotation = linear_velocity.angle()
 		return
 	elif target == null or !is_instance_valid(target) or !target.is_in_group("Players"):
 		_set_target()

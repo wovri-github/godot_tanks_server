@@ -37,7 +37,8 @@ func send_world_stance(time, playerS_stance):
 remote func recive_shoot(player_stance: Dictionary, ammo_slot: int): 
 	# [improve] Make ammo_type as server authorytative
 	var player_id = get_tree().get_rpc_sender_id()
-	main_n.player_shoot(player_id, player_stance, ammo_slot)
+	player_stance.ID = player_id
+	main_n.player_shoot(player_stance, ammo_slot)
 
 func send_shoot(player_id, bullet_data):
 	rpc("recive_shoot", player_id, bullet_data, OS.get_ticks_msec())

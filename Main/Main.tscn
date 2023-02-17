@@ -9,6 +9,9 @@
 script/source = "extends Node
 
 var player_hp = {}
+onready var world_stance = {
+	\"PlayersStance\": get_parent().playerS_stance,
+}
 
 func start_timer():
 	$Processing_timer.start()
@@ -19,12 +22,14 @@ func stop_timer():
 
 
 func _on_Processing_timer_timeout():
-	var playerS_stance = get_parent().playerS_stance
-	if playerS_stance.empty() == true:
+#	var world_stance: Dictionary 
+#	world_stance[\"Players\"] = get_parent().playerS_stance
+#	world_stance[\"Rockets\"] = get_parent().rocketS_stance
+	if world_stance.empty() == true:
 		return
 	# Verification
 	# Anti-cheate
-	Transfer.send_world_stance(OS.get_ticks_msec(), playerS_stance)
+	Transfer.send_world_stance(OS.get_ticks_msec(), world_stance)
 "
 
 [node name="Main" type="Node"]

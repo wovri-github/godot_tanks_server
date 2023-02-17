@@ -51,17 +51,17 @@ func spawn_bullet(player_id, turret_rotation, ammo_slot):
 
 
 func _physics_process(_delta):
-	var playerS_stance = get_parent().playerS_stance
-	if playerS_stance.empty() == true:
+	var players_stance = get_parent().playerS_stance
+	if players_stance.empty() == true:
 		return
-	for player_id in playerS_stance:
-		update_player_position(player_id, playerS_stance[player_id])
+	for player_stance in players_stance.values():
+		update_player_position(player_stance)
 
-func update_player_position(player_id, player_stance):
-	if !is_player_alive(player_id):
+func update_player_position(player_stance):
+	if !is_player_alive(player_stance.ID):
 		return
-	get_node("Players/" + str(player_id)).call_deferred(\
-			"set_stance",player_stance.P, player_stance.R)
+	get_node("Players/" + str(player_stance.ID)).call_deferred(\
+			"set_stance", player_stance.P, player_stance.R)
 
 
 #---------Verification----------

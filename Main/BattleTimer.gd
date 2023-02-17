@@ -7,16 +7,18 @@ onready var game_n = $"../Game"
 
 func check_battle_timer():
 	var num_players_in_game = game_n.get_node("Players").get_child_count()
+	print(get_tree().multiplayer.get_network_connected_peers().size(), " vs ", num_players_in_game)
 	if get_tree().multiplayer.get_network_connected_peers().size() != num_players_in_game:
 		var left_sec = calculate_time(num_players_in_game)
-		Transfer.send_new_battle_time(left_sec)
+		if num_players_in_game == 0:
+			left_sec = 0
 		if left_sec == -1:
 			return
-		set_paused(false)
+		Transfer.send_new_battle_time(left_sec)
 		start(left_sec)
 	else:
-		set_paused(true)
 		Transfer.send_new_battle_time(INF)
+		stop()
 
 func calculate_time(num_players_in_game) -> int:
 	var left_sec = num_players_in_game * SECONDS_PER_PLAYER
@@ -24,7 +26,6 @@ func calculate_time(num_players_in_game) -> int:
 	if num_players_in_game == 1:
 		left_sec = 7
 	if actual_time <= left_sec && !is_stopped():
-		set_paused(false)
 		return -1
 	return left_sec
 

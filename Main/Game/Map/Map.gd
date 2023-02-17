@@ -27,9 +27,9 @@ func spawn_ammo_boxes():
 		var global_position = tilemap_n.get_random_point(TYPE.AMMO)
 		var ammo_box = ammo_box_tscn.instance()
 		ammo_box.position = global_position
-		ammo_box.set_type(rng.randi_range(1, Ammunition.TYPES.size()-1))
+#		ammo_box.set_type(rng.randi_range(1, Ammunition.TYPES.size()-1))
 		#test
-#		ammo_box.set_type(1)
+		ammo_box.set_type(1)
 		ammo_boxes_n.add_child(ammo_box, true)
 
 func get_spawn_position() -> Vector2:
