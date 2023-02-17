@@ -46,7 +46,6 @@ func spawn_bullet(player_id, turret_rotation, ammo_slot):
 	player_n.special_ammo[ammo_slot].amount -= 1
 	if player_n.special_ammo[ammo_slot].amount == 0:
 		player_n.special_ammo.pop_at(ammo_slot)
-	
 	$Projectiles.add_child(bullet_inst, true)
 	return bullet_data
 

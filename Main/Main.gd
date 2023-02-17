@@ -13,7 +13,7 @@ var bulletS_stance_on_collision: Array
 var player_data: Dictionary
 var game_tscn = preload("res://Main/Game/Game.tscn")
 
-onready var processing_timer = $Processing_timer
+onready var processing_timer = $Stance_process
 onready var battle_timer_n = $BattleTimer
 onready var game_n = get_node(Dir.GAME)
 onready var map_n = get_node(Dir.MAP)
@@ -97,13 +97,21 @@ func start_new_game():
 	var new_game_data = {
 		"PlayerSData": player_data,
 		"MapData": map_n.get_map_data(),
-		"TimeOfNewGame": time_of_game_start,
+		"TimeToStartNewGame": time_of_game_start,
 	}
 	Transfer.send_new_battle(new_game_data)
+	yield(get_tree().create_timer((time_of_game_start - OS.get_ticks_msec()) * 0.001),"timeout")
+	begin_battle()
+
+func begin_battle():
+	print("[Main]: Battle has begun")
+	get_tree().set_pause(false)
+	processing_timer.start_timer()
 	network.set_refuse_new_connections(false)
-	print("[Main]: Time left for start new game: ", time_of_game_start - OS.get_ticks_msec())
 
 func end_of_battle():
+	print("[Main]: End of battle")
+	processing_timer.stop_timer()
 	network.set_refuse_new_connections(true)
 	var players_in_game = game_n.get_node("Players").get_children()
 	if players_in_game.size() == 1:
@@ -111,25 +119,28 @@ func end_of_battle():
 		player_data[player_id].Score.Wins += 1
 	game_n.queue_free()
 	var game_inst = game_tscn.instance()
-#	game_inst.get_node("Map").connect("map_created", self, "start_new_game")
+#	game_inst.set_physics_process(false)
 	yield(game_n, "tree_exited")
 	add_child(game_inst, true)
+	get_tree().set_pause(true)
 	start_new_game()
 
 
 func add_player_stance(player_id, player_stance):
-	# [info] This number [T] IS ONLY for making chronology. Don't use it
-	if playerS_last_time[player_id] < player_stance["T"]: 
-		playerS_last_time[player_id] = player_stance["T"]
-		player_stance.erase("T")
-		playerS_stance[player_id] = player_stance
+	if !get_tree().is_paused(): 
+		# [info] This number [T] IS ONLY for making chronology. Don't use it
+		if playerS_last_time[player_id] < player_stance["T"]: 
+			playerS_last_time[player_id] = player_stance["T"]
+			player_stance.erase("T")
+			playerS_stance[player_id] = player_stance
 
 func player_shoot(player_id, player_stance, ammo_slot):
-	yield(get_tree().create_timer(0), "timeout")
-	game_n.update_player_position(player_id, player_stance)
-	var bullet_data = game_n.spawn_bullet(player_id, player_stance.TR, ammo_slot)
-	if bullet_data != null:
-		Transfer.send_shoot(player_id, bullet_data)
+	if !get_tree().is_paused(): 
+		yield(get_tree().create_timer(0), "timeout")
+		game_n.update_player_position(player_id, player_stance)
+		var bullet_data = game_n.spawn_bullet(player_id, player_stance.TR, ammo_slot)
+		if bullet_data != null:
+			Transfer.send_shoot(player_id, bullet_data)
 
 func add_bullet_stance_on_collision(bullet_stance_on_collision):
 	bulletS_stance_on_collision.append(bullet_stance_on_collision)
