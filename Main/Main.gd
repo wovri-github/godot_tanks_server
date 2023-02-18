@@ -54,7 +54,6 @@ func player_initiation(player_id: int, player_name : String):
 				"Wins": 0,
 				"Kills": 0,
 			},
-			"SP": null,
 	}
 	playerS_last_time[player_id] = -INF
 	var init_data = {
@@ -68,12 +67,12 @@ func player_initiation(player_id: int, player_name : String):
 
 func get_playerS_data() -> Array:
 	var playerS = $Game/Players.get_children()
-	var playerS_name: Array = []
+	var data: Array = []
 	for player in player_data.values():
-		if player.SP == null:
-			continue
-		playerS_name.append(player)
-	return playerS_name
+		if playerS_stance.has(player.ID):
+			player.merge(playerS_stance[player.ID], true)
+			data.append(player)
+	return data
 
 func get_playerS_corpses():
 	var playerS_corpses = $Game/Objects.get_children()
@@ -91,10 +90,17 @@ func start_new_game():
 	var time_of_game_start = OS.get_ticks_msec() + NEW_BATTLE_START_WAITING
 	for player_id in player_data.keys():
 		var spawn_point = map_n.get_spawn_position()
-		player_data[player_id].SP = spawn_point
+		playerS_stance[player_id] = {
+			"ID": player_id,
+			"P": spawn_point,
+			"R": 0,
+			"TR": 0,
+		}
 		game_n.spawn_player(player_id, spawn_point)
+		get_playerS_data()
 	var new_game_data = {
-		"PlayerSData": player_data,
+		"PlayerSData": get_playerS_data(),
+		"PlayerSCorpses": get_playerS_corpses(),
 		"MapData": map_n.get_map_data(),
 		"TimeToStartNewGame": time_of_game_start,
 	}
@@ -106,12 +112,10 @@ func begin_battle():
 	print("[Main]: Battle has begun")
 	get_tree().set_pause(false)
 	processing_timer.start_timer()
-#	network.set_refuse_new_connections(false)
 
 func end_of_battle():
 	print("[Main]: End of battle")
 	processing_timer.stop_timer()
-#	network.set_refuse_new_connections(true)
 	var players_in_game = game_n.get_node("Players").get_children()
 	if players_in_game.size() == 1:
 		var player_id = int(players_in_game[0].name)

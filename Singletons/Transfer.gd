@@ -1,7 +1,7 @@
 extends Node
 
-onready var game_n = $"/root/Main/Game"
 onready var main_n = $"/root/Main"
+
 
 
 #---- INIT DATA ----
@@ -11,14 +11,11 @@ remote func recive_init_data(player_name):
 
 
 func send_init_data(player_id, init_data):
-	rpc_id(player_id, "recive_init_data", init_data)
-
-
-func send_new_player(player_id, spawn_point):
-	rpc("recive_new_player", player_id, spawn_point)
+	rpc_id(player_id, "recive_data_during_game", init_data)
 
 func send_new_battle(new_game_data):
 	rpc("recive_new_battle", new_game_data)
+
 #---- CORE GAME MECHANIC -----
 
 func send_new_battle_time(left_sec):
