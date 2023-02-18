@@ -10,7 +10,7 @@ func check_battle_timer():
 	if get_tree().multiplayer.get_network_connected_peers().size() != num_players_in_game:
 		var left_sec = calculate_time(num_players_in_game)
 		if num_players_in_game == 0:
-			left_sec = 0
+			left_sec = 1
 		if left_sec == -1:
 			return
 		Transfer.send_new_battle_time(left_sec)
