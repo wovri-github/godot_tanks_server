@@ -25,12 +25,18 @@ var EMPTY_RECT_MAX_SIZE
 # ------------------
 enum TURN{FOWARD, LEFT, BACKWARD, RIGHT, FULL}
 var TILESIZE = cell_size.x # tiles must be square!!!
-const SEQUENCE = [\
-		TURN.LEFT,\
-		TURN.FOWARD,\
-		TURN.RIGHT,\
-		TURN.BACKWARD]
-var collision_points = []
+const SEQUENCE = [
+		TURN.LEFT,
+		TURN.FOWARD,
+		TURN.RIGHT,
+		TURN.BACKWARD
+]
+const OPPOSITE_SEQUENCE = [
+		TURN.RIGHT,
+		TURN.FOWARD,
+		TURN.LEFT,
+		TURN.BACKWARD
+]
 var rng = RandomNumberGenerator.new()
 #---
 const TILE_TYPE = MapGlobal.TILE_TYPE
@@ -80,7 +86,7 @@ func _ready():
 		clear()
 		_ready()
 		return
-	_generate_collision_shape()
+	_manage_structure_based_on_polygons()
 	for tile_type in TILE_TYPE.values():
 		if tile_type == TILE_TYPE.WALL:
 			continue
@@ -157,6 +163,7 @@ func fill_matrix_inner_wall(matrix, positions: Array, rows, cols):
 	for pos in positions:
 		if pos.x != 0 and pos.y != 0 and pos.y != rows - 1 and pos.x != cols - 1:
 			matrix[pos.y][pos.x] = 1
+	return matrix
 
 func look_for_complex_walls(_matrix, rows, cols) -> Array:
 	var matrix = _matrix.duplicate(true)
@@ -307,43 +314,258 @@ func fill_matrix_wall(matrix, positions: Array):
 		var x = pos.y
 		var y = pos.x
 		matrix[x][y] = 1
-	matrix[0][0] = 0
+	return matrix
 
-func find_up_left_corners(matrix, rows, cols, up_left_corners):
-	up_left_corners.push_back(Vector2(1,0))
+func find_up_left_corners(matrix, rows, cols):
+	var up_left_corners: Array
 	for y in rows:
 		for x in cols:
+			if matrix[y][x] == 1:
+				if matrix[y][x-1] == 0 and matrix[y-1][x] == 0:
+					up_left_corners.push_back(Vector2(x,y))
+	return up_left_corners
+
+
+func find_down_right_corners(matrix, rows, cols, up_left_corners):
+	for y in range(0,rows,-1):
+		for x in range(0,cols,-1):
 			if matrix[y][x] == 1:
 				if x <= 0 or y <= 0:
 					continue
 				if get_cell(x,y-1) != TILE_TYPE.WALL and get_cell(x-1,y) != TILE_TYPE.WALL:
 					up_left_corners.push_back(Vector2(x,y))
-	
 
-func _generate_collision_shape():
-	var up_left_corners = []
+func swap_zeros_and_ones(matrix):
+	for y in range(matrix.size()):
+		for i in range(matrix[y].size()):
+			var cell = matrix[y][i]
+			if cell == 0:
+				matrix[y][i] = 1
+			if cell == 1:
+				matrix[y][i] = 0
+	return matrix
+
+
+
+func _manage_structure_based_on_polygons():
+	var polygons_pool = _create_polygons()
+	_generate_collision_shape(polygons_pool)
+	_generate_navigation_map()
+
+func _create_polygons()-> Array:
+	var polygons_pool: Array
 	var rect = get_used_rect()
 	var rows = rect.size.y
 	var cols = rect.size.x
-	var matrix2 = create_matrix(rows, cols)
-	fill_matrix_wall(matrix2, get_used_cells_by_id(TILE_TYPE.WALL))
-	find_up_left_corners(matrix2, rows, cols, up_left_corners)
+	var matrix = create_matrix(rows, cols)
+	matrix = fill_matrix_inner_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL), rows, cols)
+	var up_left_corners = find_up_left_corners(matrix, rows, cols)
 	while !up_left_corners.empty():
 		var current_tile = up_left_corners.pop_front()
-		if matrix2[current_tile.y][current_tile.x] != 1:
+		if matrix[current_tile.y][current_tile.x] != 1:
 			continue
 		var corners = []
 		var last_direction = Vector2.RIGHT
 		var pointer = (current_tile + rect.position) * TILESIZE
-		var varibles = step(matrix2, last_direction, current_tile, corners, pointer)
+		var varibles = step(matrix, last_direction, current_tile, corners, pointer)
 		while !varibles.empty():
-			varibles = step(matrix2, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
+			varibles = step(matrix, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
 		corners.pop_back()
-		var pool = PoolVector2Array(corners)
-		var poly = CollisionPolygon2D.new()
-		poly.set_polygon(pool)
-		collision_points.push_back(pool)
+		polygons_pool.append(PoolVector2Array(corners))
+	return polygons_pool
+
+func _generate_collision_shape(polygons_pool:Array):
+	var up_left_corners = []
+	var rect = get_used_rect()
+	var rows = rect.size.y
+	var cols = rect.size.x
+	var matrix = create_matrix(rows, cols)
+	matrix = fill_matrix_outer_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL), cols, rows)
+	matrix[0][0] = 0
+	up_left_corners.push_back(Vector2(1,0))
+	var current_tile = up_left_corners.pop_front()
+	var corners = []
+	var last_direction = Vector2.RIGHT
+	var pointer = (current_tile + rect.position) * TILESIZE
+	var varibles = step(matrix, last_direction, current_tile, corners, pointer)
+	while !varibles.empty():
+		varibles = step(matrix, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
+	corners.pop_back()
+	var poly = CollisionPolygon2D.new()
+	poly.set_polygon(PoolVector2Array(corners))
+	$StaticBody2D.add_child(poly)
+	for polygon in polygons_pool:
+		poly = CollisionPolygon2D.new()
+		poly.set_polygon(polygon)
 		$StaticBody2D.add_child(poly)
+
+func fill_matrix_outer_wall(matrix, positions: Array, rows, cols):
+	for pos in positions:
+		if pos.x == 0 or pos.y == 0 or  pos.y == rows - 1 or  pos.x == cols - 1:
+			matrix[pos.y][pos.x] = 1
+	return matrix
+
+func _generate_navigation_map_way1(polygons_pool):
+	var navpoly = NavigationPolygon.new()
+	var rect = get_used_rect()
+	var x = rect.position.x
+	var y = rect.end.x * TILESIZE
+	var corners = PoolVector2Array([Vector2(x,x), Vector2(x,y), Vector2(y,y), Vector2(y,x)])
+	#navpoly.set_vertices(corners)
+	#var indices1 = PoolIntArray([0, 1, 2, 3])
+	#navpoly.add_polygon(indices1)
+	navpoly.add_outline(corners)
+	navpoly.make_polygons_from_outlines()
+	
+	var vertices = PoolVector2Array([Vector2(10, 10), Vector2(10, 50), Vector2(50, 50), Vector2(50, 10)])
+	print(vertices)
+	navpoly.set_vertices(vertices)
+	var indices = PoolIntArray([0, 1, 2, 3, ])
+	navpoly.add_polygon(indices)
+
+#	for polygon in polygons_pool:#range(0, polygons_pool.size()-1, -1):
+#		navpoly.add_outline(polygon)
+	$NavigationPolygonInstance.set_navigation_polygon(navpoly)
+
+func remove_2(matrix):
+	for j in range(matrix.size()):
+		for i in range(matrix[j].size()):
+			if matrix[j][i] == 2:
+				matrix[j][i] = 0
+	return matrix
+
+func show_matrix(matrix):
+	for row in matrix:
+		var line = ""
+		for c in row:
+			line += str(c) + " "
+		print(line)
+	
+
+func _generate_navigation_map():
+	var navpoly = NavigationPolygon.new()
+	var polygons_pool: Array
+	var up_left_corners = []
+	var rect = get_used_rect()
+	var rows = rect.size.y
+	var cols = rect.size.x
+	var matrix = create_matrix(rows, cols)
+	matrix = fill_matrix_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL))
+	matrix = swap_zeros_and_ones(matrix)
+	#show_matrix(matrix)
+	up_left_corners = [Vector2(1,1)]
+	var current_tile = up_left_corners.pop_front()
+#	if matrix[current_tile.y][current_tile.x] != 1:
+#		continue
+	var corners = []
+	var last_direction = Vector2.RIGHT
+	var pointer = (current_tile + rect.position) * TILESIZE
+	var varibles = extended_step(matrix, last_direction, current_tile, corners, pointer)
+	while !varibles.empty():
+		varibles = extended_step(matrix, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
+	corners.pop_back()
+	navpoly.add_outline(corners)
+	print("---------------------------------------------------------")
+	#matrix = swap_zeros_and_ones(matrix)
+	matrix = create_matrix(rows, cols)
+	matrix = fill_matrix_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL))
+	var complex = look_for_complex_walls(matrix, rows, cols)
+	complex.pop_front()
+	#print(complex.size())
+	matrix = create_matrix(rows, cols)
+	for row in complex:
+		for pos in row:
+			var x = pos.x
+			var y = pos.y
+			matrix[x][y] = 1
+		#matrix = fill_matrix_wall(matrix, row)
+	#show_matrix(matrix)
+	up_left_corners = find_up_left_corners(matrix, rows, cols)
+	while !up_left_corners.empty():
+		current_tile = up_left_corners.pop_front()
+		if matrix[current_tile.y][current_tile.x] != 1:
+			continue
+		corners = []
+		last_direction = Vector2.RIGHT
+		pointer = (current_tile + rect.position) * TILESIZE
+		varibles = extended_step(matrix, last_direction, current_tile, corners, pointer)
+		while !varibles.empty():
+			varibles = extended_step(matrix, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
+		corners.pop_back()
+		polygons_pool.append(PoolVector2Array(corners))
+	print(polygons_pool.size())
+	
+	for polygon in polygons_pool:#range(0, polygons_pool.size()-1, -1):
+		navpoly.add_outline(polygon)
+	navpoly.make_polygons_from_outlines()
+	$NavigationPolygonInstance.set_navigation_polygon(navpoly)
+
+
+
+
+#enum EXTENDED_TURN{FOWARD, LEFT, BACKWARD, RIGHT, FULL}
+
+const EXTENDED_SEQUENCE = [
+		[TURN.LEFT],
+		[TURN.FOWARD, TURN.LEFT],
+		[TURN.FOWARD],
+		[TURN.RIGHT, TURN.FOWARD],
+		[TURN.RIGHT],
+		[TURN.BACKWARD]
+]
+const NUMBER_OF_STEP = {
+	TURN.LEFT: 0,
+	TURN.FOWARD: 1,
+	TURN.RIGHT: 2, 
+	TURN.BACKWARD: 3, 
+}
+
+
+func extended_go(steps, last_direction, corners, pointer):
+	if steps == 0:
+		corners.push_back(pointer + Vector2(5, 5))
+		return pointer
+	pointer = pointer + _turn(last_direction, SEQUENCE[1]) * TILESIZE
+	steps -=1
+	for move in steps:
+		corners.push_back(pointer)
+		pointer = pointer + _turn(last_direction, SEQUENCE[(move+2)%4]) * TILESIZE
+	return pointer
+
+func extended_step(map, last_direction, current_field, corners, pointer):
+	map[current_field.y][current_field.x] = 2
+	if len(corners) >= 2 and corners[0] == corners[-1]:
+		return []
+	elif len(corners) >= 3 and corners[0] == corners[-2]:
+		corners.pop_back()
+		return []
+	for steps in EXTENDED_SEQUENCE:
+		var new_direction = Vector2.ZERO
+		for step in steps:
+			new_direction = _turn(last_direction, step)
+		var new_field = current_field + new_direction
+		if new_field.y >= 0 and new_field.y < len(map)\
+				and new_field.x >= 0 and new_field.x < len(map[0])\
+				and map[new_field.y][new_field.x] >= 1\
+		:
+			for step in steps:
+				var move = NUMBER_OF_STEP[step]
+				pointer = extended_go(move, last_direction, corners, pointer)
+				return {
+					"LastDirection": new_direction,
+					"CurrentTile": new_field,
+					"Pointer": pointer
+				}
+	_go(4, last_direction, corners, pointer)
+	corners.push_back(pointer)
+	corners.push_back(pointer)
+	return []
+
+
+
+
+
+
 
 # ---- generate player spawn points and start ammo boxes----
 func _generate_player_spawn_points_and_start_ammo_boxes():
@@ -374,6 +596,8 @@ func _generate_player_spawn_points(available_spawn_points, available_ammo_boxes:
 		remove_avilable_places_in_range(tile_pos, available_spawn_points)
 		remove_avilable_places_until_wall(tile_pos, available_ammo_boxes, AMMOBOX_MIN_DISTANCE * 2)
 	return true
+
+	
 
 # -----------------
 # And should not be able to see directly (without wall between) each other

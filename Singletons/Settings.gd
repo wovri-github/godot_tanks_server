@@ -40,7 +40,7 @@ const AMMUNITION = {
 	},
 	"ROCKET": {
 		"SPEED" : 200,
-		"FOLLOW_SPEED" : 5,
+		"FOLLOW_SPEED" : 150,
 	},
 	"FRAG_BOMB": {
 		"SPEED" : 200,
