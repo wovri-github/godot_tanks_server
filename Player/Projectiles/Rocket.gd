@@ -32,3 +32,14 @@ func _set_target():
 			d = cd
 			t = player_node
 	target = t
+
+func _ready():
+	get_stance()
+
+func get_stance() -> Dictionary:
+	var stance = {
+		"ID": name,
+		"P": position,
+		"R": rotation,
+	}
+	return stance

@@ -9,8 +9,10 @@
 script/source = "extends Node
 
 var player_hp = {}
+var rockets_stances: Dictionary
 onready var world_stance = {
 	\"PlayersStance\": get_parent().playerS_stance,
+	\"RocketsStance\": rockets_stances,
 }
 
 func start_timer():
@@ -19,12 +21,14 @@ func start_timer():
 func stop_timer():
 	$Processing_timer.stop()
 
+func get_rocket_stances():
+	rockets_stances.clear()
+	for rocket in get_tree().get_nodes_in_group(\"Rocket\"):
+		rockets_stances[rocket.name] = rocket.get_stance()
 
 
 func _on_Processing_timer_timeout():
-#	var world_stance: Dictionary 
-#	world_stance[\"Players\"] = get_parent().playerS_stance
-#	world_stance[\"Rockets\"] = get_parent().rocketS_stance
+	get_rocket_stances()
 	if world_stance.empty() == true:
 		return
 	# Verification

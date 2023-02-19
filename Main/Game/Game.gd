@@ -40,7 +40,7 @@ func spawn_bullet(player_id, turret_rotation, ammo_slot):
 	player_n.rotate_turret(turret_rotation)
 	var bullet_inst = projectiles_modelS[player_n.special_ammo[ammo_slot].type].instance()
 	var bullet_data : Dictionary = bullet_inst.setup(player_n)
-	bullet_data["Name"] = bullet_inst.name
+	bullet_data["ID"] = bullet_inst.name
 	bullet_data["AT"] = player_n.special_ammo[ammo_slot].type
 	bullet_data["ST"] = OS.get_ticks_msec() #Spawn Time
 	player_n.special_ammo[ammo_slot].amount -= 1
