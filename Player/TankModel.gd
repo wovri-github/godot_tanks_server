@@ -11,6 +11,7 @@ var special_ammo = [
 	 {"type" : Ammunition.TYPES.BULLET, "amount" : INF}
 ]
 var player_name = "Player" # defined when spawning
+var player_color = Color.blue # defined when spawning
 
 func pick_up_ammo_box(type):
 	var type_slot = {}
@@ -36,7 +37,8 @@ func die(projectile_name, slayer_id): #TODO
 	var corpse_data = {
 		"ID": int(name),
 		"Pos": get_global_position(),
-		"Rot": $Hitbox.get_global_rotation()
+		"Rot": $Hitbox.get_global_rotation(),
+		"Color": player_color
 	}
 	corpse_inst.setup(corpse_data)
 	game_n.spawn_wall(corpse_inst)

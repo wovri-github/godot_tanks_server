@@ -2,13 +2,14 @@ extends StaticBody2D
 
 var s = Settings.TANK
 onready var life_timer_n = $LifeTimer
-
+var color = Color.blue # for players joining during battle
 
 
 func setup(data):
 	name = str(data.ID)
 	set_position(data.Pos)
 	set_rotation(data.Rot)
+	color = data.Color
 
 func _ready():
 	life_timer_n.start(s.CORPSE_LIFE_TIME)

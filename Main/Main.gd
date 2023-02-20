@@ -46,10 +46,11 @@ func _ready():
 	battle_timer_n._ready()
 
 
-func player_initiation(player_id: int, player_name : String):
+func player_initiation(player_id: int, player_name : String, player_color : Color):
 	player_data[player_id] = {
 			"ID": player_id,
 			"Nick": player_name,
+			"Color": player_color,
 			"Score": {
 				"Wins": 0,
 				"Kills": 0,
@@ -82,6 +83,7 @@ func get_playerS_corpses():
 			"ID": int(player_corpse.name),
 			"Pos": player_corpse.get_global_position(),
 			"Rot": player_corpse.get_global_rotation(),
+			"Color": player_corpse.color
 		})
 	return playerS_corpses_dict
 
@@ -96,7 +98,7 @@ func start_new_game():
 			"R": 0,
 			"TR": 0,
 		}
-		game_n.spawn_player(player_id, spawn_point)
+		game_n.spawn_player(player_id, spawn_point, player_data[player_id].Color)
 		get_playerS_data()
 	var new_game_data = {
 		"PlayerSData": get_playerS_data(),

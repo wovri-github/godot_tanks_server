@@ -14,10 +14,11 @@ const BULLET_SPEED = 200
 
 
 
-func spawn_player(player_id, spawn_point):
+func spawn_player(player_id, spawn_point, color):
 	var player_inst = player_model.instance()
 	player_inst.name = str(player_id)
 	player_inst.player_name = "No_Need"
+	player_inst.player_color = color
 	player_inst.position = spawn_point
 	$Players.add_child(player_inst)
 

@@ -5,9 +5,9 @@ onready var main_n = $"/root/Main"
 
 
 #---- INIT DATA ----
-remote func recive_init_data(player_name):
+remote func recive_init_data(player_name, player_color):
 	var player_id = get_tree().get_rpc_sender_id()
-	main_n.player_initiation(player_id, player_name)
+	main_n.player_initiation(player_id, player_name, player_color)
 
 
 func send_init_data(player_id, init_data):
