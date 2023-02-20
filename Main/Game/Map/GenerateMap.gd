@@ -22,6 +22,7 @@ var EMPTY_RECT_DENSITY
 var EMPTY_RECT_MIN_SIZE
 var EMPTY_RECT_MAX_SIZE 
 # ------------------
+const POLYGON_MARGIN = Vector2(10,10)
 enum TURN{FOWARD, LEFT, BACKWARD, RIGHT, FULL}
 var TILESIZE = cell_size.x # tiles must be square!!!
 const SEQUENCE = [
@@ -266,47 +267,70 @@ func _generate_maze(visited_cells : Array):
 			visited_cells[chosen_cell.y][chosen_cell.x] = true
 			stack.push_back(chosen_cell)
 			
-# ---- generate collision shapes ----
+# ---- generate polygons shapes ----
+
+func _manage_structure_based_on_polygons():
+	_generate_collision_shape()
+	_generate_navigation_map()
+
+
+func _generate_collision_shape():
+	var rect = get_used_rect()
+	var rows = rect.size.y
+	var cols = rect.size.x
+	var polygons_pool = outside_collision_polygon(rows, cols)
+	var inner_polygons = inner_wall_polygons(rows, cols)
+	polygons_pool.append_array(inner_polygons)
+	for polygon in polygons_pool:
+		var poly = CollisionPolygon2D.new()
+		poly.set_polygon(polygon)
+		$StaticBody2D.add_child(poly)
+
+func outside_collision_polygon(rows, cols):
+	var matrix = create_matrix(rows, cols)
+	matrix = fill_matrix_outer_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL), cols, rows)
+	matrix = remove_matrix_corners(matrix, rows, cols)
+	return polygons_pool(matrix, rows, cols, Vector2(0, 0), false)
+
+func inner_wall_polygons(rows, cols):
+	var matrix = create_matrix(rows, cols)
+	matrix = fill_matrix_inner_wall(matrix,get_used_cells_by_id(TILE_TYPE.WALL),rows, cols)
+	var polygons_pool = polygons_pool(matrix, rows, cols, Vector2(0, 0), false)
+	return polygons_pool
+
+
+func _generate_navigation_map():
+	var navpoly = NavigationPolygon.new()
+	var rect = get_used_rect()
+	var rows = rect.size.y
+	var cols = rect.size.x
+	var outside_polygon = outside_polygon(rows, cols)
+	navpoly.add_outline(outside_polygon)
+	var inner_polygons_pool = independent_inner_wall_polygons(rows, cols)
+	for polygon in inner_polygons_pool:
+		navpoly.add_outline(polygon)
+	navpoly.make_polygons_from_outlines()
+	$NavigationPolygonInstance.set_navigation_polygon(navpoly)
+
+func outside_polygon(rows, cols):
+	var matrix = create_matrix(rows, cols)
+	matrix = fill_matrix_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL))
+	matrix = swap_zeros_and_ones(matrix)
+	var first_tile = Vector2(1, 1)
+	var vertices = wall_complex_vertices(matrix, first_tile, -POLYGON_MARGIN, false)
+	return vertices
+
+func independent_inner_wall_polygons(rows, cols):
+	var matrix = create_independent_inner_wall_matrix(rows, cols)
+	var polygons_pool = polygons_pool(matrix, rows, cols, POLYGON_MARGIN, true)
+	return polygons_pool
+
+
+
 func _turn(current_pos: Vector2, step):
 	for _i in range(step):
 		current_pos = current_pos.tangent()
 	return current_pos
-
-func _go(steps, last_direction, corners, pointer):
-	if steps == 0:
-		corners.push_back(pointer)
-		return pointer
-	pointer = pointer + _turn(last_direction, SEQUENCE[1]) * TILESIZE
-	steps -=1
-	for move in steps:
-		corners.push_back(pointer)
-		pointer = pointer + _turn(last_direction, SEQUENCE[(move+2)%4]) * TILESIZE
-	return pointer
-
-func step(map, last_direction, current_field, corners, pointer):
-	map[current_field.y][current_field.x] = 2
-	if len(corners) >= 2 and corners[0] == corners[-1]:
-		return []
-	elif len(corners) >= 3 and corners[0] == corners[-2]:
-		corners.pop_back()
-		return []
-	for step in range(4):
-		var new_direction = _turn(last_direction, SEQUENCE[step])
-		var new_field = current_field + new_direction
-		if new_field.y >= 0 and new_field.y < len(map)\
-				and new_field.x >= 0 and new_field.x < len(map[0])\
-				and map[new_field.y][new_field.x] >= 1\
-		:
-			pointer = _go(step, last_direction, corners, pointer)
-			return {
-				"LastDirection": new_direction,
-				"CurrentTile": new_field,
-				"Pointer": pointer
-			}
-	_go(4, last_direction, corners, pointer)
-	corners.push_back(pointer)
-	corners.push_back(pointer)
-	return []
 
 func fill_matrix_wall(matrix, positions: Array):
 	for pos in positions:
@@ -320,6 +344,10 @@ func find_up_left_corners(matrix, rows, cols):
 	for y in rows:
 		for x in cols:
 			if matrix[y][x] == 1:
+				if y-1 == -1 and matrix[y][x-1] == 0:
+					up_left_corners.push_back(Vector2(x,y))
+				if x-1 == -1 and matrix[y-1][x] == 0:
+					up_left_corners.push_back(Vector2(x,y))
 				if matrix[y][x-1] == 0 and matrix[y-1][x] == 0:
 					up_left_corners.push_back(Vector2(x,y))
 	return up_left_corners
@@ -346,91 +374,20 @@ func swap_zeros_and_ones(matrix):
 
 
 
-func _manage_structure_based_on_polygons():
-	#################3var polygons_pool = _create_polygons()
-	###################################_generate_collision_shape(polygons_pool)
-	_generate_navigation_map()
-
-func _create_polygons()-> Array:
-	var polygons_pool: Array
-	var rect = get_used_rect()
-	var rows = rect.size.y
-	var cols = rect.size.x
-	var matrix = create_matrix(rows, cols)
-	matrix = fill_matrix_inner_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL), rows, cols)
-	var up_left_corners = find_up_left_corners(matrix, rows, cols)
-	while !up_left_corners.empty():
-		var current_tile = up_left_corners.pop_front()
-		if matrix[current_tile.y][current_tile.x] != 1:
-			continue
-		var corners = []
-		var last_direction = Vector2.RIGHT
-		var pointer = (current_tile + rect.position) * TILESIZE
-		var varibles = step(matrix, last_direction, current_tile, corners, pointer)
-		while !varibles.empty():
-			varibles = step(matrix, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
-		corners.pop_back()
-		polygons_pool.append(PoolVector2Array(corners))
-	return polygons_pool
-
-func _generate_collision_shape(polygons_pool:Array):
-	var up_left_corners = []
-	var rect = get_used_rect()
-	var rows = rect.size.y
-	var cols = rect.size.x
-	var matrix = create_matrix(rows, cols)
-	matrix = fill_matrix_outer_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL), cols, rows)
+func remove_matrix_corners(matrix, rows, cols):
+	var x = cols - 1
+	var y = rows - 1
 	matrix[0][0] = 0
-	up_left_corners.push_back(Vector2(1,0))
-	var current_tile = up_left_corners.pop_front()
-	var corners = []
-	var last_direction = Vector2.RIGHT
-	var pointer = (current_tile + rect.position) * TILESIZE
-	var varibles = step(matrix, last_direction, current_tile, corners, pointer)
-	while !varibles.empty():
-		varibles = step(matrix, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
-	corners.pop_back()
-	var poly = CollisionPolygon2D.new()
-	poly.set_polygon(PoolVector2Array(corners))
-	$StaticBody2D.add_child(poly)
-	for polygon in polygons_pool:
-		poly = CollisionPolygon2D.new()
-		poly.set_polygon(polygon)
-		$StaticBody2D.add_child(poly)
+	matrix[0][x] = 0
+	matrix[y][x] = 0
+	matrix[y][0] = 0
+	return matrix
+
 
 func fill_matrix_outer_wall(matrix, positions: Array, rows, cols):
 	for pos in positions:
-		if pos.x == 0 or pos.y == 0 or  pos.y == rows - 1 or  pos.x == cols - 1:
+		if pos.x == 0 or pos.y == 0 or pos.x == rows - 1 or  pos.y == cols - 1:
 			matrix[pos.y][pos.x] = 1
-	return matrix
-
-func _generate_navigation_map_way1(polygons_pool):
-	var navpoly = NavigationPolygon.new()
-	var rect = get_used_rect()
-	var x = rect.position.x
-	var y = rect.end.x * TILESIZE
-	var corners = PoolVector2Array([Vector2(x,x), Vector2(x,y), Vector2(y,y), Vector2(y,x)])
-	#navpoly.set_vertices(corners)
-	#var indices1 = PoolIntArray([0, 1, 2, 3])
-	#navpoly.add_polygon(indices1)
-	navpoly.add_outline(corners)
-	navpoly.make_polygons_from_outlines()
-	
-	var vertices = PoolVector2Array([Vector2(10, 10), Vector2(10, 50), Vector2(50, 50), Vector2(50, 10)])
-	print(vertices)
-	navpoly.set_vertices(vertices)
-	var indices = PoolIntArray([0, 1, 2, 3, ])
-	navpoly.add_polygon(indices)
-
-#	for polygon in polygons_pool:#range(0, polygons_pool.size()-1, -1):
-#		navpoly.add_outline(polygon)
-	$NavigationPolygonInstance.set_navigation_polygon(navpoly)
-
-func remove_2(matrix):
-	for j in range(matrix.size()):
-		for i in range(matrix[j].size()):
-			if matrix[j][i] == 2:
-				matrix[j][i] = 0
 	return matrix
 
 func show_matrix(matrix):
@@ -439,112 +396,9 @@ func show_matrix(matrix):
 		for c in row:
 			line += str(c) + " "
 		print(line)
-	
-
-func _generate_navigation_map():
-	var navpoly = NavigationPolygon.new()
-	var polygons_pool: Array
-	var up_left_corners = []
-	var rect = get_used_rect()
-	var rows = rect.size.y
-	var cols = rect.size.x
-	var matrix = create_matrix(rows, cols)
-	matrix = fill_matrix_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL))
-	matrix = swap_zeros_and_ones(matrix)
-	#show_matrix(matrix)
-	up_left_corners = [Vector2(1,1)]
-	var current_tile = up_left_corners.pop_front()
-#	if matrix[current_tile.y][current_tile.x] != 1:
-#		continue
 
 
-	var corners = []
-	var last_direction = Vector2.UP
-	var pointer = (current_tile + rect.position) * TILESIZE
-	####################3var varibles = extended_step(matrix, last_direction, current_tile, corners, pointer)
-#	while !varibles.empty():
-#		varibles = extended_step(matrix, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
-#	corners.pop_back()
-#	navpoly.add_outline(corners)
-#	print("---------------------------------------------------------")
-#	#matrix = swap_zeros_and_ones(matrix)
-	matrix = create_matrix(rows, cols)
-	matrix = fill_matrix_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL))
-	var complex = look_for_complex_walls(matrix, rows, cols)
-	complex.pop_front()
-	print(complex)
-	matrix = create_matrix(rows, cols)
-	for row in complex:
-		for pos in row:
-			var x = pos.x
-			var y = pos.y
-			matrix[x][y] = 1
-	show_matrix(matrix)
-#	matrix[5][4] = 1
-#	matrix[5][5] = 1
-	#matrix[5][6] = 1
-#
-#	matrix[1][2] = 1
-	#matrix[2][1] = 1
-#	matrix[2][1] = 1
 
-#	matrix[1][1] = 1
-#	matrix[1][2] = 1
-#	matrix[2][2] = 1
-#
-#	matrix[4][1] = 1
-#	matrix[5][1] = 1
-#	matrix[4][2] = 1
-##
-#	matrix[5][5] = 1
-#	matrix[5][4] = 1
-#	matrix[4][5] = 1
-	
-#	matrix[4][7] = 1
-#	matrix[6][6] = 1
-#	matrix[6][7] = 1
-	up_left_corners = find_up_left_corners(matrix, rows, cols)
-	print(up_left_corners)
-	while !up_left_corners.empty():
-		current_tile = up_left_corners.pop_front()
-		print(matrix[current_tile.y][current_tile.x])
-		if matrix[current_tile.y][current_tile.x] != 1:
-			continue
-		var pck = {
-			"Matrix": matrix,
-			"Vertices": [],
-			"LastDirection": Vector2.RIGHT,
-			"CurrentTile": current_tile,
-			"Pointer": (current_tile + rect.position) * TILESIZE,
-		}
-		var is_complete = first_extended_step(pck, true, true)
-		while !is_complete:
-			is_complete = another_extended_step(pck, true, true)
-		
-#		varibles = extended_step(matrix, last_direction, current_tile, corners, pointer)
-#		while !varibles.empty():
-#			varibles = extended_step(matrix, varibles.LastDirection, varibles.CurrentTile, corners, varibles.Pointer)
-		#pck..pop_back()
-		print(pck.Vertices)
-		print("--------")
-		polygons_pool.append(PoolVector2Array(pck.Vertices))
-	print(polygons_pool.size())
-	
-	for polygon in polygons_pool:#range(0, polygons_pool.size()-1, -1):
-		navpoly.add_outline(polygon)
-	navpoly.make_polygons_from_outlines()
-	$NavigationPolygonInstance.set_navigation_polygon(navpoly)
-
-const EXTENDED_SEQUENCE = [
-		[TURN.LEFT],
-		[TURN.FOWARD],
-		[TURN.FOWARD, TURN.LEFT],
-		[TURN.RIGHT],
-		[TURN.RIGHT, TURN.LEFT],
-		[TURN.BACKWARD],
-		[TURN.BACKWARD, TURN.LEFT],
-		[TURN.FULL, TURN.LEFT],
-]
 const EXTEND_MOVMENT = [
 		[TURN.LEFT],
 		[TURN.FOWARD],
@@ -555,14 +409,50 @@ const EXTEND_MOVMENT = [
 		[TURN.BACKWARD, TURN.LEFT],
 		[TURN.LEFT, TURN.LEFT],
 ]
-const POLYGON_MARGIN = Vector2(10,10)
-const NUMBER_OF_MOVES = {
-	TURN.LEFT: 0,
-	TURN.FOWARD: 1,
-	TURN.RIGHT: 2, 
-	TURN.BACKWARD: 3, 
-	TURN.FULL: 4, 
-}
+
+
+func polygons_pool(matrix, rows, cols, polygon_margin, include_diagonals):
+	var up_left_corners = find_up_left_corners(matrix, rows, cols)
+	var polygons_pool = []
+	while !up_left_corners.empty():
+		var possible_tile = up_left_corners.pop_front()
+		var vertices = wall_complex_vertices(matrix, possible_tile, polygon_margin, include_diagonals)
+		if vertices.empty():
+			continue
+		polygons_pool.append(PoolVector2Array(vertices))
+	return polygons_pool
+	
+
+func create_independent_inner_wall_matrix(rows, cols) -> Array:
+	var matrix = create_matrix(rows, cols)
+	matrix = fill_matrix_wall(matrix, get_used_cells_by_id(TILE_TYPE.WALL))
+	var complex = look_for_complex_walls(matrix, rows, cols)
+	complex.pop_front()
+	matrix = create_matrix(rows, cols)
+	for row in complex:
+		for pos in row:
+			var x = pos.x
+			var y = pos.y
+			matrix[x][y] = 1
+	return matrix
+
+func wall_complex_vertices(matrix, possible_tile, polygon_margin, include_diagonals) -> Array:
+	if matrix[possible_tile.y][possible_tile.x] != 1:
+		return []
+	var pck = {
+		"Matrix": matrix,
+		"Margin": polygon_margin,
+		"Vertices": [],
+		"LastDirection": Vector2.RIGHT,
+		"CurrentTile": possible_tile,
+		"Pointer": possible_tile * TILESIZE,
+	}
+	if is_it_single_tile(pck, include_diagonals):
+		return pck.Vertices
+	var is_complete = false
+	while !is_complete:
+		is_complete = complex_wall_manager(pck, include_diagonals)
+	return pck.Vertices
 
 func next_tile(matrix, last_direction, current_tile, include_diagonals):
 	for steps in EXTEND_MOVMENT:
@@ -590,10 +480,8 @@ func next_tile(matrix, last_direction, current_tile, include_diagonals):
 			}
 			return move_date
 
-func extended_step(pck, include_diagonals, use_margin) -> bool:
+func extended_step(pck, include_diagonals):
 	var move_data = next_tile(pck.Matrix, pck.LastDirection, pck.CurrentTile, include_diagonals)
-	if move_data == null:
-		return true
 	var steps = move_data.Steps
 	var second_direction = move_data.SecondDirection
 	var new_tile = move_data.FinalTile
@@ -603,63 +491,49 @@ func extended_step(pck, include_diagonals, use_margin) -> bool:
 		var ref_tile = pck.CurrentTile
 		if i == 0:
 			ref_tile = pck.CurrentTile
-			#pck.LastDirection = first_direction
 		elif i == 1:
 			ref_tile = middle_tile
 			pck.LastDirection = first_direction
-		var is_compleated = extended_go(pck, ref_tile, use_margin, steps[i])
+		var is_compleated = extended_go(pck, ref_tile, steps[i])
 		if is_compleated == true:
 			return true
 	if second_direction != Vector2.ZERO:
 		pck.LastDirection = second_direction
 	else:
 		pck.LastDirection = first_direction
-#			pck.PreviousTile = pck.CurrentTile
 	pck.CurrentTile = new_tile
 	return false
 
-func another_extended_step(pck, include_diagonals, use_margin) -> bool:
+func complex_wall_manager(pck, include_diagonals) -> bool:
 	pck.Matrix[pck.CurrentTile.y][pck.CurrentTile.x] = 2
-	if extended_step(pck, include_diagonals, use_margin):
-		return true
-#	if pck.PreviousTile == pck.FirstTile and \
-#			!is_first_time:
-#		return true
-	#if pck.Matrix[pck.CurrentTile.y][pck.CurrentTile.x] != 3:
-	return false
-
-func first_extended_step(pck, include_diagonals, use_margin) -> bool:
-#	var pointer = pck.Pointer
-#	var margin_direction = Vector2.ZERO
-#	if use_margin:
-#		margin_direction = Vector2(-1, -1)
-#	pck.Vertices.push_back(pointer + POLYGON_MARGIN * margin_direction)
-	pck.Matrix[pck.CurrentTile.y][pck.CurrentTile.x] = 3
-	if extended_step(pck, include_diagonals, use_margin):
-		extended_go(pck, pck.CurrentTile, use_margin, TURN.FULL)
-		extended_go(pck, pck.CurrentTile, use_margin, TURN.LEFT)
+	if extended_step(pck, include_diagonals):
 		return true
 	return false
 
-func push_vertices(pck, mid_point, use_margin, turn):
-	var margin_direction = Vector2.ZERO
-	if use_margin:
-		margin_direction = Vector2(sign(pck.Pointer.x - mid_point.x), sign(pck.Pointer.y - mid_point.y))
-	if pck.Vertices.empty() != true and pck.Vertices.front() == pck.Pointer + POLYGON_MARGIN * margin_direction:
+func is_it_single_tile(pck, include_diagonals) -> bool:
+	var move_data = next_tile(pck.Matrix, pck.LastDirection, pck.CurrentTile, include_diagonals)
+	if move_data == null:
+		extended_go(pck, pck.CurrentTile, TURN.FULL)
+		extended_go(pck, pck.CurrentTile, TURN.LEFT)
 		return true
-	pck.Vertices.push_back(pck.Pointer + POLYGON_MARGIN * margin_direction)
 	return false
-	
 
-func extended_go(pck, ref_tile, use_margin, turn):
-	var pointer = pck.Pointer
+func push_vertices(pck, mid_point, turn):
+	var margin_direction = Vector2(sign(pck.Pointer.x - mid_point.x), sign(pck.Pointer.y - mid_point.y))
+	var vertice = pck.Pointer + pck.Margin * margin_direction
+	if pck.Vertices.empty() != true and pck.Vertices.front() == vertice:
+		return true
+	pck.Vertices.push_back(vertice)
+	return false
+
+func extended_go(pck, ref_tile, turn):
 	var mid_point = map_to_world(ref_tile) + Vector2(TILESIZE * 0.5, TILESIZE * 0.5)
-	var margin_direction = Vector2.ZERO
 	var is_compleated = false
-	
+
 	if turn == TURN.LEFT:
-		is_compleated = push_vertices(pck, mid_point, use_margin, turn)
+		is_compleated = push_vertices(pck, mid_point, turn)
 		if is_compleated:
+			print("[Map Generation]: Its not possible")
 			return true
 
 	if turn == TURN.FOWARD:
@@ -667,33 +541,33 @@ func extended_go(pck, ref_tile, use_margin, turn):
 	
 	if turn == TURN.RIGHT:
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.FOWARD) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, use_margin, turn)
+		is_compleated = push_vertices(pck, mid_point, turn)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.RIGHT) * TILESIZE
 	
 	if turn == TURN.BACKWARD:
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.FOWARD) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, use_margin, turn)
+		is_compleated = push_vertices(pck, mid_point, turn)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.RIGHT) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, use_margin, turn)
+		is_compleated = push_vertices(pck, mid_point, turn)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.BACKWARD) * TILESIZE
 	
 	if turn == TURN.FULL:
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.FOWARD) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, use_margin, turn)
+		is_compleated = push_vertices(pck, mid_point, turn)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.RIGHT) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, use_margin, turn)
+		is_compleated = push_vertices(pck, mid_point, turn)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.BACKWARD) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, use_margin, turn)
+		is_compleated = push_vertices(pck, mid_point, turn)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.LEFT) * TILESIZE
@@ -702,63 +576,6 @@ func extended_go(pck, ref_tile, use_margin, turn):
 	return false
 
 
-
-func extended_go1(steps, last_direction, corners, pointer, current_field):
-	var middle_cell = map_to_world(current_field) - Vector2(-TILESIZE * 0.5, TILESIZE * 0.5)
-	var margin_direction = Vector2.ZERO
-	if steps == 0:
-		#print(middle_cell)
-		margin_direction = Vector2(sign(pointer.x - middle_cell.x), sign(pointer.y - middle_cell.y))
-		#print(margin_direction)
-		corners.push_back(pointer + POLYGON_MARGIN * margin_direction)# + Vector2(5, 5))
-		return pointer
-	pointer = pointer + _turn(last_direction, SEQUENCE[1]) * TILESIZE
-	steps -=1
-	for move in steps:
-		margin_direction = Vector2(sign(pointer.x - middle_cell.x), sign(pointer.y - middle_cell.y))
-		corners.push_back(pointer + POLYGON_MARGIN * margin_direction)
-		pointer = pointer + _turn(last_direction, SEQUENCE[(move+2)%4]) * TILESIZE
-	return pointer
-
-func extended_step1(map, last_direction, current_field, corners, pointer):
-	map[current_field.y][current_field.x] = 2
-	if len(corners) >= 2 and corners[0] == corners[-1]:
-		return []
-	elif len(corners) >= 3 and corners[0] == corners[-2]:
-		corners.pop_back()
-		return []
-	for steps in EXTENDED_SEQUENCE:
-		var new_direction = Vector2.ZERO
-		var a = Vector2(0, 0)
-		var old_dir
-		for step in steps:
-			old_dir = a
-			new_direction = _turn(last_direction, step)
-			a = a + new_direction
-		var check_field = current_field + new_direction
-		var new_field = current_field + a
-		var middle_field = current_field + old_dir
-		if new_field.y >= 0 and new_field.y < len(map)\
-				and new_field.x >= 0 and new_field.x < len(map[0])\
-				and map[new_field.y][new_field.x] >= 1\
-		:
-			for step in steps:
-				var move = NUMBER_OF_MOVES[step]
-				var find_field
-				if steps.size() == 2:
-					find_field = middle_field
-				else:
-					find_field = current_field
-				pointer = extended_go1(move, last_direction, corners, pointer, find_field)
-			return {
-				"LastDirection": new_direction,
-				"CurrentTile": new_field,
-				"Pointer": pointer
-			}
-	_go(4, last_direction, corners, pointer)
-	corners.push_back(pointer)
-	corners.push_back(pointer)
-	return []
 
 
 
@@ -796,9 +613,6 @@ func _generate_player_spawn_points(available_spawn_points, available_ammo_boxes:
 		remove_avilable_places_until_wall(tile_pos, available_ammo_boxes, AMMOBOX_MIN_DISTANCE * 2)
 	return true
 
-	
-
-# -----------------
 # And should not be able to see directly (without wall between) each other
 func remove_avilable_places_until_wall(tile_pos, available_spots, distance_to_run):
 	for direction in DIRECTIONS:

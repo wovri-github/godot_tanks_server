@@ -30,6 +30,7 @@ func _on_Projectile_body_entered(body):
 		}
 		main_n.add_bullet_stance_on_collision(bullet_stance)
 	else:
+		#set_p
 		if owner_id != int(body.name) and main_n.player_data.has(owner_id):
 			main_n.player_data[int(owner_id)].Score.Kills += 1
 		var _name = name
