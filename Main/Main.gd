@@ -45,6 +45,14 @@ func _peer_disconnected(player_id) -> void:
 func _ready():
 	battle_timer_n._ready()
 
+func get_init_data() -> Dictionary:
+	var init_data = {
+		"PlayerSData": get_playerS_data(),
+		"PlayerSCorpses": get_playerS_corpses(),
+		"BulletsStances": get_bullets_stances(),
+		"MapData": map_n.get_map_data(),
+	}
+	return init_data
 
 func player_initiation(player_id: int, player_name : String, player_color : Color):
 	player_data[player_id] = {
@@ -56,13 +64,9 @@ func player_initiation(player_id: int, player_name : String, player_color : Colo
 				"Kills": 0,
 			},
 	}
+	var init_data = get_init_data()
+	init_data["TimeLeft"] = int(battle_timer_n.get_time_left())
 	playerS_last_time[player_id] = -INF
-	var init_data = {
-		"PlayerSData": get_playerS_data(),
-		"PlayerSCorpses": get_playerS_corpses(),
-		"MapData": map_n.get_map_data(),
-		"TimeLeft": int(battle_timer_n.get_time_left())
-	}
 	Transfer.send_init_data(player_id, init_data)
 	battle_timer_n.check_battle_timer()
 
@@ -87,6 +91,13 @@ func get_playerS_corpses():
 		})
 	return playerS_corpses_dict
 
+func get_bullets_stances() -> Array:
+	var bullets = $Game/Projectiles.get_children()
+	var stances: Array = []
+	for bullet in bullets:
+		stances.append(bullet.get_data())
+	return stances
+
 func start_new_game():
 	_ready()
 	var time_of_game_start = OS.get_ticks_msec() + NEW_BATTLE_START_WAITING
@@ -99,14 +110,9 @@ func start_new_game():
 			"TR": 0,
 		}
 		game_n.spawn_player(player_id, spawn_point, player_data[player_id].Color)
-		get_playerS_data()
-	var new_game_data = {
-		"PlayerSData": get_playerS_data(),
-		"PlayerSCorpses": get_playerS_corpses(),
-		"MapData": map_n.get_map_data(),
-		"TimeToStartNewGame": time_of_game_start,
-	}
-	Transfer.send_new_battle(new_game_data)
+	var init_data = get_init_data()
+	init_data["TimeToStartNewGame"] = time_of_game_start
+	Transfer.send_new_battle(init_data)
 	yield(get_tree().create_timer((time_of_game_start - OS.get_ticks_msec()) * 0.001),"timeout")
 	begin_battle()
 

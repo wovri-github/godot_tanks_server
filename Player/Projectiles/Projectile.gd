@@ -3,14 +3,28 @@ class_name Projectile
 
 var speed = Settings.AMMUNITION.BULLET.SPEED
 var owner_id = NAN
+var ammo_type = NAN
 var is_frag_bomb_frag = false
 var position_1 = position
 onready var main_n = $"/root/Main"
 
 
 
+func get_data():
+	var pck = {
+		"PlayerID": owner_id,
+		"ID": name,
+		"SP": get_position(),
+		"AT": ammo_type,
+		"V": get_linear_velocity(),
+		"ST": OS.get_ticks_msec() #Spawn Time
+	}
+	return pck
+
+
 # [info] Server doesn't have ammo_left property
-func setup(player : KinematicBody2D) -> Dictionary:
+func setup(player : KinematicBody2D, ammo_slot) -> Dictionary:
+	ammo_type = ammo_slot
 	owner_id = int(player.name)
 	var point = player.get_node("%BulletSpawn")
 	position = point.global_position

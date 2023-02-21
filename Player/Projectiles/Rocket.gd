@@ -4,7 +4,7 @@ var s = Settings.AMMUNITION.ROCKET
 var target : KinematicBody2D = null
 onready var navigation_agent: NavigationAgent2D = $NavigationAgent2D
 var started_targeting = false
-
+var x = -0.5
 
 func get_stance() -> Dictionary:
 	var stance = {
@@ -28,8 +28,11 @@ func _integrate_forces(_state):
 				target.global_position.distance_to(self.global_position):
 			target = player
 	if is_instance_valid(target):
+		x += 0.05
+		if x >= 0.5:
+			x = -0.5
 		navigation_agent.set_target_location(target.global_position)
-		var move_direction = position.direction_to(navigation_agent.get_next_location())
+		var move_direction = (position.direction_to(navigation_agent.get_next_location())).rotated(x*2)
 		var velocity = move_direction * s.FOLLOW_SPEED
 		look_at(navigation_agent.get_next_location())
 		set_linear_velocity(velocity) 

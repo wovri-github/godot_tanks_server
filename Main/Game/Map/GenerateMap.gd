@@ -22,7 +22,8 @@ var EMPTY_RECT_DENSITY
 var EMPTY_RECT_MIN_SIZE
 var EMPTY_RECT_MAX_SIZE 
 # ------------------
-const POLYGON_MARGIN = Vector2(10,10)
+const POLYGON_MARGIN = Vector2(16,16)
+
 enum TURN{FOWARD, LEFT, BACKWARD, RIGHT, FULL}
 var TILESIZE = cell_size.x # tiles must be square!!!
 const SEQUENCE = [
