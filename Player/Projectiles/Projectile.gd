@@ -23,14 +23,13 @@ func get_data():
 
 
 # [info] Server doesn't have ammo_left property
-func setup(player : KinematicBody2D, ammo_slot) -> Dictionary:
-	ammo_type = ammo_slot
-	owner_id = int(player.name)
-	var point = player.get_node("%BulletSpawn")
+func setup(player_n : KinematicBody2D, ammo_slot):
+	ammo_type = player_n.special_ammo[ammo_slot].type
+	owner_id = int(player_n.name)
+	var point = player_n.get_node("%BulletSpawn")
 	position = point.global_position
 	var velocity = Vector2.UP.rotated(point.global_rotation) * speed
 	set_linear_velocity(velocity)
-	return {"SP": position, "V": velocity}
 
 
 func _on_Projectile_body_entered(body):

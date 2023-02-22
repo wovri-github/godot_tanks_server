@@ -12,11 +12,23 @@ var point : Position2D = null
 onready var main_n = $"/root/Main"
 
 
-func setup(player : KinematicBody2D) -> Dictionary:
+
+func setup(player : KinematicBody2D, ammo_slot):
 	point = player.get_node("%LaserSpawn")
 	owner_id = int(player.name)
-	return {"SP": point.global_position, "R": point.global_rotation}
-	
+
+func get_data():
+	var pck = {
+		"PlayerID": owner_id,
+		"ID": name,
+		"AT": Ammunition.TYPES.LASER,
+		"ST": OS.get_ticks_msec(), #Spawn Time
+		"SP": point.global_position, 
+		"R": point.global_rotation
+	}
+	return pck
+
+
 func _ready():
 	cast_laser()
 

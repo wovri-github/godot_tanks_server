@@ -24,6 +24,8 @@ func _integrate_forces(_state):
 	for player in get_tree().get_nodes_in_group("Players"):
 		if target == null:
 			target = player
+		if !is_instance_valid(player) or !is_instance_valid(target):
+			continue
 		if player.global_position.distance_to(self.global_position) < \
 				target.global_position.distance_to(self.global_position):
 			target = player

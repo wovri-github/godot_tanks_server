@@ -4,43 +4,13 @@
 [ext_resource path="res://Main/Game/Game.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Spectator/Spectator.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Main/BattleTimer.gd" type="Script" id=4]
-
-[sub_resource type="GDScript" id=1]
-script/source = "extends Node
-
-var player_hp = {}
-var rockets_stances: Dictionary
-onready var world_stance = {
-	\"PlayersStance\": get_parent().playerS_stance,
-	\"RocketsStance\": rockets_stances,
-}
-
-func start_timer():
-	$Processing_timer.start()
-
-func stop_timer():
-	$Processing_timer.stop()
-
-func get_rocket_stances():
-	rockets_stances.clear()
-	for rocket in get_tree().get_nodes_in_group(\"Rocket\"):
-		rockets_stances[rocket.name] = rocket.get_stance()
-
-
-func _on_Processing_timer_timeout():
-	get_rocket_stances()
-	if world_stance.empty() == true:
-		return
-	# Verification
-	# Anti-cheate
-	Transfer.send_world_stance(OS.get_ticks_msec(), world_stance)
-"
+[ext_resource path="res://Main/StanceProcess.gd" type="Script" id=5]
 
 [node name="Main" type="Node"]
 script = ExtResource( 1 )
 
 [node name="Stance_process" type="Node" parent="."]
-script = SubResource( 1 )
+script = ExtResource( 5 )
 
 [node name="Processing_timer" type="Timer" parent="Stance_process"]
 wait_time = 0.05

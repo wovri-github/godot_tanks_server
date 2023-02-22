@@ -26,5 +26,5 @@ func explode():
 		call_deferred("spawn_frag", rotation)
 	.die()	#call super die() function
 
-func die():
+func _on_LifeTime_timeout():
 	explode()
