@@ -5,7 +5,7 @@ func die():
 	.die()
 
 
-func _on_Fireball_body_entered(body):
+func _on_Fireball_body_entered(_body):
 	explode()
 
 func explode():

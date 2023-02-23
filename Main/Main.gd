@@ -54,7 +54,13 @@ func get_init_data() -> Dictionary:
 	}
 	return init_data
 
-func player_initiation(player_id: int, player_name : String, player_color : Color):
+func player_initiation(player_id: int, player_name : String, player_color : Color, player_version):
+	var err = Functions.check_version(player_version)
+	if err == ERR_UNAUTHORIZED:
+		Transfer.send_old_version_info(player_id)
+		network.disconnect_peer(player_id)
+		print("[Main]: Old version. Connection droped")
+		return
 	player_data[player_id] = {
 			"ID": player_id,
 			"Nick": player_name,
@@ -71,7 +77,6 @@ func player_initiation(player_id: int, player_name : String, player_color : Colo
 	battle_timer_n.check_battle_timer()
 
 func get_playerS_data() -> Array:
-	var playerS = $Game/Players.get_children()
 	var data: Array = []
 	for player in player_data.values():
 		if playerS_stance.has(player.ID):

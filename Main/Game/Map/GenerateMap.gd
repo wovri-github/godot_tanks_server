@@ -341,7 +341,7 @@ func fill_matrix_wall(matrix, positions: Array):
 	return matrix
 
 func find_up_left_corners(matrix, rows, cols):
-	var up_left_corners: Array
+	var up_left_corners: Array = []
 	for y in rows:
 		for x in cols:
 			if matrix[y][x] == 1:

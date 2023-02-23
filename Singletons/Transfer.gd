@@ -5,10 +5,13 @@ onready var main_n = $"/root/Main"
 
 
 #---- INIT DATA ----
-remote func recive_init_data(player_name, player_color):
+remote func recive_init_data(player_name, player_color, player_version):
 	var player_id = get_tree().get_rpc_sender_id()
-	main_n.player_initiation(player_id, player_name, player_color)
+	main_n.player_initiation(player_id, player_name, player_color, player_version)
 
+func send_old_version_info(player_id):
+	var available_versions = ProjectSettings.get_setting("application/other/available_versions")
+	rpc_id(player_id, "recive_old_version_info", available_versions)
 
 func send_init_data(player_id, init_data):
 	rpc_id(player_id, "recive_data_during_game", init_data)

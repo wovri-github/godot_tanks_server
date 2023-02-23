@@ -20,6 +20,11 @@ _global_script_classes=[ {
 "path": "res://Singletons/Dir.gd"
 }, {
 "base": "Reference",
+"class": "Functions",
+"language": "GDScript",
+"path": "res://Singletons/Functions.gd"
+}, {
+"base": "Reference",
 "class": "MapGlobal",
 "language": "GDScript",
 "path": "res://Main/Game/Map/map_global.gd"
@@ -32,6 +37,7 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "Ammunition": "",
 "Dir": "",
+"Functions": "",
 "MapGlobal": "",
 "Projectile": ""
 }
@@ -41,6 +47,7 @@ _global_script_class_icons={
 config/name="Godot Tanks Server"
 run/main_scene="res://Main/Main.tscn"
 config/icon="res://icon.png"
+other/available_versions=PoolStringArray( "0.1" )
 
 [autoload]
 
