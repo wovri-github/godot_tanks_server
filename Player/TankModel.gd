@@ -7,11 +7,14 @@ onready var main_n = $"/root/Main"
 onready var game_n = $"/root/Main/Game"
 onready var battle_timer_n = get_node("/root/Main/BattleTimer")
 
-var special_ammo = [
-	 {"type" : Ammunition.TYPES.BULLET, "amount" : INF}
-]
+var special_ammo
 var player_name = "Player" # defined when spawning
 var player_color = Color.blue # defined when spawning
+
+func _ready():
+	 special_ammo = [
+	 {"type" : Settings.TANK.BASE_AMMO_TYPE, "amount" : INF}
+]
 
 func pick_up_ammo_box(type):
 	var type_slot = {}
