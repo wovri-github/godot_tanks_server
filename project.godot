@@ -107,9 +107,10 @@ left_click={
 [layer_names]
 
 2d_physics/layer_1="player"
-2d_physics/layer_2="projectile"
-2d_physics/layer_3="object"
+2d_physics/layer_2="corpse"
+2d_physics/layer_3="wall"
 2d_physics/layer_4="ammo_box"
+2d_physics/layer_5="projectile"
 "<<<<<<<HEAD[locale]locale_filter"=[ 0, [  ] ]
 
 [locale]

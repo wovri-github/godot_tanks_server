@@ -12,8 +12,8 @@ radius = 8.0
 [node name="Bullet" type="RigidBody2D" groups=["Projectile"]]
 physics_interpolation_mode = 2
 process_priority = -1
-collision_layer = 2
-collision_mask = 7
+collision_layer = 16
+collision_mask = 23
 physics_material_override = SubResource( 3 )
 gravity_scale = 0.0
 continuous_cd = 2

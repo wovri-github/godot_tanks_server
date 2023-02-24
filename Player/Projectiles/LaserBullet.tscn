@@ -10,10 +10,12 @@ bounce = 1.0
 radius = 8.0
 
 [node name="LaserBullet" type="RigidBody2D" groups=["Projectile"]]
-collision_layer = 2
+collision_layer = 0
 collision_mask = 7
 physics_material_override = SubResource( 2 )
 gravity_scale = 0.0
+contacts_reported = 1
+contact_monitor = true
 linear_damp = 0.0
 script = ExtResource( 1 )
 
