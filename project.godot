@@ -37,7 +37,7 @@ _global_script_classes=[ {
 "base": "RigidBody2D",
 "class": "Projectile",
 "language": "GDScript",
-"path": "res://Shootable/Projectile/!Projectile.gd"
+"path": "res://Shootable/Projectiles/!Projectile.gd"
 }, {
 "base": "Reference",
 "class": "Shootable",

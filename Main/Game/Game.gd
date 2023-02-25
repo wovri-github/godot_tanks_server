@@ -4,12 +4,12 @@ var settings = GameSettings
 var tank_tscn = preload("res://Player/TankModel.tscn")
 const AMMO_TYPES = Ammunition.TYPES
 var projectiles_tscn = {
-	AMMO_TYPES.BULLET: preload("res://Player/Projectiles/Bullet.tscn"),
-	AMMO_TYPES.ROCKET: preload("res://Player/Projectiles/Rocket.tscn"),
-	AMMO_TYPES.FRAG_BOMB: preload("res://Player/Projectiles/FragBomb.tscn"),
-	AMMO_TYPES.LASER: preload("res://Player/Projectiles/Laser.tscn"),
-	AMMO_TYPES.LASER_BULLET: preload("res://Player/Projectiles/LaserBullet.tscn"),
-	AMMO_TYPES.FIREBALL: preload("res://Player/Projectiles/Fireball.tscn")
+	AMMO_TYPES.BULLET: preload("res://Shootable/Projectiles/Bullet.tscn"),
+	AMMO_TYPES.ROCKET: preload("res://Shootable/Projectiles/Rocket.tscn"),
+	AMMO_TYPES.FRAG_BOMB: preload("res://Shootable/Projectiles/FragBomb.tscn"),
+	AMMO_TYPES.LASER: preload("res://Shootable/Laser.tscn"),
+	AMMO_TYPES.LASER_BULLET: preload("res://Shootable/Projectiles/LaserBullet.tscn"),
+	AMMO_TYPES.FIREBALL: preload("res://Shootable/Projectiles/Fireball.tscn")
 }
 onready var projectile_n = $Projectiles
 onready var players_n = $Players

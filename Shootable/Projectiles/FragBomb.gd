@@ -1,6 +1,6 @@
 extends Projectile
 
-const FRAG_TSCN =  preload("res://Player/Projectiles/FragBullet.tscn")
+const FRAG_TSCN =  preload("res://Shootable/Projectiles/FragBullet.tscn")
 
 
 
