@@ -7,26 +7,44 @@ onready var main_n = $"/root/Main"
 onready var game_n = $"/root/Main/Game"
 onready var battle_timer_n = get_node("/root/Main/BattleTimer")
 
-var special_ammo
+var arms= {
+		Settings.TANK.BASE_AMMO_TYPE: INF,
+}
+
 var player_name = "Player" # defined when spawning
 var player_color = Color.blue # defined when spawning
 
-func _ready():
-	 special_ammo = [
-	 {"type" : Settings.TANK.BASE_AMMO_TYPE, "amount" : INF}
-]
 
-func pick_up_ammo_box(type):
-	var type_slot = {}
-	for slot in special_ammo.size():
-		type_slot[special_ammo[slot].type] = slot
-	if type_slot.has(type):
-		special_ammo[type_slot[type]].amount += 1
+
+func pick_up_ammo_box(ammo_type) -> bool:
+	if !arms.has(ammo_type):
+		arms[ammo_type] = 1
 		return true
-	elif special_ammo.size() < MAX_AMMO_TYPES:
-		special_ammo.push_back({"type" : int(type), "amount" : 1})
+	if arms[ammo_type] < MAX_AMMO_TYPES:
+		arms[ammo_type] += 1
 		return true
 	return false
+
+func subtract_ammo_type(ammo_type) -> int:
+	if !arms.has(ammo_type):
+		print("[Game]: Player ", name, " want to shoot without ammo!")
+		return FAILED
+	arms[ammo_type] -= 1
+	if arms[ammo_type] == 0:
+		arms.erase(ammo_type)
+	return OK
+
+
+#	var type_slot = {}	
+#	for slot in special_ammo.size():
+#		type_slot[special_ammo[slot].type] = slot
+#	if type_slot.has(type):
+#		special_ammo[type_slot[type]].amount += 1
+#		return true
+#	elif special_ammo.size() < MAX_AMMO_TYPES:
+#		special_ammo.push_back({"type" : int(type), "amount" : 1})
+#		return true
+#	return false
 
 func set_stance(_position, _rotation):
 	position = _position

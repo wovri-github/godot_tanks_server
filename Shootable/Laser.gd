@@ -1,32 +1,40 @@
 extends Line2D
 
-const LASER_LENGTH = 2000
-const MAX_BOUNCES = 15
-const MAX_WIDTH = 5
-
-onready var ray = $RayCast2D
-
+var s: Dictionary
+var ammo_type
 var owner_id = NAN
 var point : Position2D = null
 
+onready var ray = $RayCast2D
 onready var main_n = $"/root/Main"
 
 
-
-func setup(player : KinematicBody2D, ammo_slot):
-	point = player.get_node("%LaserSpawn")
-	owner_id = int(player.name)
+func setup(player_n : KinematicBody2D, _ammo_type, _settings):
+	s = _settings
+	owner_id = int(player_n.name)
+	ammo_type = _ammo_type
+	var point = player_n.get_node("%LaserSpawn")
+	position = point.global_position
 
 func get_data():
-	var pck = {
-		"PlayerID": owner_id,
-		"ID": name,
-		"AT": Ammunition.TYPES.LASER,
-		"ST": OS.get_ticks_msec(), #Spawn Time
-		"SP": point.global_position, 
-		"R": point.global_rotation
-	}
+	var pck = Shootable.get_data(
+			owner_id, 
+			name,
+			get_position(),
+			get_rotation(),
+			null,
+			ammo_type
+	)
 	return pck
+
+#	var pck = {
+#		"PlayerID": owner_id,
+#		"ID": name,
+#		"AT": Ammunition.TYPES.LASER,
+#		"ST": OS.get_ticks_msec(), #Spawn Time
+#		"SP": point.global_position, 
+#		"R": point.global_rotation
+#	}
 
 
 func _ready():
@@ -34,7 +42,7 @@ func _ready():
 
 func cast_laser():
 	global_position = point.global_position
-	var length_left = LASER_LENGTH
+	var length_left = s.LASER_LENGTH
 	
 	clear_points()
 	add_point(Vector2.ZERO)
@@ -42,7 +50,7 @@ func cast_laser():
 	ray.cast_to = Vector2.UP.rotated(point.global_rotation) * length_left
 	ray.force_raycast_update()
 	
-	for _i in range(MAX_BOUNCES):	# limit bounces
+	for _i in range(s.MAX_BOUNCES):	# limit bounces
 		
 		if !ray.is_colliding():
 			add_point(ray.cast_to + ray.position)

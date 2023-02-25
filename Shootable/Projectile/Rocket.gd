@@ -1,10 +1,10 @@
 extends Projectile
 
-var s = Settings.AMMUNITION.ROCKET
 var target : KinematicBody2D = null
 onready var navigation_agent: NavigationAgent2D = $NavigationAgent2D
 var started_targeting = false
 var x = -0.5
+
 
 func get_stance() -> Dictionary:
 	var stance = {

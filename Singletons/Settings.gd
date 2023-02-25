@@ -1,12 +1,5 @@
 extends Node
-# Too keep const expresions and being able to change them
-# It would be good to allow player to change setting only at the beggining of the full game
-# And this will replace change is "Settings" before such node would be created
-#
-# Or just... give up with this constants
-#
-# Okey, so constants are called at the beginning of project compilation. 
-# So if we want to change settings in game, then change varible to vars
+
 
 
 const TANK = {

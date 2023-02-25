@@ -151,13 +151,13 @@ func add_player_stance(player_id, player_stance):
 			player_stance.ID = player_id
 			playerS_stance[player_id] = player_stance
 
-func player_shoot(player_stance, ammo_slot):
-	if !get_tree().is_paused(): 
-		yield(get_tree().create_timer(0), "timeout")
-		game_n.update_player_position(player_stance)
-		var bullet_data = game_n.spawn_bullet(player_stance.ID, player_stance.TR, ammo_slot)
-		if bullet_data != null:
-			Transfer.send_shoot(player_stance.ID, bullet_data)
+func player_shoot(player_stance, ammo_type):
+	if get_tree().is_paused(): 
+		return
+	game_n.update_player_position(player_stance)
+	var bullet_data = game_n.spawn_bullet(player_stance.ID, player_stance.TR, ammo_type)
+	if bullet_data != null:
+		Transfer.send_shoot(player_stance.ID, bullet_data)
 
 func add_bullet_stance_on_collision(bullet_stance_on_collision):
 	bulletS_stance_on_collision.append(bullet_stance_on_collision)

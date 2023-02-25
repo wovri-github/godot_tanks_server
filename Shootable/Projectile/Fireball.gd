@@ -1,9 +1,6 @@
 extends Projectile
 
 
-func die():
-	.die()
-
 
 func _on_Fireball_body_entered(_body):
 	explode()
@@ -11,7 +8,7 @@ func _on_Fireball_body_entered(_body):
 func explode():
 	for body in $ExplosionArea.get_overlapping_bodies():
 		kill(body)
-	.die()
+	die()
 
 func kill(body):
 	if body.is_in_group("Players"): 
