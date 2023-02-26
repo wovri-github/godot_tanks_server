@@ -1,0 +1,39 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Code/Main/Main.gd" type="Script" id=1]
+[ext_resource path="res://Code/Main/Game/Game.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Code/Spectator/Spectator.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Code/Main/BattleTimer.gd" type="Script" id=4]
+[ext_resource path="res://Code/Main/StanceProcess.gd" type="Script" id=5]
+
+[node name="Main" type="Node"]
+script = ExtResource( 1 )
+
+[node name="Stance_process" type="Node" parent="."]
+script = ExtResource( 5 )
+
+[node name="Processing_timer" type="Timer" parent="Stance_process"]
+wait_time = 0.05
+autostart = true
+
+[node name="Game" parent="." instance=ExtResource( 2 )]
+
+[node name="BattleTimer" type="Timer" parent="."]
+one_shot = true
+script = ExtResource( 4 )
+
+[node name="Spectator" parent="." instance=ExtResource( 3 )]
+pause_mode = 2
+position = Vector2( 572, 383 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+pause_mode = 2
+
+[node name="Button" type="Button" parent="CanvasLayer"]
+margin_right = 119.0
+margin_bottom = 33.0
+text = "End of battle"
+
+[connection signal="timeout" from="Stance_process/Processing_timer" to="Stance_process" method="_on_Processing_timer_timeout"]
+[connection signal="timeout" from="BattleTimer" to="BattleTimer" method="_on_BattleTimer_timeout"]
+[connection signal="pressed" from="CanvasLayer/Button" to="." method="_on_Button_pressed"]
