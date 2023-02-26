@@ -20,15 +20,6 @@ func get_data():
 			ammo_type
 	)
 	return pck
-#	var pck = {
-#		"PlayerID": owner_id,
-#		"ID": name,
-#		"SP": get_position(),
-#		"AT": ammo_type,
-#		"V": get_linear_velocity(),
-#		"ST": OS.get_ticks_msec() #Spawn Time
-#	}
-#	return pck
 
 
 func setup(player_n : KinematicBody2D, _ammo_type, _settings):

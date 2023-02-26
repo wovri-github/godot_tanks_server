@@ -1,6 +1,6 @@
 extends Node2D
 
-var settings = GameSettings
+var settings = GameSettings.get_duplicate_settings()
 var tank_tscn = preload("res://Player/TankModel.tscn")
 const AMMO_TYPES = Ammunition.TYPES
 var projectiles_tscn = {
@@ -16,19 +16,12 @@ onready var players_n = $Players
 
 
 func _ready():
-	print(settings)
-	#settings.AMMUNITION = 200
-	print(settings.AMMUNITION[AMMO_TYPES.BULLET].SPEED)
-
+	settings.WRECK.LIFE_TIME -= 1
 
 func spawn_player(player_id, spawn_point, color):
 	var player_inst = tank_tscn.instance()
-	player_inst.name = str(player_id)
-	player_inst.player_name = "No_Need"
-	player_inst.player_color = color
-	player_inst.position = spawn_point
+	player_inst.setup(player_id, spawn_point, color, settings.TANK)
 	$Players.add_child(player_inst)
-
 
 func despawn_player(player_id):
 	if !$Players.has_node(str(player_id)):
@@ -36,7 +29,7 @@ func despawn_player(player_id):
 	var player_path: String = "Players/" + str(player_id)
 	get_node(player_path).queue_free()
 
-func spawn_wall(corpse_inst):
+func spawn_wreck(corpse_inst):
 	$Objects.call_deferred("add_child", corpse_inst)
 
 func spawn_bullet(player_id, turret_rotation, ammo_type):

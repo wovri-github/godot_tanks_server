@@ -1,6 +1,26 @@
+extends Resource
 class_name GameSettings
 
 const AMMO_TYPE = Ammunition.TYPES
+
+static func get_duplicate_settings():
+	var settings = {
+		"TANK": TANK,
+		"WRECK": WRECK,
+		"AMMUNITION": AMMUNITION,
+	}
+	return settings.duplicate(true)
+
+const TANK = {
+	"SPEED" : 100.0,
+	"ROTATION_SPEED" : 2.0,
+	"MAX_AMMO" : 5,
+	"BASE_AMMO_TYPE" : Ammunition.TYPES.BULLET,
+	"MAX_AMMO_TYPES" : 3, # including default bullet
+}
+const WRECK = {
+	"LIFE_TIME" : 20,
+}
 const AMMUNITION = {
 	AMMO_TYPE.BULLET:{
 		"SPEED" : 200,

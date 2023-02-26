@@ -1,8 +1,8 @@
 extends StaticBody2D
 
-var s = Settings.TANK
-onready var life_timer_n = $LifeTimer
 var color = Color.blue # for players joining during battle
+onready var s = get_node(Dir.GAME).settings.WRECK
+onready var life_timer_n = $LifeTimer
 
 
 func setup(data):
@@ -12,7 +12,8 @@ func setup(data):
 	color = data.Color
 
 func _ready():
-	life_timer_n.start(s.CORPSE_LIFE_TIME)
+	print(s.LIFE_TIME)
+	life_timer_n.start(s.LIFE_TIME)
 
 func _on_LifeTimer_timeout():
 	queue_free()
