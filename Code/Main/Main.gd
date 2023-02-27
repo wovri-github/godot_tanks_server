@@ -39,7 +39,7 @@ func _peer_disconnected(player_id) -> void:
 	var _err = player_data.erase(player_id)
 	var player_n = get_node_or_null("/root/Main/Game/Players/" + str(player_id))
 	if player_n:
-		player_n.die(null, null)
+		player_n.die()
 	battle_timer_n.check_battle_timer()
 
 

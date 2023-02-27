@@ -25,10 +25,10 @@ func setup(player_id, spawn_point, color, _settings):
 	
 
 func pick_up_ammo_box(ammo_type) -> bool:
-	if !arms.has(ammo_type):
+	if !arms.has(ammo_type) and arms.size() < s.MaxAmmoTypes:
 		arms[ammo_type] = 1
 		return true
-	if arms[ammo_type] < s.MaxAmmoTypes:
+	elif arms.has(ammo_type):
 		arms[ammo_type] += 1
 		return true
 	return false
@@ -49,7 +49,7 @@ func set_stance(_position, _rotation):
 func rotate_turret(turret_rotation):
 	$"%Turret".rotation = turret_rotation
 
-func die(projectile_name, slayer_id):
+func die(kill_event_data={"KillerID" : "", "KilledID" : "", "AT" : NAN, "PName" : ""}):
 	var wreck_data = {
 		"ID": int(name),
 		"Pos": get_global_position(),
@@ -58,7 +58,7 @@ func die(projectile_name, slayer_id):
 		"Kills": kills
 	}
 	get_parent().remove_child(self)
-	emit_signal("player_destroyed", slayer_id, wreck_data)
-	Transfer.send_player_destroyed(wreck_data, slayer_id, projectile_name)
+	emit_signal("player_destroyed", kill_event_data.KillerID, wreck_data)
+	Transfer.send_player_destroyed(wreck_data, kill_event_data)
 	battle_timer_n.check_battle_timer()
 	queue_free()
