@@ -177,7 +177,6 @@ func recive_upgrades(player_id: int, upgrades: Dictionary):
 		printerr("[Main]: Upgrades may be recived only once per game. New upgrades droped.")
 		return
 	var available_upgrade_points = game_n.player_upgrade_points[player_id]
-	game_n.player_upgrade_points.erase(player_id)
 	var sum = 0
 	for upgrade in upgrades:
 		var temp_dict = GameSettings.get_settings()
@@ -198,13 +197,15 @@ func recive_upgrades(player_id: int, upgrades: Dictionary):
 			printerr("[Main]: Values has to be integer! It only show how much points player spend on each upgrade")
 			val = 0
 		val = clamp(val, 0, MAX_CLIENTS)
-		if val == 0:
-			printerr("[Main]: Inconsistency in upgrades. Upgrades droped.")
+		if val == 0 or val == MAX_CLIENTS:
+			printerr("[Main]: Value out of range. Upgrades droped.")
 			return
 		sum += val
 	if sum > available_upgrade_points:
 		printerr("[Main]: More spended points than kills. Upgrades droped.")
 		return
+	var points_left = sum - available_upgrade_points
+	game_n.player_upgrade_points[player_id] = points_left
 	temp_upgrades[player_id] = upgrades
 
 func add_temp_upgrades_to_player_data():

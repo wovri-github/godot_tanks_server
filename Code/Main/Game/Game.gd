@@ -43,7 +43,10 @@ func player_destroyed(slayer_id, wreck_data):
 		if players_n.has_node(str(slayer_id)):
 			players_n.get_node(str(slayer_id)).kills += 1
 		else:
-			player_upgrade_points[slayer_id] += 1
+			if player_upgrade_points.has(slayer_id):
+				player_upgrade_points[slayer_id] += 1
+			else:
+				player_upgrade_points[slayer_id] = 1
 	player_upgrade_points[wreck_data.ID] = wreck_data.Kills
 
 func spawn_wreck(wreck_data):
