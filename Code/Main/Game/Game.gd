@@ -1,5 +1,7 @@
 extends Node2D
 
+signal player_destroyed()
+
 const WRECK_TSCN = preload("res://Code/Objects/Wreck.tscn")
 const TANK_TSCN = preload("res://Code/Player/TankModel.tscn")
 const AMMO_TYPES = Ammunition.TYPES
@@ -33,11 +35,12 @@ func setup(all_upgrades):
 
 func spawn_player(player_id, spawn_point, color):
 	var player_inst = TANK_TSCN.instance()
-	player_inst.connect("player_destroyed", self, "player_destroyed")
+	player_inst.connect("player_destroyed", self, "_on_player_destroyed")
 	player_inst.setup(player_id, spawn_point, color, settings.Tank)
 	$Players.add_child(player_inst)
 
-func player_destroyed(slayer_id, wreck_data):
+func _on_player_destroyed(slayer_id, wreck_data):
+	emit_signal("player_destroyed")
 	spawn_wreck(wreck_data)
 	if slayer_id != wreck_data.ID and slayer_id != null:
 		if players_n.has_node(str(slayer_id)):

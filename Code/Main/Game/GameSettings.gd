@@ -2,6 +2,8 @@ class_name GameSettings
 
 const AMMO_TYPE = Ammunition.TYPES
 
+
+
 static func get_duplicate_settings():
 	var settings = {
 		"Tank": TANK,

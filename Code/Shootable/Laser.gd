@@ -13,8 +13,8 @@ func setup(player_n : KinematicBody2D, _ammo_type, _settings):
 	s = _settings
 	owner_id = int(player_n.name)
 	ammo_type = _ammo_type
-	var point = player_n.get_node("%LaserSpawn")
-	position = point.global_position
+	var _point = player_n.get_node("%LaserSpawn")
+	position = _point.global_position
 
 func get_data():
 	var pck = Shootable.get_data(

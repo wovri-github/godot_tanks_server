@@ -11,10 +11,6 @@ var player_name = "Player" # defined when spawning
 var player_color = Color.blue # defined when spawning
 var kills: int = 0
 
-onready var main_n = get_node(Dir.MAIN)
-onready var game_n = get_node(Dir.GAME)
-onready var battle_timer_n = get_node("/root/Main/BattleTimer")
-
 
 
 func setup(player_id, spawn_point, color, _settings):
@@ -60,5 +56,4 @@ func die(projectile_name, slayer_id):
 	get_parent().remove_child(self)
 	emit_signal("player_destroyed", slayer_id, wreck_data)
 	Transfer.send_player_destroyed(wreck_data, slayer_id, projectile_name)
-	battle_timer_n.check_battle_timer()
 	queue_free()

@@ -519,7 +519,7 @@ func is_it_single_tile(pck, include_diagonals) -> bool:
 		return true
 	return false
 
-func push_vertices(pck, mid_point, turn):
+func push_vertices(pck, mid_point):
 	var margin_direction = Vector2(sign(pck.Pointer.x - mid_point.x), sign(pck.Pointer.y - mid_point.y))
 	var vertice = pck.Pointer + pck.Margin * margin_direction
 	if pck.Vertices.empty() != true and pck.Vertices.front() == vertice:
@@ -532,7 +532,7 @@ func extended_go(pck, ref_tile, turn):
 	var is_compleated = false
 
 	if turn == TURN.LEFT:
-		is_compleated = push_vertices(pck, mid_point, turn)
+		is_compleated = push_vertices(pck, mid_point)
 		if is_compleated:
 			print("[Map Generation]: Its not possible")
 			return true
@@ -542,33 +542,33 @@ func extended_go(pck, ref_tile, turn):
 	
 	if turn == TURN.RIGHT:
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.FOWARD) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, turn)
+		is_compleated = push_vertices(pck, mid_point)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.RIGHT) * TILESIZE
 	
 	if turn == TURN.BACKWARD:
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.FOWARD) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, turn)
+		is_compleated = push_vertices(pck, mid_point)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.RIGHT) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, turn)
+		is_compleated = push_vertices(pck, mid_point)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.BACKWARD) * TILESIZE
 	
 	if turn == TURN.FULL:
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.FOWARD) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, turn)
+		is_compleated = push_vertices(pck, mid_point)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.RIGHT) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, turn)
+		is_compleated = push_vertices(pck, mid_point)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.BACKWARD) * TILESIZE
-		is_compleated = push_vertices(pck, mid_point, turn)
+		is_compleated = push_vertices(pck, mid_point)
 		if is_compleated:
 			return true
 		pck.Pointer = pck.Pointer + _turn(pck.LastDirection, TURN.LEFT) * TILESIZE

@@ -4,6 +4,7 @@ const DEFALUT_PORT = 42521
 const MAX_CLIENTS = 16
 
 const NEW_BATTLE_START_WAITING = 500 # ms
+const VERIFY = preload("res://Code/Main/MainVerification.gd")
 
 var network = NetworkedMultiplayerENet.new()
 
@@ -18,7 +19,6 @@ onready var processing_timer = $Stance_process
 onready var battle_timer_n = $BattleTimer
 onready var game_n = get_node(Dir.GAME)
 onready var map_n = get_node(Dir.MAP)
-
 
 
 func _enter_tree() -> void:
@@ -42,9 +42,9 @@ func _peer_disconnected(player_id) -> void:
 		player_n.die(null, null)
 	battle_timer_n.check_battle_timer()
 
-
 func _ready():
-	battle_timer_n._ready()
+	game_n.connect("player_destroyed", self, "_on_player_destroyed")
+
 
 func get_init_data() -> Dictionary:
 	var init_data = {
@@ -173,37 +173,13 @@ func add_bullet_stance_on_collision(bullet_stance_on_collision):
 		bulletS_stance_on_collision.clear()
 
 func recive_upgrades(player_id: int, upgrades: Dictionary):
-	if !game_n.player_upgrade_points.has(player_id):
-		printerr("[Main]: Upgrades may be recived only once per game. New upgrades droped.")
+	if !VERIFY.is_recive_upgrades_input_valid(player_id, game_n, upgrades, MAX_CLIENTS):
 		return
 	var available_upgrade_points = game_n.player_upgrade_points[player_id]
 	var sum = 0
 	for upgrade in upgrades:
-		var temp_dict = GameSettings.get_settings()
-		var i = 0
-		for path_step in upgrade:
-			i += 1
-			if !temp_dict.has(path_step):
-				printerr("[Main]: There is no such key. Upgrades droped.")
-				return
-			temp_dict = temp_dict[path_step]
-			if i == upgrade.size() and \
-					typeof(temp_dict) != TYPE_REAL and \
-					typeof(temp_dict) != TYPE_INT:
-				printerr("[Main]: Last value is not Float number. Upgrades droped.")
-				return
 		var val = upgrades[upgrade]
-		if typeof(val) != TYPE_INT:
-			printerr("[Main]: Values has to be integer! It only show how much points player spend on each upgrade")
-			val = 0
-		val = clamp(val, 0, MAX_CLIENTS)
-		if val == 0 or val == MAX_CLIENTS:
-			printerr("[Main]: Value out of range. Upgrades droped.")
-			return
 		sum += val
-	if sum > available_upgrade_points:
-		printerr("[Main]: More spended points than kills. Upgrades droped.")
-		return
 	var points_left = sum - available_upgrade_points
 	game_n.player_upgrade_points[player_id] = points_left
 	temp_upgrades[player_id] = upgrades
@@ -217,6 +193,9 @@ func add_temp_upgrades_to_player_data():
 				continue
 			player_data_upgrades[upgrade] = temp_upgrades[player_id][upgrade]
 
+
+func _on_player_destroyed():
+	battle_timer_n.check_battle_timer()
 
 func _on_Button_pressed():
 	# [info] only for testing purposes
