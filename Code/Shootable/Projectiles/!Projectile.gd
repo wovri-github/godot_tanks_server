@@ -49,7 +49,7 @@ func _on_Projectile_body_entered(body):
 		var _name = name
 		if is_frag_bomb_frag:
 			_name = null
-		body.die(_name, owner_id)
+		body.die({"KillerID" : str(owner_id), "KilledID" : body.name, "AT" : ammo_type, "PName" : _name})
 		queue_free()
 
 

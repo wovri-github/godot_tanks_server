@@ -4,6 +4,7 @@ var s: Dictionary
 var ammo_type
 var owner_id = NAN
 var point : Position2D = null
+var point_rotation = 0
 
 onready var ray = $RayCast2D
 onready var main_n = $"/root/Main"
@@ -13,15 +14,16 @@ func setup(player_n : KinematicBody2D, _ammo_type, _settings):
 	s = _settings
 	owner_id = int(player_n.name)
 	ammo_type = _ammo_type
-	var _point = player_n.get_node("%LaserSpawn")
-	position = _point.global_position
+	point = player_n.get_node("%LaserSpawn")
+	position = point.global_position
+	point_rotation = point.global_rotation
 
 func get_data():
 	var pck = Shootable.get_data(
 			owner_id, 
 			name,
 			get_position(),
-			get_rotation(),
+			point_rotation,
 			null,
 			ammo_type
 	)
@@ -32,7 +34,7 @@ func _ready():
 
 func cast_laser():
 	global_position = point.global_position
-	var length_left = s.LaserLength
+	var length_left = s.Length
 	
 	clear_points()
 	add_point(Vector2.ZERO)
@@ -55,7 +57,7 @@ func cast_laser():
 		if collider.is_in_group("Players"):
 			if owner_id != int(collider.name) and main_n.player_data.has(owner_id):
 				main_n.player_data[int(owner_id)].Score.Kills += 1
-			collider.die(null, owner_id) # name as null bcs we cant destroy it
+			collider.die({"KillerID" : str(owner_id), "KilledID" : collider.name, "AT" : ammo_type, "PName" : null}) # name as null bcs we cant destroy it
 			break
 		
 		if collider.is_in_group("Corpse"):

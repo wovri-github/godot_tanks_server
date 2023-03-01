@@ -4,9 +4,8 @@ const AMMO_TYPE = Ammunition.TYPES
 
 
 static func get_paths():
-	var current_dict = get_settings()
-	var properties: Array
-	var path: Array
+	var properties: Array = []
+	var path: Array = []
 	_get_paths_recursion(null, get_settings(), properties, path)
 	return properties
 

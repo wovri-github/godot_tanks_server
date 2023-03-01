@@ -45,7 +45,7 @@ func _peer_disconnected(player_id) -> void:
 	var _err = player_data.erase(player_id)
 	var player_n = get_node_or_null("/root/Main/Game/Players/" + str(player_id))
 	if player_n:
-		player_n.die(null, null)
+		player_n.die()
 	battle_timer_n.check_battle_timer()
 
 func _ready():
@@ -204,13 +204,12 @@ func add_temp_upgrades_to_player_data():
 			player_data_upgrades[upgrade] = temp_upgrades[player_id][upgrade]
 
 func choose_player_upgrades(player_id, MAX_UPGRADES):
-	var upgrades: Array
+	var upgrades: Array = []
 	var size = settings_paths.size()
 	for _i in range(MAX_UPGRADES):
 		randomize()
 		upgrades.append(settings_paths[randi() % size])
 	player_choosen_upgrades[player_id] = upgrades
-	print(player_choosen_upgrades)
 
 func _on_player_destroyed():
 	battle_timer_n.check_battle_timer()

@@ -40,14 +40,14 @@ func spawn_player(player_id, spawn_point, color):
 func _on_player_destroyed(slayer_id, wreck_data):
 	emit_signal("player_destroyed")
 	spawn_wreck(wreck_data)
-	if slayer_id != wreck_data.ID and slayer_id != null:
-		if players_n.has_node(str(slayer_id)):
-			players_n.get_node(str(slayer_id)).kills += 1
+	if !slayer_id.empty() and int(slayer_id) != wreck_data.ID:
+		if players_n.has_node(slayer_id):
+			players_n.get_node(slayer_id).kills += 1
 		else:
 			if player_upgrade_points.has(slayer_id):
-				player_upgrade_points[slayer_id] += 1
+				player_upgrade_points[int(slayer_id)] += 1
 			else:
-				player_upgrade_points[slayer_id] = 1
+				player_upgrade_points[int(slayer_id)] = 1
 	player_upgrade_points[wreck_data.ID] = wreck_data.Kills
 
 func spawn_wreck(wreck_data):
