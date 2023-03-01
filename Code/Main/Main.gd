@@ -211,8 +211,9 @@ func choose_player_upgrades(player_id, MAX_UPGRADES):
 		upgrades.append(settings_paths[randi() % size])
 	player_choosen_upgrades[player_id] = upgrades
 
-func _on_player_destroyed():
+func _on_player_destroyed(player_id):
 	battle_timer_n.check_battle_timer()
+	Transfer.send_player_possible_upgrades(player_id, player_choosen_upgrades[player_choosen_upgrades])
 
 func _on_Button_pressed():
 	# [info] only for testing purposes

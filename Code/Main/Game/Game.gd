@@ -1,6 +1,6 @@
 extends Node2D
 
-signal player_destroyed()
+signal player_destroyed(player_id)
 
 const WRECK_TSCN = preload("res://Code/Objects/Wreck.tscn")
 const TANK_TSCN = preload("res://Code/Player/TankModel.tscn")
@@ -38,7 +38,7 @@ func spawn_player(player_id, spawn_point, color):
 	$Players.add_child(player_inst)
 
 func _on_player_destroyed(slayer_id, wreck_data):
-	emit_signal("player_destroyed")
+	emit_signal("player_destroyed", wreck_data.ID)
 	spawn_wreck(wreck_data)
 	if !slayer_id.empty() and int(slayer_id) != wreck_data.ID:
 		if players_n.has_node(slayer_id):
