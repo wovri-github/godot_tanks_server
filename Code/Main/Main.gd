@@ -6,6 +6,8 @@ const MAX_CLIENTS = 16
 const NEW_BATTLE_START_WAITING = 500 # ms
 const VERIFY = preload("res://Code/Main/MainVerification.gd")
 
+const MAX_UPGRADES = 3
+
 var network = NetworkedMultiplayerENet.new()
 
 var playerS_last_time: Dictionary
@@ -13,6 +15,10 @@ var playerS_stance: Dictionary
 var bulletS_stance_on_collision: Array
 var player_data: Dictionary
 var temp_upgrades: Dictionary
+
+var settings_paths = GameSettings.get_paths()
+var player_choosen_upgrades: Dictionary
+
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
 onready var processing_timer = $Stance_process
@@ -108,6 +114,7 @@ func get_bullets_stances() -> Array:
 func start_new_game():
 	var game_inst = game_tscn.instance()
 	add_child(game_inst, true)
+	battle_timer_n._ready()
 	_ready()
 	var time_of_game_start = OS.get_ticks_msec() + NEW_BATTLE_START_WAITING
 	for player_id in player_data.keys():
@@ -119,6 +126,7 @@ func start_new_game():
 			"TR": 0,
 		}
 		game_n.spawn_player(player_id, spawn_point, player_data[player_id].Color)
+		choose_player_upgrades(player_id, MAX_UPGRADES)
 	var init_data = get_init_data()
 	init_data["TimeToStartNewGame"] = time_of_game_start
 	Transfer.send_new_battle(init_data)
@@ -143,6 +151,7 @@ func end_of_battle():
 	game_n = null
 	playerS_stance.clear()
 	temp_upgrades.clear()
+	player_choosen_upgrades.clear()
 	get_tree().set_pause(true)
 	start_new_game()
 
@@ -172,8 +181,9 @@ func add_bullet_stance_on_collision(bullet_stance_on_collision):
 		Transfer.send_shoot_bounce_state(bulletS_stance_on_collision, OS.get_ticks_msec())
 		bulletS_stance_on_collision.clear()
 
+
 func recive_upgrades(player_id: int, upgrades: Dictionary):
-	if !VERIFY.is_recive_upgrades_input_valid(player_id, game_n, upgrades, MAX_CLIENTS):
+	if !VERIFY.is_recive_upgrades_input_valid(player_id, game_n, upgrades, player_choosen_upgrades, MAX_CLIENTS):
 		return
 	var available_upgrade_points = game_n.player_upgrade_points[player_id]
 	var sum = 0
@@ -193,6 +203,14 @@ func add_temp_upgrades_to_player_data():
 				continue
 			player_data_upgrades[upgrade] = temp_upgrades[player_id][upgrade]
 
+func choose_player_upgrades(player_id, MAX_UPGRADES):
+	var upgrades: Array
+	var size = settings_paths.size()
+	for _i in range(MAX_UPGRADES):
+		randomize()
+		upgrades.append(settings_paths[randi() % size])
+	player_choosen_upgrades[player_id] = upgrades
+	print(player_choosen_upgrades)
 
 func _on_player_destroyed():
 	battle_timer_n.check_battle_timer()

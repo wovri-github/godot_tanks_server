@@ -1,25 +1,18 @@
 #extends Object
 
-static func is_recive_upgrades_input_valid(player_id: int, game_n: Node, upgrades: Dictionary, MAX_CLIENTS: int) -> bool:
+static func is_recive_upgrades_input_valid(player_id: int, game_n: Node, upgrades: Dictionary, player_choosen_upgrades: Dictionary, MAX_CLIENTS: int) -> bool:
 	if !game_n.player_upgrade_points.has(player_id):
 		printerr("[Main]: Upgrades may be recived only once per game. New upgrades droped.")
 		return false
 	var available_upgrade_points = game_n.player_upgrade_points[player_id]
 	var sum = 0
 	for upgrade in upgrades:
-		var temp_dict = GameSettings.get_settings()
-		var i = 0
-		for path_step in upgrade:
-			i += 1
-			if !temp_dict.has(path_step):
-				printerr("[Main]: There is no such key. Upgrades droped.")
-				return false
-			temp_dict = temp_dict[path_step]
-			if i == upgrade.size() and \
-					typeof(temp_dict) != TYPE_REAL and \
-					typeof(temp_dict) != TYPE_INT:
-				printerr("[Main]: Last value is not Float number. Upgrades droped.")
-				return false
+		if !player_choosen_upgrades.has(player_id):
+			printerr("[Main]: There is no player in choosen upgrades. Upgrades droped.")
+			return false
+		if !upgrade in player_choosen_upgrades[player_id]:
+			printerr("[Main]: There is no upgrade in choosen upgrades. Upgrades droped.")
+			return false
 		var val = upgrades[upgrade]
 		if typeof(val) != TYPE_INT:
 			printerr("[Main]: Values has to be integer! It only show how much points player spend on each upgrade")

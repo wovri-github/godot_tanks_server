@@ -3,6 +3,21 @@ class_name GameSettings
 const AMMO_TYPE = Ammunition.TYPES
 
 
+static func get_paths():
+	var current_dict = get_settings()
+	var properties: Array
+	var path: Array
+	_get_paths_recursion(null, get_settings(), properties, path)
+	return properties
+
+static func _get_paths_recursion(_key, dict, properties, path):
+	if typeof(dict) != TYPE_DICTIONARY:
+		properties.append(path.duplicate(true))
+		return
+	for key in dict:
+		path.append(key)
+		_get_paths_recursion(key, dict[key], properties, path)
+		path.pop_back()
 
 static func get_duplicate_settings():
 	var settings = {

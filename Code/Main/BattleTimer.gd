@@ -6,7 +6,11 @@ onready var game_n = $"../Game"
 
 
 func check_battle_timer():
-	var num_players_in_game = game_n.get_node("Players").get_child_count()
+	var num_players_in_game
+	if is_instance_valid(game_n):
+		num_players_in_game = 0
+	else:
+		num_players_in_game = game_n.get_node("Players").get_child_count()
 	if get_tree().multiplayer.get_network_connected_peers().size() != num_players_in_game:
 		var left_sec = calculate_time(num_players_in_game)
 		if num_players_in_game == 0:

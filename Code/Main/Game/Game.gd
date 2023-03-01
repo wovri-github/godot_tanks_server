@@ -19,8 +19,6 @@ onready var projectile_n = $Projectiles
 onready var players_n = $Players
 
 
-
-
 func setup(all_upgrades):
 	for players_upgrades in all_upgrades:
 		for upgrade in players_upgrades:
