@@ -2,24 +2,20 @@ extends Node
 
 const DEFALUT_PORT = 42521
 const MAX_CLIENTS = 16
-
 const NEW_BATTLE_START_WAITING = 500 # ms
-
-const MAX_UPGRADES = 3
 
 var network = NetworkedMultiplayerENet.new()
 
-var playerS_last_time: Dictionary
-var playerS_stance: Dictionary
+
 var bulletS_stance_on_collision: Array
 
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
-onready var upgrades_gd = preload("res://Code/Main/Upgrades.gd").new(MAX_CLIENTS)
-onready var processing_timer = $Stance_process
+onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new(MAX_CLIENTS)
+onready var stance_timer = $StanceSender
 onready var battle_timer_n = $BattleTimer
-onready var game_n = get_node(Dir.GAME)
-onready var map_n = get_node(Dir.MAP)
+onready var game_n = $Game
+onready var map_n = $Game/Map
 
 
 
@@ -50,7 +46,7 @@ func _ready():
 
 func get_init_data() -> Dictionary:
 	var init_data = {
-		"PlayerSData": get_playerS_data(),
+		"PlayerSData": Data.get_merged_players_data(),
 		"PlayerSCorpses": get_playerS_corpses(),
 		"BulletsStances": get_bullets_stances(),
 		"MapData": map_n.get_map_data(),
@@ -58,35 +54,32 @@ func get_init_data() -> Dictionary:
 	return init_data
 
 func player_initiation(player_id: int, player_name : String, player_color : Color, player_version):
-	var err = Functions.check_version(player_version)
+	var err = check_version(player_version)
 	if err == ERR_UNAUTHORIZED:
 		Transfer.send_old_version_info(player_id)
 		network.disconnect_peer(player_id)
-		print("[Main]: Old version. Connection droped")
+		print("[Main]: Old version detected. Connection droped")
 		return
-	Data.players[player_id] = {
-			"ID": player_id,
-			"Nick": player_name,
-			"Color": player_color,
-			"Score": {
-				"Wins": 0,
-				"Kills": 0,
-			},
-			"Upgrades": {}
+	var player_data = {
+		"ID": player_id,
+		"Nick": player_name,
+		"Color": player_color,
+		"Version": player_version,
 	}
 	var init_data = get_init_data()
 	init_data["TimeLeft"] = int(battle_timer_n.get_time_left())
-	playerS_last_time[player_id] = -INF
 	Transfer.send_init_data(player_id, init_data)
+	Data.add_new_player(player_data)
 	battle_timer_n.check_battle_timer()
 
-func get_playerS_data() -> Array:
-	var data: Array = []
-	for player in Data.players.values():
-		if playerS_stance.has(player.ID):
-			player.merge(playerS_stance[player.ID], true)
-			data.append(player)
-	return data
+static func check_version(version) -> int:
+	if version == null:
+		return OK
+	version = version.left(version.find_last("."))
+	if version in ProjectSettings.get_setting("application/other/available_versions"):
+		return OK
+	return ERR_UNAUTHORIZED
+
 
 func get_playerS_corpses():
 	var playerS_corpses = $Game/Objects.get_children()
@@ -115,14 +108,9 @@ func start_new_game():
 	var time_of_game_start = OS.get_ticks_msec() + NEW_BATTLE_START_WAITING
 	for player_id in Data.players:
 		var spawn_point = map_n.get_spawn_position()
-		playerS_stance[player_id] = {
-			"ID": player_id,
-			"P": spawn_point,
-			"R": 0,
-			"TR": 0,
-		}
+		Data.add_first_playerS_stance(player_id, spawn_point)
 		game_n.spawn_player(player_id, spawn_point, Data.players[player_id].Color)
-		upgrades_gd.choose_player_upgrades(player_id, MAX_UPGRADES)
+		upgrades_gd.choose_player_upgrades(player_id)
 	var init_data = get_init_data()
 	init_data["TimeToStartNewGame"] = time_of_game_start
 	Transfer.send_new_battle(init_data)
@@ -132,11 +120,11 @@ func start_new_game():
 func begin_battle():
 	print("[Main]: Battle has begun")
 	get_tree().set_pause(false)
-	processing_timer.start_timer()
+	stance_timer.start()
 
 func end_of_battle():
 	print("[Main]: End of battle")
-	processing_timer.stop_timer()
+	stance_timer.stop()
 	var players_in_game = game_n.get_node("Players").get_children()
 	if players_in_game.size() == 1:
 		var player_id = int(players_in_game[0].name)
@@ -145,19 +133,10 @@ func end_of_battle():
 	upgrades_gd.add_temp_upgrades_to_player_data()
 	yield(game_n, "tree_exited")
 	game_n = null
-	playerS_stance.clear()
+	Data.playerS_stance.clear()
 	get_tree().set_pause(true)
 	start_new_game()
 
-func add_player_stance(player_id, player_stance):
-	if !get_tree().is_paused(): 
-		# [info] This number [T] IS ONLY for making chronology. Don't use it
-		if playerS_last_time[player_id] < player_stance["T"] && \
-				$Game/Players.has_node(str(player_id)): 
-			playerS_last_time[player_id] = player_stance["T"]
-			player_stance.erase("T")
-			player_stance.ID = player_id
-			playerS_stance[player_id] = player_stance
 
 func player_shoot(player_stance, ammo_type):
 	if get_tree().is_paused(): 

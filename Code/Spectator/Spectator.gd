@@ -1,6 +1,6 @@
 extends Camera2D
 
-var s = Settings.SPECATOR.CAMERA
+var s = GameSettings.SPECATOR.CAMERA
 var following = false
 
 func zoom_point(zoom_diff, mouse_position):

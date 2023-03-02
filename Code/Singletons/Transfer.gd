@@ -29,7 +29,7 @@ func send_player_destroyed(corpse_data, kill_event_data):
 
 remote func recive_stance(player_stance: Dictionary):
 	var player_id = get_tree().get_rpc_sender_id()
-	main_n.add_player_stance(player_id, player_stance)
+	Data.add_player_stance(player_id, player_stance)
 
 func send_world_stance(time, playerS_stance):
 	rpc_unreliable("recive_world_stance", time, playerS_stance)

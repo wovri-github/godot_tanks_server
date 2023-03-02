@@ -89,11 +89,6 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/gdUnit3/src/matchers/EqualsArgumentMatcher.gd"
 }, {
-"base": "Reference",
-"class": "Functions",
-"language": "GDScript",
-"path": "res://Code/Singletons/Functions.gd"
-}, {
 "base": "Resource",
 "class": "Fuzzer",
 "language": "GDScript",
@@ -112,7 +107,7 @@ _global_script_classes=[ {
 "base": "Reference",
 "class": "GameSettings",
 "language": "GDScript",
-"path": "res://Code/Main/Game/GameSettings.gd"
+"path": "res://Code/Singletons/GameSettings.gd"
 }, {
 "base": "GdUnitTestSuite",
 "class": "GameTest",
@@ -761,7 +756,6 @@ _global_script_class_icons={
 "DefaultValueProvider": "",
 "Dir": "",
 "EqualsArgumentMatcher": "",
-"Functions": "",
 "Fuzzer": "",
 "FuzzerTool": "",
 "Fuzzers": "",
@@ -903,7 +897,6 @@ other/available_versions=PoolStringArray( "0.1" )
 
 [autoload]
 
-Settings="*res://Code/Singletons/Settings.tscn"
 Transfer="*res://Code/Singletons/Transfer.tscn"
 Data="*res://Code/Singletons/Data.tscn"
 

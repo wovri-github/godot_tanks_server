@@ -1,5 +1,6 @@
 extends GDScript
 
+const MAX_UPGRADES = GameSettings.MAX_UPGRADES
 var player_choosen_upgrades: Dictionary
 var max_points
 var temp_upgrades: Dictionary
@@ -9,7 +10,6 @@ var player_upgrade_points: Dictionary
 
 func _init(_max_points: int):
 	max_points = _max_points
-
 
 func recive_upgrades(player_id: int, upgrades: Dictionary):
 	if !is_recive_upgrades_input_valid(player_id, upgrades):
@@ -59,7 +59,7 @@ func add_temp_upgrades_to_player_data():
 				continue
 			player_data_upgrades[upgrade] = temp_upgrades[player_id][upgrade]
 
-func choose_player_upgrades(player_id, MAX_UPGRADES):
+func choose_player_upgrades(player_id):
 	var upgrades: Array = []
 	var size = settings_paths.size()
 	for _i in range(MAX_UPGRADES):

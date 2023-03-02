@@ -1,6 +1,8 @@
 class_name GameSettings
 
 const AMMO_TYPE = Ammunition.TYPES
+const MAX_UPGRADES = 3
+const PERCENTAGE_OF_BASE_VALUE_PER_POINT = 0.1
 
 
 static func get_paths():
@@ -75,4 +77,25 @@ const AMMUNITION = {
 	AMMO_TYPE.FIREBALL:{
 		"Speed" : 200,
 	},
+}
+
+
+const CAMERA = {
+	"CAMERA_ZOOM_SPEED" : 0.3,
+	"CAMERA_MAX_ZOOM_IN" : Vector2(0.1, 0.1),
+	"CAMERA_MAX_ZOOM_OUT" : Vector2(2, 2),
+}
+
+const SPECATOR = {
+	"CAMERA":{
+		"ZOOM_SPEED" : 0.3,
+		"MOVE_SPEED" : 50,
+		"MAX_ZOOM_IN" : Vector2(0.1, 0.1),
+		"MAX_ZOOM_OUT" : Vector2(100, 100),
+	}
+}
+
+const INDICATORS = {
+	"MAX_COUNT" : 5,
+	"ARROW_MARGIN" : 20,
 }

@@ -3,7 +3,6 @@ extends Node
 signal map_created
 
 const ammo_box_tscn = preload("res://Code/Objects/AmmoBox.tscn")
-#const TILE_MAP_TSCN = preload("res://Code/Main/Game/Map/TileMap.tscn")
 const TYPE = MapGlobal.TILE_TYPE
 
 var number_of_repetition = 0
@@ -16,7 +15,6 @@ onready var ammo_boxes_n = $"%AmmoBoxes"
 
 
 func _ready():
-#	generate_new_map()
 	rng.randomize()
 	spawn_ammo_boxes()
 	emit_signal("map_created")

@@ -3,7 +3,7 @@ extends Node2D
 signal player_destroyed(wreck_data, slayer_id, is_slayer_dead)
 
 
-const PERCENTAGE_OF_BASE_VALUE_PER_POINT = 0.1
+const VALUE_PER_POINT = GameSettings.PERCENTAGE_OF_BASE_VALUE_PER_POINT
 const WRECK_TSCN = preload("res://Code/Objects/Wreck.tscn")
 const TANK_TSCN = preload("res://Code/Player/TankModel.tscn")
 const AMMO_TYPES = Ammunition.TYPES
@@ -37,8 +37,8 @@ func add_upgrades_to_settings():
 				i += 1
 				if i == upgrade.size():
 					temp_dict[path_step] += players_upgrades[upgrade] * \
-							(temp_orginal_dict[path_step] * \
-							PERCENTAGE_OF_BASE_VALUE_PER_POINT)
+							temp_orginal_dict[path_step] * \
+							VALUE_PER_POINT
 					break
 				temp_dict = temp_dict[path_step]
 				temp_orginal_dict = temp_orginal_dict[path_step]
@@ -58,6 +58,8 @@ func spawn_player(player_id, spawn_point, color):
 
 func _on_player_destroyed(slayer_id, wreck_data):
 	spawn_wreck(wreck_data)
+	Data.playerS_stance.erase(wreck_data.ID)
+	Data.playerS_last_time.erase(wreck_data.ID)
 	var is_slayer_dead = false
 	if players_n.has_node(slayer_id):
 		players_n.get_node(slayer_id).kills += 1
@@ -84,7 +86,7 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 
 
 func _physics_process(_delta):
-	var players_stance = get_parent().playerS_stance
+	var players_stance = Data.playerS_stance
 	if players_stance.empty() == true:
 		return
 	for player_stance in players_stance.values():
