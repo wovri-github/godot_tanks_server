@@ -13,7 +13,7 @@ var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
 onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new(MAX_CLIENTS)
 onready var stance_timer = $StanceSender
-onready var battle_timer_n = $BattleTimer
+onready var battle_timer_n = $Game/BattleTimer
 onready var game_n = $Game
 onready var map_n = $Game/Map
 
@@ -38,10 +38,11 @@ func _peer_disconnected(player_id) -> void:
 	var player_n = get_node_or_null("/root/Main/Game/Players/" + str(player_id))
 	if player_n:
 		player_n.die()
-	battle_timer_n.check_battle_timer()
+	game_n.check_battle_timer()
 
 func _ready():
 	game_n.connect("player_destroyed", self, "_on_player_destroyed")
+	battle_timer_n.connect("timeout", self, "end_of_battle")
 
 
 func get_init_data() -> Dictionary:
@@ -70,7 +71,7 @@ func player_initiation(player_id: int, player_name : String, player_color : Colo
 	init_data["TimeLeft"] = int(battle_timer_n.get_time_left())
 	Transfer.send_init_data(player_id, init_data)
 	Data.add_new_player(player_data)
-	battle_timer_n.check_battle_timer()
+	game_n.check_battle_timer()
 
 static func check_version(version) -> int:
 	if version == null:
@@ -103,7 +104,6 @@ func get_bullets_stances() -> Array:
 func start_new_game():
 	var game_inst = game_tscn.instance()
 	add_child(game_inst, true)
-	battle_timer_n._ready()
 	_ready()
 	var time_of_game_start = OS.get_ticks_msec() + NEW_BATTLE_START_WAITING
 	for player_id in Data.players:
@@ -156,7 +156,6 @@ func add_bullet_stance_on_collision(bullet_stance_on_collision):
 
 
 func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):
-	battle_timer_n.check_battle_timer()
 	upgrades_gd.set_points_to_upgrade_points(wreck_data, slayer_id, is_slayer_dead)
 	Transfer.send_player_possible_upgrades(wreck_data.ID, upgrades_gd.player_choosen_upgrades[wreck_data.ID])
 	if wreck_data.ID == slayer_id:
@@ -165,5 +164,5 @@ func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):
 
 func _on_Button_pressed():
 	# [info] only for testing purposes
-	$BattleTimer.stop()
+	battle_timer_n.stop()
 	end_of_battle()

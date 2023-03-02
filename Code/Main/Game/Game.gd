@@ -20,11 +20,11 @@ var orginal_settings = GameSettings.get_settings()
 var player_upgrade_points: Dictionary
 onready var projectile_n = $Projectiles
 onready var players_n = $Players
+onready var battle_timer_n = $BattleTimer
 
 
 func _ready():
 	add_upgrades_to_settings()
-
 
 func add_upgrades_to_settings():
 	var all_upgrades = get_all_players_upgrades()
@@ -60,6 +60,7 @@ func _on_player_destroyed(slayer_id, wreck_data):
 	spawn_wreck(wreck_data)
 	Data.playerS_stance.erase(wreck_data.ID)
 	Data.playerS_last_time.erase(wreck_data.ID)
+	check_battle_timer()
 	var is_slayer_dead = false
 	if players_n.has_node(slayer_id):
 		players_n.get_node(slayer_id).kills += 1
@@ -97,6 +98,11 @@ func update_player_position(player_stance):
 		return
 	get_node("Players/" + str(player_stance.ID)).call_deferred(\
 			"set_stance", player_stance.P, player_stance.R)
+
+
+func check_battle_timer():
+	var players_alive = players_n.get_child_count()
+	battle_timer_n.check_time(players_alive)
 
 
 #---------Verification----------
