@@ -2,6 +2,8 @@ extends Node2D
 
 signal player_destroyed(wreck_data, slayer_id, is_slayer_dead)
 
+
+const PERCENTAGE_OF_BASE_VALUE_PER_POINT = 0.1
 const WRECK_TSCN = preload("res://Code/Objects/Wreck.tscn")
 const TANK_TSCN = preload("res://Code/Player/TankModel.tscn")
 const AMMO_TYPES = Ammunition.TYPES
@@ -14,22 +16,39 @@ const shootable_tscn = {
 	AMMO_TYPES.FIREBALL: preload("res://Code/Shootable/Projectiles/Fireball.tscn")
 }
 var settings = GameSettings.get_duplicate_settings()
+var orginal_settings = GameSettings.get_settings()
 var player_upgrade_points: Dictionary
 onready var projectile_n = $Projectiles
 onready var players_n = $Players
 
 
-func setup(all_upgrades):
+func _ready():
+	add_upgrades_to_settings()
+
+
+func add_upgrades_to_settings():
+	var all_upgrades = get_all_players_upgrades()
 	for players_upgrades in all_upgrades:
 		for upgrade in players_upgrades:
 			var temp_dict = settings
+			var temp_orginal_dict = orginal_settings
 			var i = 0
 			for path_step in upgrade:
 				i += 1
 				if i == upgrade.size():
-					temp_dict[path_step] += players_upgrades[upgrade]
+					temp_dict[path_step] += players_upgrades[upgrade] * \
+							(temp_orginal_dict[path_step] * \
+							PERCENTAGE_OF_BASE_VALUE_PER_POINT)
 					break
 				temp_dict = temp_dict[path_step]
+				temp_orginal_dict = temp_orginal_dict[path_step]
+
+func get_all_players_upgrades():
+	var upgrades: Array = []
+	for player_id in Data.players:
+		upgrades.append(Data.players[player_id].Upgrades)
+	return upgrades
+
 
 func spawn_player(player_id, spawn_point, color):
 	var player_inst = TANK_TSCN.instance()

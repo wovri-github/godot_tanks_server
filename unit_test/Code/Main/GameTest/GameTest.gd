@@ -6,43 +6,45 @@ extends GdUnitTestSuite
 
 # TestSuite generated from
 const __source = 'res://Code/Main/Game/Game.gd'
-#var game_n = preload(__source).new()
+var game_n
 
-func test_setup_null() -> void:
-	var game_n = preload(__source).new()
-	var upgrades = []
-	var target_dict = GameSettings.get_duplicate_settings()
-	game_n.setup(upgrades)
+func before():
+	game_n = preload(__source).new()
+
+
+func test_add_upgrades_to_settings_null() -> void:
+	game_n.add_upgrades_to_settings()
 	assert_dict(game_n.settings).is_not_empty()
-	game_n.queue_free()
 
 func test_setup_one_upgrade() -> void:
 	var game_n = preload(__source).new()
-	var upgrades = [
-		{
-			["Tank", "Speed"]: 5
+	Data.players = {
+		1:{
+			"Upgrades":{
+				["Tank", "Speed"]: 3
+			}
 		}
-	]
+	}
 	var dict = GameSettings.get_duplicate_settings()
-	dict.Tank.Speed += 5
-	game_n.setup(upgrades)
+	dict.Tank.Speed += 30
+	game_n.add_upgrades_to_settings()
 	assert_dict(game_n.settings.Tank).contains_key_value("Speed", dict.Tank.Speed)
 	game_n.queue_free()
 	
 func test_setup_two_upgrades() -> void:
 	var game_n = preload(__source).new()
-	var upgrades = [
-		{
-			["Tank", "Speed"]: 5
-		},
-		{
-			["Wreck", "LifeTime"]: 10
-		},
-	]
+	Data.players ={
+		1:{
+			"Upgrades":{
+				["Tank", "Speed"]: 5,
+				["Wreck", "LifeTime"]: 10,
+			}
+		}
+	}
 	var dict = GameSettings.get_duplicate_settings()
-	dict.Tank.Speed += 5
-	dict.Wreck.LifeTime += 10
-	game_n.setup(upgrades)
+	dict.Tank.Speed += float(50)
+	dict.Wreck.LifeTime += float(20)
+	game_n.add_upgrades_to_settings()
 	assert_dict(game_n.settings.Tank)\
 			.contains_key_value("Speed", dict.Tank.Speed)
 	assert_dict(game_n.settings.Wreck)\
@@ -51,43 +53,48 @@ func test_setup_two_upgrades() -> void:
 
 func test_setup_inner_upgrade() -> void:
 	var game_n = preload(__source).new()
-	var upgrades = [
-		{
-			["Ammunition", Ammunition.TYPES.FRAG_BOMB, "Frag", "Scale"]: 0.5
-		},
-	]
+	Data.players ={
+		1:{
+			"Upgrades":{
+				["Ammunition", Ammunition.TYPES.FRAG_BOMB, "Frag", "Scale"]: 1
+				
+			}
+		}
+	}
 	var dict = GameSettings.get_duplicate_settings()
-	dict.Ammunition[Ammunition.TYPES.FRAG_BOMB].Frag.Scale += 0.5
-	game_n.setup(upgrades)
+	dict.Ammunition[Ammunition.TYPES.FRAG_BOMB].Frag.Scale += float(0.05)
+	game_n.add_upgrades_to_settings()
 	assert_dict(game_n.settings.Ammunition[Ammunition.TYPES.FRAG_BOMB].Frag)\
 			.contains_key_value("Scale", dict.Ammunition[Ammunition.TYPES.FRAG_BOMB].Frag.Scale)
 	game_n.queue_free()
 
 func test_setup_multiple_players() -> void:
 	var game_n = preload(__source).new()
-	var upgrades = [
-		{
-			["Tank", "Speed"]: 5
+	Data.players ={
+		1:{
+			"Upgrades":{
+				["Tank", "Speed"]: 1,
+				
+			}
 		},
-		{
-			["Tank", "Speed"]: 5
+		2:{
+			"Upgrades":{
+				["Wreck", "LifeTime"]: 5,
+				["Tank", "Speed"]: 1,
+				
+			}
 		},
-		{
-			["Wreck", "LifeTime"]: 10,
-			["Tank", "Speed"]: 5
+		3:{
+			"Upgrades":{
+				["Ammunition", Ammunition.TYPES.FRAG_BOMB, "Frag", "Scale"]: 1,
+			}
 		},
-		{
-			["Ammunition", Ammunition.TYPES.FRAG_BOMB, "Frag", "Scale"]: 0.5
-		},
-		{
-			["Ammunition", Ammunition.TYPES.FRAG_BOMB, "Frag", "Scale"]: 0.5
-		},
-	]
+	}
 	var dict = GameSettings.get_duplicate_settings()
-	dict.Tank.Speed += 15
-	dict.Wreck.LifeTime += 10
-	dict.Ammunition[Ammunition.TYPES.FRAG_BOMB].Frag.Scale += 1
-	game_n.setup(upgrades)
+	dict.Tank.Speed += float(20)
+	dict.Wreck.LifeTime += float(10)
+	dict.Ammunition[Ammunition.TYPES.FRAG_BOMB].Frag.Scale += 0.05
+	game_n.add_upgrades_to_settings()
 	assert_dict(game_n.settings.Wreck)\
 			.contains_key_value("LifeTime", dict.Wreck.LifeTime)
 	assert_dict(game_n.settings.Tank)\

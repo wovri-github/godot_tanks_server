@@ -4,7 +4,6 @@ const DEFALUT_PORT = 42521
 const MAX_CLIENTS = 16
 
 const NEW_BATTLE_START_WAITING = 500 # ms
-const VERIFY = preload("res://Code/Main/MainVerification.gd")
 
 const MAX_UPGRADES = 3
 
@@ -147,8 +146,6 @@ func end_of_battle():
 	yield(game_n, "tree_exited")
 	game_n = null
 	playerS_stance.clear()
-#	temp_upgrades.clear()
-#	player_choosen_upgrades.clear()
 	get_tree().set_pause(true)
 	start_new_game()
 
@@ -180,11 +177,12 @@ func add_bullet_stance_on_collision(bullet_stance_on_collision):
 
 
 func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):
-	upgrades_gd.set_points_to_upgrade_points(wreck_data, slayer_id, is_slayer_dead)
 	battle_timer_n.check_battle_timer()
+	upgrades_gd.set_points_to_upgrade_points(wreck_data, slayer_id, is_slayer_dead)
 	Transfer.send_player_possible_upgrades(wreck_data.ID, upgrades_gd.player_choosen_upgrades[wreck_data.ID])
 	if wreck_data.ID == slayer_id:
 		upgrades_gd.player_choosen_upgrades.erase(wreck_data.ID)
+
 
 func _on_Button_pressed():
 	# [info] only for testing purposes
