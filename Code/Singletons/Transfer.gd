@@ -53,4 +53,4 @@ func send_player_possible_upgrades(player_id, player_choosen_upgrades):
 
 remote func recive_upgrade(upgrades: Dictionary):
 	var player_id = get_tree().get_rpc_sender_id()
-	main_n.recive_upgrades(player_id, upgrades)
+	main_n.upgrades_gd.recive_upgrades(player_id, upgrades)

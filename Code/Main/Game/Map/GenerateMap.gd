@@ -95,7 +95,7 @@ func _ready():
 
 
 func set_values_logick():
-	MAX_PLAYERS = get_node("/root/Main").player_data.size()
+	MAX_PLAYERS = Data.players.size()
 	define_map_size()
 	define_removing_cell()
 

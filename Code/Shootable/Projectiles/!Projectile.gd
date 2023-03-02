@@ -7,7 +7,6 @@ var ammo_type = NAN
 var is_frag_bomb_frag = false
 var position_1 = position
 onready var main_n = $"/root/Main"
-onready var game_n = get_node(Dir.GAME)
 
 
 
@@ -44,8 +43,8 @@ func _on_Projectile_body_entered(body):
 		}
 		main_n.add_bullet_stance_on_collision(bullet_stance)
 	else:
-		if owner_id != int(body.name) and main_n.player_data.has(owner_id):
-			main_n.player_data[int(owner_id)].Score.Kills += 1
+		if owner_id != int(body.name) and Data.players.has(owner_id):
+			Data.players[int(owner_id)].Score.Kills += 1
 		var _name = name
 		if is_frag_bomb_frag:
 			_name = null

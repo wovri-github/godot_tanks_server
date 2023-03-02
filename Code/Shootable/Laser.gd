@@ -55,8 +55,8 @@ func cast_laser():
 		add_point(to_local(ray.get_collision_point()))
 		
 		if collider.is_in_group("Players"):
-			if owner_id != int(collider.name) and main_n.player_data.has(owner_id):
-				main_n.player_data[int(owner_id)].Score.Kills += 1
+			if owner_id != int(collider.name) and Data.players.has(owner_id):
+				Data.players[int(owner_id)].Score.Kills += 1
 			collider.die({"KillerID" : str(owner_id), "KilledID" : collider.name, "AT" : ammo_type, "PName" : null}) # name as null bcs we cant destroy it
 			break
 		

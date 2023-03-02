@@ -13,18 +13,15 @@ var network = NetworkedMultiplayerENet.new()
 var playerS_last_time: Dictionary
 var playerS_stance: Dictionary
 var bulletS_stance_on_collision: Array
-var player_data: Dictionary
-var temp_upgrades: Dictionary
-
-var settings_paths = GameSettings.get_paths()
-var player_choosen_upgrades: Dictionary
 
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
+onready var upgrades_gd = preload("res://Code/Main/Upgrades.gd").new(MAX_CLIENTS)
 onready var processing_timer = $Stance_process
 onready var battle_timer_n = $BattleTimer
 onready var game_n = get_node(Dir.GAME)
 onready var map_n = get_node(Dir.MAP)
+
 
 
 func _enter_tree() -> void:
@@ -42,7 +39,7 @@ func _peer_conected(player_id) -> void:
 
 func _peer_disconnected(player_id) -> void:
 	print("[Main]: Player " + str(player_id) + " disconnected")
-	var _err = player_data.erase(player_id)
+	var _err = Data.players.erase(player_id)
 	var player_n = get_node_or_null("/root/Main/Game/Players/" + str(player_id))
 	if player_n:
 		player_n.die()
@@ -68,7 +65,7 @@ func player_initiation(player_id: int, player_name : String, player_color : Colo
 		network.disconnect_peer(player_id)
 		print("[Main]: Old version. Connection droped")
 		return
-	player_data[player_id] = {
+	Data.players[player_id] = {
 			"ID": player_id,
 			"Nick": player_name,
 			"Color": player_color,
@@ -86,7 +83,7 @@ func player_initiation(player_id: int, player_name : String, player_color : Colo
 
 func get_playerS_data() -> Array:
 	var data: Array = []
-	for player in player_data.values():
+	for player in Data.players.values():
 		if playerS_stance.has(player.ID):
 			player.merge(playerS_stance[player.ID], true)
 			data.append(player)
@@ -117,7 +114,7 @@ func start_new_game():
 	battle_timer_n._ready()
 	_ready()
 	var time_of_game_start = OS.get_ticks_msec() + NEW_BATTLE_START_WAITING
-	for player_id in player_data.keys():
+	for player_id in Data.players:
 		var spawn_point = map_n.get_spawn_position()
 		playerS_stance[player_id] = {
 			"ID": player_id,
@@ -125,8 +122,8 @@ func start_new_game():
 			"R": 0,
 			"TR": 0,
 		}
-		game_n.spawn_player(player_id, spawn_point, player_data[player_id].Color)
-		choose_player_upgrades(player_id, MAX_UPGRADES)
+		game_n.spawn_player(player_id, spawn_point, Data.players[player_id].Color)
+		upgrades_gd.choose_player_upgrades(player_id, MAX_UPGRADES)
 	var init_data = get_init_data()
 	init_data["TimeToStartNewGame"] = time_of_game_start
 	Transfer.send_new_battle(init_data)
@@ -144,14 +141,14 @@ func end_of_battle():
 	var players_in_game = game_n.get_node("Players").get_children()
 	if players_in_game.size() == 1:
 		var player_id = int(players_in_game[0].name)
-		player_data[player_id].Score.Wins += 1
+		Data.players[player_id].Score.Wins += 1
 	game_n.queue_free()
-	add_temp_upgrades_to_player_data()
+	upgrades_gd.add_temp_upgrades_to_player_data()
 	yield(game_n, "tree_exited")
 	game_n = null
 	playerS_stance.clear()
-	temp_upgrades.clear()
-	player_choosen_upgrades.clear()
+#	temp_upgrades.clear()
+#	player_choosen_upgrades.clear()
 	get_tree().set_pause(true)
 	start_new_game()
 
@@ -182,40 +179,12 @@ func add_bullet_stance_on_collision(bullet_stance_on_collision):
 		bulletS_stance_on_collision.clear()
 
 
-func recive_upgrades(player_id: int, upgrades: Dictionary):
-	if !VERIFY.is_recive_upgrades_input_valid(player_id, game_n, upgrades, player_choosen_upgrades, MAX_CLIENTS):
-		return
-	var available_upgrade_points = game_n.player_upgrade_points[player_id]
-	var sum = 0
-	for upgrade in upgrades:
-		var val = upgrades[upgrade]
-		sum += val
-	var points_left = sum - available_upgrade_points
-	game_n.player_upgrade_points[player_id] = points_left
-	temp_upgrades[player_id] = upgrades
-
-func add_temp_upgrades_to_player_data():
-	for player_id in temp_upgrades:
-		var player_data_upgrades = player_data[player_id].Upgrades
-		for upgrade in temp_upgrades[player_id]:
-			if player_data_upgrades.has(upgrade):
-				player_data_upgrades[upgrade] += temp_upgrades[player_id][upgrade]
-				continue
-			player_data_upgrades[upgrade] = temp_upgrades[player_id][upgrade]
-
-func choose_player_upgrades(player_id, MAX_UPGRADES):
-	var upgrades: Array = []
-	var size = settings_paths.size()
-	for _i in range(MAX_UPGRADES):
-		randomize()
-		upgrades.append(settings_paths[randi() % size])
-	player_choosen_upgrades[player_id] = upgrades
-
-func _on_player_destroyed(player_id, slayer_id):
-	if player_id == slayer_id:
-		player_choosen_upgrades.erase(player_id)
+func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):
+	upgrades_gd.set_points_to_upgrade_points(wreck_data, slayer_id, is_slayer_dead)
 	battle_timer_n.check_battle_timer()
-	Transfer.send_player_possible_upgrades(player_id, player_choosen_upgrades[player_choosen_upgrades])
+	Transfer.send_player_possible_upgrades(wreck_data.ID, upgrades_gd.player_choosen_upgrades[wreck_data.ID])
+	if wreck_data.ID == slayer_id:
+		upgrades_gd.player_choosen_upgrades.erase(wreck_data.ID)
 
 func _on_Button_pressed():
 	# [info] only for testing purposes
