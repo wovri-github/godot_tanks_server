@@ -5,10 +5,6 @@ const MAX_CLIENTS = 16
 const NEW_BATTLE_START_WAITING = 500 # ms
 
 var network = NetworkedMultiplayerENet.new()
-
-
-var bulletS_stance_on_collision: Array
-
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
 onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new(MAX_CLIENTS)
@@ -145,14 +141,6 @@ func player_shoot(player_stance, ammo_type):
 	var bullet_data = game_n.spawn_bullet(player_stance.ID, player_stance.TR, ammo_type)
 	if bullet_data != null:
 		Transfer.send_shoot(player_stance.ID, bullet_data)
-
-func add_bullet_stance_on_collision(bullet_stance_on_collision):
-	bulletS_stance_on_collision.append(bullet_stance_on_collision)
-	#[info] When two bullets collide its better to send it in one file
-	yield(get_tree(), "idle_frame")
-	if bulletS_stance_on_collision.empty() == false:
-		Transfer.send_shoot_bounce_state(bulletS_stance_on_collision, OS.get_ticks_msec())
-		bulletS_stance_on_collision.clear()
 
 
 func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):

@@ -1,6 +1,8 @@
 extends RigidBody2D
 class_name Projectile
 
+signal wall_collided(bullet_stance)
+
 var s: Dictionary
 var owner_id = NAN
 var ammo_type = NAN
@@ -41,7 +43,7 @@ func _on_Projectile_body_entered(body):
 			"Pos": get_position(), 
 			"LV": get_linear_velocity(),
 		}
-		main_n.add_bullet_stance_on_collision(bullet_stance)
+		emit_signal("wall_collided", bullet_stance)
 	else:
 		if owner_id != int(body.name) and Data.players.has(owner_id):
 			Data.players[int(owner_id)].Score.Kills += 1

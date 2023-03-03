@@ -18,9 +18,11 @@ const shootable_tscn = {
 var settings = GameSettings.get_duplicate_settings()
 var orginal_settings = GameSettings.get_settings()
 var player_upgrade_points: Dictionary
+var bulletS_stance_on_collision: Array
 onready var projectile_n = $Projectiles
 onready var players_n = $Players
 onready var battle_timer_n = $BattleTimer
+
 
 
 func _ready():
@@ -81,9 +83,20 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 		return null
 	player_n.rotate_turret(turret_rotation)
 	var bullet_inst = shootable_tscn[ammo_type].instance()
+	bullet_inst.connect("wall_collided", self, "_on_wall_collided")
 	bullet_inst.setup(player_n, ammo_type, settings.Ammunition[ammo_type])
 	projectile_n.add_child(bullet_inst, true)
 	return bullet_inst.get_data()
+
+
+func _on_wall_collided(bullet_stance_on_collision):
+	bulletS_stance_on_collision.append(bullet_stance_on_collision)
+	#[info] When two bullets collide its better to send it in one file
+	yield(get_tree(), "idle_frame")
+	if bulletS_stance_on_collision.empty() == false:
+		Transfer.send_shoot_bounce_state(bulletS_stance_on_collision, OS.get_ticks_msec())
+		bulletS_stance_on_collision.clear()
+
 
 
 func _physics_process(_delta):
