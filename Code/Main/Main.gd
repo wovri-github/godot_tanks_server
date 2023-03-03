@@ -4,7 +4,8 @@ const DEFALUT_PORT = 42521
 const MAX_CLIENTS = 16
 const NEW_BATTLE_START_WAITING = 500 # ms
 
-var network = NetworkedMultiplayerENet.new()
+#var network = NetworkedMultiplayerENet.new()
+var network = WebSocketServer.new()
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
 onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new(MAX_CLIENTS)
@@ -20,8 +21,12 @@ func _enter_tree() -> void:
 	network.connect("peer_connected", self, "_peer_conected")
 	network.connect("peer_disconnected", self, "_peer_disconnected")
 
+#func _start_server() -> void:
+#	network.create_server(DEFALUT_PORT, MAX_CLIENTS)
+#	get_tree().set_network_peer(network)
+#	print("[Main]: Server started")
 func _start_server() -> void:
-	network.create_server(DEFALUT_PORT, MAX_CLIENTS)
+	network.listen(DEFALUT_PORT, PoolStringArray(), true)
 	get_tree().set_network_peer(network)
 	print("[Main]: Server started")
 
@@ -40,6 +45,8 @@ func _ready():
 	game_n.connect("player_destroyed", self, "_on_player_destroyed")
 	battle_timer_n.connect("timeout", self, "end_of_battle")
 
+func _process(delta):
+	network.poll()
 
 func get_init_data() -> Dictionary:
 	var init_data = {
