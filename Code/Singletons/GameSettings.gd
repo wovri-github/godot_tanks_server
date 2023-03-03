@@ -61,7 +61,7 @@ const AMMUNITION = {
 			"Speed" : 150,
 			"Scale" : 0.5,
 			"LifetimeMultiplayer" : 0.2,
-			"Type" : NAN,
+			"Type" : AMMO_TYPE.ROCKET,
 		},
 	},
 	AMMO_TYPE.LASER:{
@@ -81,9 +81,9 @@ const AMMUNITION = {
 
 
 const CAMERA = {
-	"CAMERA_ZOOM_SPEED" : 0.3,
-	"CAMERA_MAX_ZOOM_IN" : Vector2(0.1, 0.1),
-	"CAMERA_MAX_ZOOM_OUT" : Vector2(2, 2),
+	"ZOOM_SPEED" : 0.3,
+	"MAX_ZOOM_IN" : Vector2(0.1, 0.1),
+	"MAX_ZOOM_OUT" : Vector2(2, 2),
 }
 
 const SPECATOR = {

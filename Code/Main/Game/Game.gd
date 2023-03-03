@@ -1,6 +1,7 @@
 extends Node2D
 
 signal player_destroyed(wreck_data, slayer_id, is_slayer_dead)
+signal battle_over(alived_players)
 
 
 const VALUE_PER_POINT = GameSettings.PERCENTAGE_OF_BASE_VALUE_PER_POINT
@@ -67,6 +68,8 @@ func _on_player_destroyed(slayer_id, wreck_data):
 		players_n.get_node(slayer_id).kills += 1
 	else:
 		is_slayer_dead = true
+	if slayer_id == "":
+		return
 	emit_signal("player_destroyed", wreck_data, int(slayer_id), is_slayer_dead)
 
 func spawn_wreck(wreck_data):
@@ -82,7 +85,8 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 		return null
 	player_n.rotate_turret(turret_rotation)
 	var bullet_inst = shootable_tscn[ammo_type].instance()
-	bullet_inst.connect("wall_collided", self, "_on_wall_collided")
+	if ammo_type != Ammunition.TYPES.LASER:
+		bullet_inst.connect("wall_collided", self, "_on_wall_collided")
 	bullet_inst.setup(player_n, ammo_type, settings.Ammunition[ammo_type])
 	projectile_n.add_child(bullet_inst, true)
 	return bullet_inst.get_data()
@@ -95,7 +99,6 @@ func _on_wall_collided(bullet_stance_on_collision):
 	if bulletS_stance_on_collision.empty() == false:
 		Transfer.send_shoot_bounce_state(bulletS_stance_on_collision, OS.get_ticks_msec())
 		bulletS_stance_on_collision.clear()
-
 
 
 func _physics_process(_delta):
@@ -122,3 +125,10 @@ func is_player_alive(player_id) -> bool:
 	if has_node("Players/" + str(player_id)):
 		return true
 	return false
+
+#-----------Signals----------
+func _on_BattleTimer_timeout():
+	var alived_players_id: Array = []
+	for player in players_n.get_children():
+		alived_players_id.append({"ID":int(player.name), "Kills":player.kills})
+	emit_signal("battle_over", alived_players_id)
