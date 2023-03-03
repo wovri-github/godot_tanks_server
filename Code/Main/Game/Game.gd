@@ -71,7 +71,7 @@ func _on_player_destroyed(slayer_id, wreck_data):
 
 func spawn_wreck(wreck_data):
 	var wreck_inst = WRECK_TSCN.instance()
-	wreck_inst.setup(wreck_data)
+	wreck_inst.setup(wreck_data, settings.Wreck)
 	$Objects.call_deferred("add_child", wreck_inst)
 
 func spawn_bullet(player_id, turret_rotation, ammo_type):

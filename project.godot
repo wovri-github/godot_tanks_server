@@ -79,11 +79,6 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://addons/gdUnit3/src/asserts/DefaultValueProvider.gd"
 }, {
-"base": "Reference",
-"class": "Dir",
-"language": "GDScript",
-"path": "res://Code/Singletons/Dir.gd"
-}, {
 "base": "GdUnitArgumentMatcher",
 "class": "EqualsArgumentMatcher",
 "language": "GDScript",
@@ -754,7 +749,6 @@ _global_script_class_icons={
 "CmdOptions": "",
 "Comparator": "",
 "DefaultValueProvider": "",
-"Dir": "",
 "EqualsArgumentMatcher": "",
 "Fuzzer": "",
 "FuzzerTool": "",

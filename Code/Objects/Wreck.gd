@@ -1,11 +1,12 @@
 extends StaticBody2D
 
 var color = Color.blue # for players joining during battle
-onready var s = get_node(Dir.GAME).settings.Wreck
+onready var s = GameSettings.WRECK
 onready var life_timer_n = $LifeTimer
 
 
-func setup(data):
+func setup(data, _settings):
+	s = _settings
 	name = str(data.ID)
 	set_position(data.Pos)
 	set_rotation(data.Rot)
