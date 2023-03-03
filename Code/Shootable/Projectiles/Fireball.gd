@@ -15,6 +15,6 @@ func kill(body):
 		if owner_id != int(body.name) and Data.players.has(owner_id):
 			Data.players[int(owner_id)].Score.Kills += 1
 		var _name = name
-		body.die(_name, owner_id)
+		body.die({"KillerID" : str(owner_id), "KilledID" : body.name, "AT" : ammo_type, "PName" : _name})
 	if body.is_in_group("Projectile"):
 		body.die()
