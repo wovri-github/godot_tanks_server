@@ -52,8 +52,8 @@ func send_shoot_bounce_state(bulletS_state, time):
 	rpc_unreliable("recive_shoot_bounce_state", bulletS_state, time)
 
 
-func send_player_possible_upgrades(player_id, choosen_upgrades, points, self_destroyed):
-	rpc_id(player_id, "recive_player_possible_upgrades", choosen_upgrades, points, self_destroyed)
+func send_player_possible_upgrades(player_id, data):
+	rpc_id(player_id, "recive_player_possible_upgrades", data)
 
 
 remote func recive_upgrade(upgrades: Dictionary):

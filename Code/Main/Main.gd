@@ -8,11 +8,12 @@ const BATTLE_END_WAITING = 7500 # ms
 var network = NetworkedMultiplayerENet.new()
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
-onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new(MAX_CLIENTS)
 onready var stance_timer = $StanceSender
 onready var battle_timer_n = $Game/BattleTimer
 onready var game_n = $Game
 onready var map_n = $Game/Map
+
+onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new(game_n, MAX_CLIENTS)
 
 
 
@@ -37,8 +38,8 @@ func _peer_disconnected(player_id) -> void:
 		player_n.die()
 	game_n.check_battle_timer()
 
+
 func _ready():
-	game_n.connect("player_destroyed", self, "_on_player_destroyed")
 	game_n.connect("battle_over", self, "_on_battle_over")
 
 
@@ -125,11 +126,10 @@ func _on_battle_over(alived_players_id):
 	stance_timer.stop()
 	if alived_players_id.size() == 1:
 		Data.players[alived_players_id[0].ID].Score.Wins += 1
-		#make Special upgrade
-		make_upgrade(alived_players_id[0])
+		upgrades_gd.make_upgrade(alived_players_id[0], "Winner")
 	else:
 		for player_data in alived_players_id:
-			make_upgrade(player_data)
+			upgrades_gd.make_upgrade(player_data, "Normal")
 	Transfer.send_battle_over_time(time_to_end)
 	yield(get_tree().create_timer((time_to_end - OS.get_ticks_msec()) * 0.001),"timeout")
 	end_of_battle()
@@ -151,26 +151,6 @@ func player_shoot(player_stance, ammo_type):
 	var bullet_data = game_n.spawn_bullet(player_stance.ID, player_stance.TR, ammo_type)
 	if bullet_data != null:
 		Transfer.send_shoot(player_stance.ID, bullet_data)
-
-
-func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):
-	upgrades_gd.set_points_to_upgrade_points(wreck_data, slayer_id, is_slayer_dead)
-	var self_destroyed = false
-	if wreck_data.ID == slayer_id:
-		self_destroyed = true
-	Transfer.send_player_possible_upgrades(wreck_data.ID, \
-			upgrades_gd.player_choosen_upgrades[wreck_data.ID], \
-			upgrades_gd.player_upgrade_points[wreck_data.ID], \
-			self_destroyed)
-	if self_destroyed:
-		upgrades_gd.player_upgrade_points[wreck_data.ID] = -INF
-
-func make_upgrade(player_data):
-	upgrades_gd.set_points_to_upgrade_points(player_data, null, false)
-	Transfer.send_player_possible_upgrades(player_data.ID, \
-			upgrades_gd.player_choosen_upgrades[player_data.ID], \
-			upgrades_gd.player_upgrade_points[player_data.ID], \
-			false)
 
 
 func _on_Button_pressed():

@@ -1,84 +1,120 @@
 class_name GameSettings
 
-const AMMO_TYPE = Ammunition.TYPES
+const AT = Ammunition.TYPES
 const MAX_UPGRADES = 3
-const PERCENTAGE_OF_BASE_VALUE_PER_POINT = 0.1
+const VALUE_PER_POINT = 0.1
 
 
-static func get_paths():
-	var properties: Array = []
-	var path: Array = []
-	_get_paths_recursion(null, get_settings(), properties, path)
-	return properties
 
-static func _get_paths_recursion(_key, dict, properties, path):
-	if typeof(dict) != TYPE_DICTIONARY:
-		properties.append(path.duplicate(true))
-		return
-	for key in dict:
-		path.append(key)
-		_get_paths_recursion(key, dict[key], properties, path)
-		path.pop_back()
+static func get_all_players_upgrades():
+	var upgrades: Array = []
+	for player_id in Data.players:
+		upgrades.append(Data.players[player_id].Upgrades)
+	return upgrades
 
-static func get_duplicate_settings():
-	var settings = {
-		"Tank": TANK,
-		"Wreck": WRECK,
-		"Ammunition": AMMUNITION,
-	}
-	return settings.duplicate(true)
+static func set_dynamic_settings():
+	for path in STATIC:
+		var last = path.pop_back()
+		var temp_dict = Dynamic
+		for step in path:
+			temp_dict = temp_dict[step]
+		path.append(last)
+		temp_dict[last] = STATIC[path]
+	var all_upgrades = get_all_players_upgrades()
+	for players_upgrades in all_upgrades:
+		for upgrade in players_upgrades:
+			var temp_dict = Dynamic
+			var temp_orginal_dict = STATIC[upgrade]
+			var i = 0
+			for path_step in upgrade:
+				i += 1
+				if i == upgrade.size():
+					temp_dict[path_step] += players_upgrades[upgrade] * \
+							temp_orginal_dict * \
+							VALUE_PER_POINT
+					break
+				temp_dict = temp_dict[path_step]
 
-static func get_settings():
-	var settings = {
-		"Tank": TANK,
-		"Wreck": WRECK,
-		"Ammunition": AMMUNITION,
-	}
-	return settings
 
-const TANK = {
-	"Speed" : 100.0,
-	"RotationSpeed" : 2.0,
-	"MaxAmmo" : 5,
-	"BaseAmmoType" : Ammunition.TYPES.BULLET,
-	"MaxAmmoTypes" : 3, # including default bullet
+
+const STATIC = {
+	["Tank", "Speed"]: 100.0,
+	["Tank", "RotationSpeed"]: 2.0,
+	["Tank", "MaxAmmo"]: 5,
+	["Tank", "BaseAmmoType"]:  Ammunition.TYPES.BULLET,
+	["Tank", "MaxAmmoTypes"]: 3,
+	
+	["Wreck", "LifeTime"]: 20,
+	
+	["Ammunition", AT.BULLET, "Speed"]: 200,
+	
+	["Ammunition", AT.ROCKET, "Speed"]: 200,
+	["Ammunition", AT.ROCKET, "FollowSpeed"]: 150,
+	
+	["Ammunition", AT.FRAG_BOMB, "Speed"]: 200,
+	["Ammunition", AT.FRAG_BOMB, "Count"]: 30,
+	
+	["Ammunition", AT.FRAG_BOMB, "Frag", "Speed"]: 150,
+	["Ammunition", AT.FRAG_BOMB, "Frag", "Scale"]: 0.5,
+	["Ammunition", AT.FRAG_BOMB, "Frag", "LifetimeMultiplayer"]: 0.2,
+	["Ammunition", AT.FRAG_BOMB, "Frag", "Type"]: AT.BULLET,
+	
+	["Ammunition", AT.LASER, "Length"]: 2000,
+	["Ammunition", AT.LASER, "MaxBounces"]: 15,
+	["Ammunition", AT.LASER, "MaxWidth"]: 5,
+	
+	["Ammunition", AT.LASER_BULLET, "Speed"]: 200,
+	["Ammunition", AT.LASER_BULLET, "Length"]: 50,
+	["Ammunition", AT.LASER_BULLET, "MaxBounces"]: 15,
+	
+	["Ammunition", AT.FIREBALL, "Speed"]: 200,
 }
-const WRECK = {
-	"LifeTime" : 20,
-}
-const AMMUNITION = {
-	AMMO_TYPE.BULLET:{
-		"Speed" : 200,
+
+
+const Dynamic = {
+	"Tank": {
+		"Speed" : null,
+		"RotationSpeed" : null,
+		"MaxAmmo" : null,
+		"BaseAmmoType" : null,
+		"MaxAmmoTypes" : null, # including default bullet
 	},
-	AMMO_TYPE.ROCKET: {
-		"Speed" : 200,
-		"FollowSpeed" : 150,
+	"Wreck": {
+		"LifeTime" : null,
 	},
-	AMMO_TYPE.FRAG_BOMB: {
-		"Speed" : 200,
-		"Count" : 30,
-		"Frag":{
-			"Speed" : 150,
-			"Scale" : 0.5,
-			"LifetimeMultiplayer" : 0.2,
-			"Type" : AMMO_TYPE.ROCKET,
+	"Ammunition":{
+		AT.BULLET:{
+			"Speed" : null,
 		},
+		AT.ROCKET: {
+			"Speed" : null,
+			"FollowSpeed" : null,
+		},
+		AT.FRAG_BOMB: {
+			"Speed" : null,
+			"Count" : null,
+			"Frag":{
+				"Speed" : null,
+				"Scale" : null,
+				"LifetimeMultiplayer" : null,
+				"Type" : null,
+			},
+		},
+		AT.LASER:{
+			"Length" : null,
+			"MaxBounces" : null,
+			"MaxWidth" : null,
+		},
+		AT.LASER_BULLET:{
+			"Speed" : null,
+			"Length" : null,
+			"MaxBounces" : null,
+		},
+		AT.FIREBALL:{
+			"Speed" : null,
 	},
-	AMMO_TYPE.LASER:{
-		"Length" : 2000,
-		"MaxBounces" : 15,
-		"MaxWidth" : 5,
-	},
-	AMMO_TYPE.LASER_BULLET:{
-		"Speed" : 200,
-		"Length" : 50,
-		"MaxBounces" : 15,
-	},
-	AMMO_TYPE.FIREBALL:{
-		"Speed" : 200,
-	},
+	}
 }
-
 
 const CAMERA = {
 	"ZOOM_SPEED" : 0.3,

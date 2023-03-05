@@ -5,6 +5,13 @@ onready var navigation_agent: NavigationAgent2D = $NavigationAgent2D
 var started_targeting = false
 var x = -0.5
 
+var s = GameSettings.Dynamic.Ammunition[Ammunition.TYPES.ROCKET]
+
+func _ready():
+	position = spawn_point
+	var velocity = Vector2.UP.rotated(spawn_rotation) * s.Speed
+	set_linear_velocity(velocity)
+
 
 func get_stance() -> Dictionary:
 	var stance = {

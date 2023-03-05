@@ -1,5 +1,11 @@
 extends Projectile
 
+var s = GameSettings.Dynamic.Ammunition[Ammunition.TYPES.FIREBALL]
+
+func _ready():
+	position = spawn_point
+	var velocity = Vector2.UP.rotated(spawn_rotation) * s.Speed
+	set_linear_velocity(velocity)
 
 
 func _on_Fireball_body_entered(_body):

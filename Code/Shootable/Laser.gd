@@ -1,6 +1,6 @@
 extends Line2D
 
-var s: Dictionary
+var s = GameSettings.Dynamic.Ammunition[Ammunition.TYPES.LASER]
 var ammo_type
 var owner_id = NAN
 var point : Position2D = null
@@ -10,13 +10,11 @@ onready var ray = $RayCast2D
 onready var main_n = $"/root/Main"
 
 
-func setup(player_n : KinematicBody2D, _ammo_type, _settings):
-	s = _settings
-	owner_id = int(player_n.name)
+func setup(_owner_id, _spawn_point, _spawn_rotation, _ammo_type):
+	owner_id = _owner_id
 	ammo_type = _ammo_type
-	point = player_n.get_node("%LaserSpawn")
-	position = point.global_position
-	point_rotation = point.global_rotation
+	position = _spawn_point
+	point_rotation = _spawn_rotation
 
 func get_data():
 	var pck = Shootable.get_data(
@@ -33,13 +31,13 @@ func _ready():
 	cast_laser()
 
 func cast_laser():
-	global_position = point.global_position
+	#global_position = point.global_position
 	var length_left = s.Length
 	
 	clear_points()
 	add_point(Vector2.ZERO)
 	ray.position = Vector2.ZERO
-	ray.cast_to = Vector2.UP.rotated(point.global_rotation) * length_left
+	ray.cast_to = Vector2.UP.rotated(point_rotation) * length_left
 	ray.force_raycast_update()
 	
 	for _i in range(s.MaxBounces):	# limit bounces
