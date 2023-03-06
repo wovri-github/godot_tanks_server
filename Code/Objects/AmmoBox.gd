@@ -18,6 +18,7 @@ func _on_AmmoBox_body_entered(body):
 	if !body.is_in_group("Players"):
 		return
 	if body.pick_up_ammo_box(type):
+		get_node("/root/Main").ammo_box_destroyed(name)
 		queue_free()
 
 

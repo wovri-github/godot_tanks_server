@@ -27,6 +27,9 @@ func send_new_battle_time(left_sec):
 func send_player_destroyed(corpse_data, kill_event_data):
 	rpc("recive_player_destroyed", corpse_data, kill_event_data)
 
+func send_ammobox_destroyed(name):
+	rpc("recive_ammobox_destroyed", name)
+
 remote func recive_stance(player_stance: Dictionary):
 	var player_id = get_tree().get_rpc_sender_id()
 	Data.add_player_stance(player_id, player_stance)

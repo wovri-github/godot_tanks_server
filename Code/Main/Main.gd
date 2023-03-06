@@ -139,7 +139,9 @@ func end_of_battle():
 	Data.playerS_stance.clear()
 	get_tree().set_pause(true)
 	start_new_game()
-
+	
+func ammo_box_destroyed(name):
+	Transfer.send_ammobox_destroyed(name)
 
 func player_shoot(player_stance, ammo_type):
 	if get_tree().is_paused(): 
