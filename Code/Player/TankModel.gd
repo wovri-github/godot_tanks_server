@@ -51,7 +51,8 @@ func die(kill_event_data={"KillerID" : "", "KilledID" : "", "AT" : NAN, "PName" 
 		"Pos": get_global_position(),
 		"Rot": $Hitbox.get_global_rotation(),
 		"Color": player_color,
-		"Kills": kills
+		"Kills": kills,
+		"LT": GameSettings.WRECK.LifeTime
 	}
 	get_parent().remove_child(self)
 	emit_signal("player_destroyed", kill_event_data.KillerID, wreck_data)

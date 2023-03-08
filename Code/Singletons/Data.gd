@@ -9,9 +9,10 @@ var playerS_last_time: Dictionary
 func get_merged_players_data() -> Array:
 	var data: Array = []
 	for player_data in players.values():
+		var player_data_copy = player_data.duplicate()
 		if playerS_stance.has(player_data.ID):
-			player_data.merge(playerS_stance[player_data.ID], true)
-		data.append(player_data)
+			player_data_copy.merge(playerS_stance[player_data.ID], true)
+		data.append(player_data_copy)
 	return data
 
 func add_new_player(data):
