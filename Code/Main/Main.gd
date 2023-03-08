@@ -93,7 +93,8 @@ func get_playerS_corpses():
 			"ID": int(player_corpse.name),
 			"Pos": player_corpse.get_global_position(),
 			"Rot": player_corpse.get_global_rotation(),
-			"Color": player_corpse.color
+			"Color": player_corpse.color,
+			"LT": player_corpse.life_timer_n.time_left
 		})
 	return playerS_corpses_dict
 
