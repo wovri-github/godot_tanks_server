@@ -4,11 +4,12 @@ const MAX_UPGRADES = GameSettings.MAX_UPGRADES
 var player_choosen_upgrades: Dictionary
 var max_points
 var temp_upgrades: Dictionary
-var settings_paths = GameSettings.get_paths()
+var settings_paths = GameSettings.STATIC.keys()
 var player_upgrade_points: Dictionary
 
 
-func _init(_max_points: int):
+func _init(game_n, _max_points: int):
+	game_n.connect("player_destroyed", self, "_on_player_destroyed")
 	max_points = _max_points
 
 func recive_upgrades(player_id: int, upgrades: Dictionary):
@@ -52,6 +53,8 @@ func is_recive_upgrades_input_valid(player_id, upgrades) -> bool:
 
 func add_temp_upgrades_to_player_data():
 	for player_id in temp_upgrades:
+		if !Data.players.has(player_id):
+			continue
 		var player_data_upgrades = Data.players[player_id].Upgrades
 		for upgrade in temp_upgrades[player_id]:
 			if player_data_upgrades.has(upgrade):
@@ -62,16 +65,56 @@ func add_temp_upgrades_to_player_data():
 func choose_player_upgrades(player_id):
 	var upgrades: Array = []
 	var size = settings_paths.size()
-	for _i in range(MAX_UPGRADES):
+	var repetition_counter = 0
+	while upgrades.size() < MAX_UPGRADES:
 		randomize()
-		upgrades.append(settings_paths[randi() % size])
+		var new_upgrade = settings_paths[randi() % size]
+		if !upgrades.has(new_upgrade):
+			upgrades.append(new_upgrade)
+			continue
+		repetition_counter += 1
+		if repetition_counter > MAX_UPGRADES * 2:
+			break
 	player_choosen_upgrades[player_id] = upgrades
 
-func set_points_to_upgrade_points(wreck_data, slayer_id, is_slayer_dead):
+
+func set_upgrade_points(player_id, kills):
+	player_upgrade_points[player_id] = kills
+
+func add_points_to_slayer(slayer_id):
+	if player_upgrade_points.has(slayer_id):
+		player_upgrade_points[int(slayer_id)] += 1
+	else:
+		player_upgrade_points[int(slayer_id)] = 1
+	var data = {
+		"Upgrades": player_choosen_upgrades[slayer_id],
+		"AdditionalPoint": 1,
+		"State": null
+	}
+	Transfer.send_player_possible_upgrades(slayer_id, data)
+
+func block_points(player_id):
+	player_upgrade_points[player_id] = -INF
+
+
+func make_upgrade(player_data, state):
+	var player_id = player_data.ID
+	var kills = player_data.Kills
+	set_upgrade_points(player_id, kills)
+	var data = {
+		"Upgrades": player_choosen_upgrades[player_id],
+		"Points": player_upgrade_points[player_id],
+		"State": state
+	}
+	Transfer.send_player_possible_upgrades(player_id, data)
+	if state == "SelfDestroyed":
+		block_points(player_id)
+
+
+func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):
+	var state = "Normal"
+	if wreck_data.ID == slayer_id:
+		state = "SelfDestroyed"
 	if is_slayer_dead:
-		if player_upgrade_points.has(slayer_id):
-			player_upgrade_points[int(slayer_id)] += 1
-		else:
-			player_upgrade_points[int(slayer_id)] = 1
-	player_upgrade_points[wreck_data.ID] = wreck_data.Kills
-	
+		add_points_to_slayer(slayer_id)
+	make_upgrade(wreck_data, state)

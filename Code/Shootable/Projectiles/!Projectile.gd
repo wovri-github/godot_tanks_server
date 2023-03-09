@@ -3,11 +3,11 @@ class_name Projectile
 
 signal wall_collided(bullet_stance)
 
-var s: Dictionary
 var owner_id = NAN
 var ammo_type = NAN
 var is_frag_bomb_frag = false
-var position_1 = position
+var spawn_point 
+var spawn_rotation 
 onready var main_n = $"/root/Main"
 
 
@@ -24,14 +24,11 @@ func get_data():
 	return pck
 
 
-func setup(player_n : KinematicBody2D, _ammo_type, _settings):
-	s = _settings
-	owner_id = int(player_n.name)
+func setup(_owner_id, _spawn_point, _spawn_rotation, _ammo_type):
+	owner_id = _owner_id
 	ammo_type = _ammo_type
-	var point = player_n.get_node("%BulletSpawn")
-	position = point.global_position
-	var velocity = Vector2.UP.rotated(point.global_rotation) * s.Speed
-	set_linear_velocity(velocity)
+	spawn_point =_spawn_point
+	spawn_rotation = _spawn_rotation
 
 
 func _on_Projectile_body_entered(body):

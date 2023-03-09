@@ -2,8 +2,7 @@ extends KinematicBody2D
 
 signal player_destroyed(slayer_id, wreck_data)
 
-
-var s = GameSettings.TANK
+var s = GameSettings.Dynamic.Tank
 var arms= {
 		s.BaseAmmoType: INF,
 }
@@ -13,8 +12,7 @@ var kills: int = 0
 
 
 
-func setup(player_id, spawn_point, color, _settings):
-	s = _settings
+func setup(player_id, spawn_point, color):
 	name = str(player_id)
 	player_color = color
 	position = spawn_point

@@ -2,17 +2,19 @@ extends Node
 
 const DEFALUT_PORT = 42521
 const MAX_CLIENTS = 16
-const NEW_BATTLE_START_WAITING = 500 # ms
+const NEW_BATTLE_START_WAITING = 1500 # ms
+const BATTLE_END_WAITING = 7500 # ms
 
 #var network = NetworkedMultiplayerENet.new()
 var network = WebSocketServer.new()
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
-onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new(MAX_CLIENTS)
 onready var stance_timer = $StanceSender
 onready var battle_timer_n = $Game/BattleTimer
 onready var game_n = $Game
 onready var map_n = $Game/Map
+
+onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new(game_n, MAX_CLIENTS)
 
 
 
@@ -41,9 +43,9 @@ func _peer_disconnected(player_id) -> void:
 		player_n.die()
 	game_n.check_battle_timer()
 
+
 func _ready():
-	game_n.connect("player_destroyed", self, "_on_player_destroyed")
-	battle_timer_n.connect("timeout", self, "end_of_battle")
+	game_n.connect("battle_over", self, "_on_battle_over")
 
 func _process(delta):
 	network.poll()
@@ -71,7 +73,7 @@ func player_initiation(player_id: int, player_name : String, player_color : Colo
 		"Version": player_version,
 	}
 	var init_data = get_init_data()
-	init_data["TimeLeft"] = int(battle_timer_n.get_time_left())
+	init_data["TimeLeft"] = OS.get_ticks_msec() + battle_timer_n.get_time_left()*1000
 	Transfer.send_init_data(player_id, init_data)
 	Data.add_new_player(player_data)
 	game_n.check_battle_timer()
@@ -126,19 +128,27 @@ func begin_battle():
 	get_tree().set_pause(false)
 	stance_timer.start()
 
+func _on_battle_over(alived_players_id):
+	var time_to_end = OS.get_ticks_msec() + BATTLE_END_WAITING
+	get_tree().set_pause(true)
+	stance_timer.stop()
+	if alived_players_id.size() == 1:
+		Data.players[alived_players_id[0].ID].Score.Wins += 1
+		upgrades_gd.make_upgrade(alived_players_id[0], "Winner")
+	else:
+		for player_data in alived_players_id:
+			upgrades_gd.make_upgrade(player_data, "Normal")
+	Transfer.send_battle_over_time(time_to_end)
+	yield(get_tree().create_timer((time_to_end - OS.get_ticks_msec()) * 0.001),"timeout")
+	end_of_battle()
+
 func end_of_battle():
 	print("[Main]: End of battle")
-	stance_timer.stop()
-	var players_in_game = game_n.get_node("Players").get_children()
-	if players_in_game.size() == 1:
-		var player_id = int(players_in_game[0].name)
-		Data.players[player_id].Score.Wins += 1
 	game_n.queue_free()
 	upgrades_gd.add_temp_upgrades_to_player_data()
 	yield(game_n, "tree_exited")
 	game_n = null
 	Data.playerS_stance.clear()
-	get_tree().set_pause(true)
 	start_new_game()
 	
 func ammo_box_destroyed(name):
@@ -151,13 +161,6 @@ func player_shoot(player_stance, ammo_type):
 	var bullet_data = game_n.spawn_bullet(player_stance.ID, player_stance.TR, ammo_type)
 	if bullet_data != null:
 		Transfer.send_shoot(player_stance.ID, bullet_data)
-
-
-func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):
-	upgrades_gd.set_points_to_upgrade_points(wreck_data, slayer_id, is_slayer_dead)
-	Transfer.send_player_possible_upgrades(wreck_data.ID, upgrades_gd.player_choosen_upgrades[wreck_data.ID])
-	if wreck_data.ID == slayer_id:
-		upgrades_gd.player_choosen_upgrades.erase(wreck_data.ID)
 
 
 func _on_Button_pressed():

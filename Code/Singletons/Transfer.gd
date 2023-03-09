@@ -1,12 +1,14 @@
 extends Node
 
 onready var main_n = $"/root/Main"
+onready var clock_n = $Clock
 
 
 
 #---- INIT DATA ----
-remote func recive_init_data(player_name, player_color, player_version):
+remote func recive_init_data(player_name, player_color, player_version, client_time):
 	var player_id = get_tree().get_rpc_sender_id()
+	clock_n.rec_determine_begining_time_diff(client_time)
 	main_n.player_initiation(player_id, player_name, player_color, player_version)
 
 func send_old_version_info(player_id):
@@ -23,6 +25,10 @@ func send_new_battle(new_game_data):
 
 func send_new_battle_time(left_sec):
 	rpc("recive_new_battle_time", left_sec)
+
+func send_battle_over_time(time_to_end):
+	rpc("recive_battle_over_time", time_to_end)
+
 
 func send_player_destroyed(corpse_data, kill_event_data):
 	rpc("recive_player_destroyed", corpse_data, kill_event_data)
@@ -49,9 +55,8 @@ func send_shoot_bounce_state(bulletS_state, time):
 	rpc_unreliable("recive_shoot_bounce_state", bulletS_state, time)
 
 
-func send_player_possible_upgrades(player_id, player_choosen_upgrades):
-	pass
-#	rpc_id(player_id, "recive_player_possible_upgrades", player_choosen_upgrades)
+func send_player_possible_upgrades(player_id, data):
+	rpc_id(player_id, "recive_player_possible_upgrades", data)
 
 
 remote func recive_upgrade(upgrades: Dictionary):

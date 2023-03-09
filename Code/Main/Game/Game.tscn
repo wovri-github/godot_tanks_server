@@ -19,3 +19,5 @@ unique_name_in_owner = true
 [node name="BattleTimer" type="Timer" parent="."]
 one_shot = true
 script = ExtResource( 3 )
+
+[connection signal="timeout" from="BattleTimer" to="." method="_on_BattleTimer_timeout"]
