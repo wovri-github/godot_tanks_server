@@ -37,7 +37,7 @@ func spawn_player(player_id, spawn_point, color):
 
 func _on_player_destroyed(slayer_id, wreck_data):
 	spawn_wreck(wreck_data)
-	Data.playerS_stance.erase(wreck_data.ID)
+	var _err = Data.playerS_stance.erase(wreck_data.ID)
 	check_battle_timer()
 	var is_slayer_dead = false
 	if players_n.has_node(slayer_id):

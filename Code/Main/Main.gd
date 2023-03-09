@@ -36,6 +36,7 @@ func _peer_conected(player_id) -> void:
 	print("[Main]: Player " + str(player_id) + " connected")
 
 func _peer_disconnected(player_id) -> void:
+	yield(get_tree(), "idle_frame")
 	print("[Main]: Player " + str(player_id) + " disconnected")
 	var _err = Data.players.erase(player_id)
 	var player_n = get_node_or_null("/root/Main/Game/Players/" + str(player_id))
@@ -47,7 +48,7 @@ func _peer_disconnected(player_id) -> void:
 func _ready():
 	game_n.connect("battle_over", self, "_on_battle_over")
 
-func _process(delta):
+func _process(_delta):
 	network.poll()
 
 func get_init_data() -> Dictionary:
