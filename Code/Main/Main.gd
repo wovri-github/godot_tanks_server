@@ -5,7 +5,8 @@ const MAX_CLIENTS = 16
 const NEW_BATTLE_START_WAITING = 1500 # ms
 const BATTLE_END_WAITING = 7500 # ms
 
-var network = NetworkedMultiplayerENet.new()
+#var network = NetworkedMultiplayerENet.new()
+var network = WebSocketServer.new()
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
 onready var stance_timer = $StanceSender
@@ -22,8 +23,12 @@ func _enter_tree() -> void:
 	network.connect("peer_connected", self, "_peer_conected")
 	network.connect("peer_disconnected", self, "_peer_disconnected")
 
+#func _start_server() -> void:
+#	network.create_server(DEFALUT_PORT, MAX_CLIENTS)
+#	get_tree().set_network_peer(network)
+#	print("[Main]: Server started")
 func _start_server() -> void:
-	network.create_server(DEFALUT_PORT, MAX_CLIENTS)
+	network.listen(DEFALUT_PORT, PoolStringArray(), true)
 	get_tree().set_network_peer(network)
 	print("[Main]: Server started")
 
@@ -31,6 +36,7 @@ func _peer_conected(player_id) -> void:
 	print("[Main]: Player " + str(player_id) + " connected")
 
 func _peer_disconnected(player_id) -> void:
+	yield(get_tree(), "idle_frame")
 	print("[Main]: Player " + str(player_id) + " disconnected")
 	var _err = Data.players.erase(player_id)
 	var player_n = get_node_or_null("/root/Main/Game/Players/" + str(player_id))
@@ -42,6 +48,8 @@ func _peer_disconnected(player_id) -> void:
 func _ready():
 	game_n.connect("battle_over", self, "_on_battle_over")
 
+func _process(_delta):
+	network.poll()
 
 func get_init_data() -> Dictionary:
 	var init_data = {
@@ -88,7 +96,8 @@ func get_playerS_corpses():
 			"ID": int(player_corpse.name),
 			"Pos": player_corpse.get_global_position(),
 			"Rot": player_corpse.get_global_rotation(),
-			"Color": player_corpse.color
+			"Color": player_corpse.color,
+			"LT": player_corpse.life_timer_n.time_left
 		})
 	return playerS_corpses_dict
 
@@ -142,7 +151,9 @@ func end_of_battle():
 	game_n = null
 	Data.playerS_stance.clear()
 	start_new_game()
-
+	
+func ammo_box_destroyed(name):
+	Transfer.send_ammobox_destroyed(name)
 
 func player_shoot(player_stance, ammo_type):
 	if get_tree().is_paused(): 

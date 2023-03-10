@@ -47,5 +47,6 @@ func _get_ammo_boxes():
 		ammo_boxes_data.append({
 			"P": ab.get_position(),
 			"Type": ab.type,
+			"Name": ab.name
 		})
 	return ammo_boxes_data
