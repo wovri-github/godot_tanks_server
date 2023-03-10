@@ -35,13 +35,17 @@ static func set_dynamic_settings():
 					break
 				temp_dict = temp_dict[path_step]
 
-
+const SPECIAL_DEFAULT = {
+	["Tank", "BaseAmmoType"]:  Ammunition.TYPES.BULLET,
+	["Ammunition", AT.FRAG_BOMB, "Frag", "Type"]: AT.BULLET,
+	["Visibility"]: true,
+	
+}
 
 const STATIC = {
 	["Tank", "Speed"]: 100.0,
 	["Tank", "RotationSpeed"]: 2.0,
 	["Tank", "MaxAmmo"]: 5,
-	["Tank", "BaseAmmoType"]:  Ammunition.TYPES.BULLET,
 	["Tank", "MaxAmmoTypes"]: 3,
 	
 	["Wreck", "LifeTime"]: 20,
@@ -57,7 +61,6 @@ const STATIC = {
 	["Ammunition", AT.FRAG_BOMB, "Frag", "Speed"]: 150,
 	["Ammunition", AT.FRAG_BOMB, "Frag", "Scale"]: 0.5,
 	["Ammunition", AT.FRAG_BOMB, "Frag", "LifetimeMultiplayer"]: 0.2,
-	["Ammunition", AT.FRAG_BOMB, "Frag", "Type"]: AT.BULLET,
 	
 	["Ammunition", AT.LASER, "Length"]: 2000,
 	["Ammunition", AT.LASER, "MaxBounces"]: 15,

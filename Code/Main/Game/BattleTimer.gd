@@ -1,7 +1,7 @@
 extends Timer
 
-const SECONDS_PER_PLAYER = 3
-const BATTLE_END_WAITING = 1 # ms
+const SECONDS_PER_PLAYER = 10
+const BATTLE_END_WAITING = 3 # ms
 onready var game_n = get_parent()
 
 
