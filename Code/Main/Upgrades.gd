@@ -2,17 +2,35 @@ extends GDScript
 
 const MAX_UPGRADES = GameSettings.MAX_UPGRADES
 var player_choosen_upgrades: Dictionary
+
+var winner = null
+var special_choosen_upgrades: Dictionary
+
 var max_points
 var temp_upgrades: Dictionary
-var settings_paths = GameSettings.STATIC.keys()
+var settings_paths = GameSettings.DEFAULT.keys()
 var player_upgrade_points: Dictionary
 
 
-func _init(game_n, _max_points: int):
-	game_n.connect("player_destroyed", self, "_on_player_destroyed")
+func _init(_max_points: int):
 	max_points = _max_points
+	special_choosen_upgrades = GameSettings.SPECIAL_DEFAULT.duplicate(true)
+	var choosen_ammo_1 = randi() % Ammunition.TYPES.size()
+	var choosen_ammo_2 = randi() % Ammunition.TYPES.size()
+	special_choosen_upgrades[["Tank", "BaseAmmoType"]] = choosen_ammo_1
+	special_choosen_upgrades[["Ammunition", Ammunition.TYPES.FRAG_BOMB, "Frag", "Type"]] = choosen_ammo_2
+	
 
 func recive_upgrades(player_id: int, upgrades: Dictionary):
+	if player_id == winner:
+		if special_choosen_upgrades.has(upgrades.keys()):
+			print("I dont have it")
+			return
+		player_upgrade_points[player_id] = 0
+		temp_upgrades[player_id] = upgrades
+		
+		print("It is winner")
+		return
 	if !is_recive_upgrades_input_valid(player_id, upgrades):
 		return
 	var available_upgrade_points = player_upgrade_points[player_id]
@@ -26,7 +44,7 @@ func recive_upgrades(player_id: int, upgrades: Dictionary):
 
 func is_recive_upgrades_input_valid(player_id, upgrades) -> bool:
 	if !player_upgrade_points.has(player_id):
-		printerr("[Main]: Upgrades may be recived only once per game. New upgrades droped.")
+		printerr("[Main]: Plyayer do not exist on list of awaiting upgrade. New upgrades droped.")
 		return false
 	var available_upgrade_points = player_upgrade_points[player_id]
 	var sum = 0
@@ -106,6 +124,9 @@ func make_upgrade(player_data, state):
 		"Points": player_upgrade_points[player_id],
 		"State": state
 	}
+	if state == "Winner":
+		winner = player_id
+		data.Upgrades = special_choosen_upgrades
 	Transfer.send_player_possible_upgrades(player_id, data)
 	if state == "SelfDestroyed":
 		block_points(player_id)

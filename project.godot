@@ -105,9 +105,9 @@ _global_script_classes=[ {
 "path": "res://Code/Singletons/GameSettings.gd"
 }, {
 "base": "GdUnitTestSuite",
-"class": "GameTest",
+"class": "GameSettingsTest",
 "language": "GDScript",
-"path": "res://unit_test/Code/Main/GameTest/GameTest.gd"
+"path": "res://unit_test/Code/Singletons/GameSettingsTest.gd"
 }, {
 "base": "Resource",
 "class": "GdAssertMessages",
@@ -754,7 +754,7 @@ _global_script_class_icons={
 "FuzzerTool": "",
 "Fuzzers": "",
 "GameSettings": "",
-"GameTest": "",
+"GameSettingsTest": "",
 "GdAssertMessages": "",
 "GdAssertReports": "",
 "GdClassDescriptor": "",

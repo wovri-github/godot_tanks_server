@@ -14,7 +14,7 @@ onready var battle_timer_n = $Game/BattleTimer
 onready var game_n = $Game
 onready var map_n = $Game/Map
 
-onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new(game_n, MAX_CLIENTS)
+onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new(MAX_CLIENTS)
 
 
 
@@ -47,6 +47,7 @@ func _peer_disconnected(player_id) -> void:
 
 func _ready():
 	game_n.connect("battle_over", self, "_on_battle_over")
+	game_n.connect("player_destroyed", upgrades_gd, "_on_player_destroyed")
 
 func _process(_delta):
 	network.poll()
