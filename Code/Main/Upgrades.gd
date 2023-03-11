@@ -85,7 +85,7 @@ func is_recive_upgrades_input_valid(player_id, upgrades) -> bool:
 func remove_passed_special_upgrades():
 	for special_upgrade in Data.current_special_upgrades:
 		if Data.current_special_upgrades[special_upgrade].RoundsLeft <= 0:
-			Data.current_special_upgrades.erase(special_upgrade)
+			var _err = Data.current_special_upgrades.erase(special_upgrade)
 		else:
 			Data.current_special_upgrades[special_upgrade].RoundsLeft -=1
 
