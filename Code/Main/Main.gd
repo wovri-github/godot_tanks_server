@@ -2,7 +2,7 @@ extends Node
 
 const DEFALUT_PORT = 42521
 const MAX_CLIENTS = 16
-const NEW_BATTLE_START_WAITING = 7500 # ms
+const NEW_BATTLE_START_WAITING = 3500 # ms
 const BATTLE_END_WAITING = 7500 # ms
 
 #var network = NetworkedMultiplayerENet.new()
@@ -111,6 +111,7 @@ func get_bullets_stances() -> Array:
 	return stances
 
 func start_new_game():
+	GameSettings.set_dynamic_settings()
 	var game_inst = game_tscn.instance()
 	add_child(game_inst, true)
 	_ready()

@@ -18,6 +18,8 @@ func explode():
 
 func kill(body):
 	if body.is_in_group("Players"): 
+		if !body.is_inside_tree():
+			return
 		if owner_id != int(body.name) and Data.players.has(owner_id):
 			Data.players[int(owner_id)].Score.Kills += 1
 		var _name = name

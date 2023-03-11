@@ -25,9 +25,6 @@ onready var battle_timer_n = $BattleTimer
 
 
 
-func _ready():
-	GameSettings.set_dynamic_settings()
-
 
 func spawn_player(player_id, spawn_point, color):
 	var player_inst = TANK_TSCN.instance()

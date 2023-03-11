@@ -24,7 +24,7 @@ func set_random_special_upgrades():
 		randomize()
 		if Data.current_special_upgrades.has(upgrade) and Data.current_special_upgrades[upgrade].RoundsLeft > 0:
 			continue
-		var choosen_ammo = randi() % Ammunition.TYPES.size()
+		var choosen_ammo = randi() % 2 + 4
 		special_choosen_upgrades[upgrade] = choosen_ammo
 
 
