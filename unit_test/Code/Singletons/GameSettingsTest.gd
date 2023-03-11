@@ -99,13 +99,9 @@ func test_setup_multiple_players() -> void:
 	assert_float(GameSettings.Dynamic.Ammunition[Ammunition.TYPES.FRAG_BOMB].Frag.Scale).is_equal(0.55)
 
 func test_setup_special_upgrade() -> void:
-	Data.players ={
-		1:{
-			"Upgrades":{
-				["Tank", "BaseAmmoType"]:  Ammunition.TYPES.ROCKET,
-				["Visibility"]: false,
-			}
-		},
+	Data.current_special_upgrades ={
+		["Tank", "BaseAmmoType"]:  {"Val": Ammunition.TYPES.ROCKET, "RoundsLeft": 3},
+		["Visibility"]: {"Val": false, "RoundsLeft": 0},
 	}
 	GameSettings.set_dynamic_settings()
 	assert_int(GameSettings.Dynamic.Tank.BaseAmmoType).is_equal(Ammunition.TYPES.ROCKET)

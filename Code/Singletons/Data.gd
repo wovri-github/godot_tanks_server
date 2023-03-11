@@ -5,6 +5,8 @@ var players: Dictionary
 var playerS_stance: Dictionary
 var playerS_last_time: Dictionary
 
+var current_special_upgrades: Dictionary
+
 
 func get_merged_players_data() -> Array:
 	var data: Array = []

@@ -83,3 +83,11 @@ func test_add_temp_upgrades_to_player_data() -> void:
 	assert_dict(Data.players[1]["Upgrades"])\
 			.contains_key_value(["Tank", "Speed"], 6)\
 			.contains_key_value(["Tank", "MaxAmmo"], 6)
+
+
+
+func test_recive_upgrades() -> void:
+	runner.winner = 1
+	runner.player_upgrade_points[1] = 1
+	runner.recive_upgrades(1, {["Tank", "BaseAmmoType"]: 1})
+	

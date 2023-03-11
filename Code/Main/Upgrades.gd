@@ -14,22 +14,35 @@ var player_upgrade_points: Dictionary
 
 func _init(_max_points: int):
 	max_points = _max_points
-	special_choosen_upgrades = GameSettings.SPECIAL_DEFAULT.duplicate(true)
-	var choosen_ammo_1 = randi() % Ammunition.TYPES.size()
-	var choosen_ammo_2 = randi() % Ammunition.TYPES.size()
-	special_choosen_upgrades[["Tank", "BaseAmmoType"]] = choosen_ammo_1
-	special_choosen_upgrades[["Ammunition", Ammunition.TYPES.FRAG_BOMB, "Frag", "Type"]] = choosen_ammo_2
-	
+	set_random_special_upgrades()
+
+
+
+func set_random_special_upgrades():
+	var all_special_choosen_upgrades = GameSettings.SPECIAL_DEFAULT.duplicate(true)
+	for upgrade in all_special_choosen_upgrades:
+		randomize()
+		if Data.current_special_upgrades.has(upgrade) and Data.current_special_upgrades[upgrade].RoundsLeft > 0:
+			continue
+		var choosen_ammo = randi() % Ammunition.TYPES.size()
+		special_choosen_upgrades[upgrade] = choosen_ammo
+
 
 func recive_upgrades(player_id: int, upgrades: Dictionary):
 	if player_id == winner:
-		if special_choosen_upgrades.has(upgrades.keys()):
-			print("I dont have it")
+		var upgrade_path = upgrades.keys()[0]
+		if !special_choosen_upgrades.has(upgrade_path):
+			print("[Upgrades]: I dont have it")
 			return
+		if player_upgrade_points[player_id] <= 0:
+			print("[Upgrades]: Not enough points")
+			return 
+		var dict = {
+			"Val": special_choosen_upgrades[upgrade_path], 
+			"RoundsLeft": player_upgrade_points[player_id]
+		}
+		Data.current_special_upgrades[upgrade_path] = dict
 		player_upgrade_points[player_id] = 0
-		temp_upgrades[player_id] = upgrades
-		
-		print("It is winner")
 		return
 	if !is_recive_upgrades_input_valid(player_id, upgrades):
 		return
@@ -69,13 +82,21 @@ func is_recive_upgrades_input_valid(player_id, upgrades) -> bool:
 		return false
 	return true
 
+func remove_passed_special_upgrades():
+	for special_upgrade in Data.current_special_upgrades:
+		if Data.current_special_upgrades[special_upgrade].RoundsLeft <= 0:
+			Data.current_special_upgrades.erase(special_upgrade)
+		else:
+			Data.current_special_upgrades[special_upgrade].RoundsLeft -=1
+
 func add_temp_upgrades_to_player_data():
 	for player_id in temp_upgrades:
 		if !Data.players.has(player_id):
 			continue
 		var player_data_upgrades = Data.players[player_id].Upgrades
 		for upgrade in temp_upgrades[player_id]:
-			if player_data_upgrades.has(upgrade) and !GameSettings.SPECIAL_DEFAULT.has(upgrade):
+			assert(!GameSettings.SPECIAL_DEFAULT.has(upgrade), "[Upgrades]: Something went wrong")
+			if player_data_upgrades.has(upgrade):
 				player_data_upgrades[upgrade] += temp_upgrades[player_id][upgrade]
 				continue
 			player_data_upgrades[upgrade] = temp_upgrades[player_id][upgrade]

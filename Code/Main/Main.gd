@@ -58,6 +58,7 @@ func get_init_data() -> Dictionary:
 		"PlayerSCorpses": get_playerS_corpses(),
 		"BulletsStances": get_bullets_stances(),
 		"MapData": map_n.get_map_data(),
+		"SpecialUpgrades": Data.current_special_upgrades
 	}
 	return init_data
 
@@ -148,6 +149,7 @@ func end_of_battle():
 	print("[Main]: End of battle")
 	game_n.queue_free()
 	upgrades_gd.add_temp_upgrades_to_player_data()
+	upgrades_gd.remove_passed_special_upgrades()
 	yield(game_n, "tree_exited")
 	game_n = null
 	Data.playerS_stance.clear()

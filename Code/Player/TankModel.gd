@@ -28,7 +28,6 @@ func pick_up_ammo_box(ammo_type) -> bool:
 	return false
 
 func subtract_ammo_type(ammo_type) -> int:
-	print(ammo_type)
 	if !arms.has(ammo_type):
 		print("[TankModel]: Player ", name, " want to shoot without ammo!")
 		return FAILED
