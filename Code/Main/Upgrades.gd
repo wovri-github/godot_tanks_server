@@ -75,7 +75,7 @@ func add_temp_upgrades_to_player_data():
 			continue
 		var player_data_upgrades = Data.players[player_id].Upgrades
 		for upgrade in temp_upgrades[player_id]:
-			if player_data_upgrades.has(upgrade):
+			if player_data_upgrades.has(upgrade) and !GameSettings.SPECIAL_DEFAULT.has(upgrade):
 				player_data_upgrades[upgrade] += temp_upgrades[player_id][upgrade]
 				continue
 			player_data_upgrades[upgrade] = temp_upgrades[player_id][upgrade]
