@@ -3,7 +3,7 @@ class_name Shootable
 
 
 
-static func get_data(owner_id, _name, position, rotation, velocity, ammo_type):
+static func get_data(owner_id, _name, position, rotation, velocity, ammo_type, death_time):
 	var pck = {
 		"PlayerID": owner_id,
 		"ID": _name,
@@ -11,7 +11,7 @@ static func get_data(owner_id, _name, position, rotation, velocity, ammo_type):
 		"R": rotation,
 		"V": velocity,
 		"AT": ammo_type,
-		"ST": OS.get_ticks_msec() #Spawn Time
+		"DT": death_time # DeathTime
 	}
 	return pck
 

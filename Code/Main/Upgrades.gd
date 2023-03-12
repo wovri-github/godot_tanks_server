@@ -21,10 +21,12 @@ func _init(_max_points: int):
 func set_random_special_upgrades():
 	var all_special_choosen_upgrades = GameSettings.SPECIAL_DEFAULT.duplicate(true)
 	for upgrade in all_special_choosen_upgrades:
-		randomize()
 		if Data.current_special_upgrades.has(upgrade) and Data.current_special_upgrades[upgrade].RoundsLeft > 0:
 			continue
 		var choosen_ammo = randi() % 2 + 4
+		randomize()
+		if upgrade == ["Tank", "BaseAmmoType"]:
+			choosen_ammo = randi() % 5 + 1
 		special_choosen_upgrades[upgrade] = choosen_ammo
 
 

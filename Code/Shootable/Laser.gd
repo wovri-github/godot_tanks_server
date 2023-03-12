@@ -23,7 +23,8 @@ func get_data():
 			get_position(),
 			point_rotation,
 			null,
-			ammo_type
+			ammo_type,
+			OS.get_ticks_msec()
 	)
 	return pck
 

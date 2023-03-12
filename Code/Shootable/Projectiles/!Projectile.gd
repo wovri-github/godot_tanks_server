@@ -8,6 +8,7 @@ var ammo_type = NAN
 var is_frag_bomb_frag = false
 var spawn_point 
 var spawn_rotation 
+var death_time = OS.get_ticks_msec() + 10_000
 onready var main_n = $"/root/Main"
 
 
@@ -19,7 +20,8 @@ func get_data():
 			get_position(),
 			get_rotation(),
 			get_linear_velocity(),
-			ammo_type
+			ammo_type,
+			death_time
 	)
 	return pck
 
