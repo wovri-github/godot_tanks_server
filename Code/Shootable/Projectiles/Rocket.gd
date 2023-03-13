@@ -7,10 +7,9 @@ var x = -0.5
 
 var s = GameSettings.Dynamic.Ammunition[Ammunition.TYPES.ROCKET]
 
+
 func _ready():
-	position = spawn_point
-	var velocity = Vector2.UP.rotated(spawn_rotation) * s.Speed
-	set_linear_velocity(velocity)
+	start_movement(s.Speed)
 
 
 func get_stance() -> Dictionary:

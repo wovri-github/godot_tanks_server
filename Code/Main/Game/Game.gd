@@ -12,7 +12,7 @@ const shootable_tscn = {
 	AMMO_TYPES.BULLET: preload("res://Code/Shootable/Projectiles/Bullet.tscn"),
 	AMMO_TYPES.ROCKET: preload("res://Code/Shootable/Projectiles/Rocket.tscn"),
 	AMMO_TYPES.FRAG_BOMB: preload("res://Code/Shootable/Projectiles/FragBomb.tscn"),
-	AMMO_TYPES.LASER: preload("res://Code/Shootable/Laser.tscn"),
+	AMMO_TYPES.LASER: preload("res://Code/Shootable/NonProjectiles/Laser.tscn"),
 	AMMO_TYPES.LASER_BULLET: preload("res://Code/Shootable/Projectiles/LaserBullet.tscn"),
 	AMMO_TYPES.FIREBALL: preload("res://Code/Shootable/Projectiles/Fireball.tscn")
 }
@@ -36,6 +36,8 @@ func _on_player_destroyed(slayer_id, wreck_data):
 	spawn_wreck(wreck_data)
 	var _err = Data.playerS_stance.erase(wreck_data.ID)
 	check_battle_timer()
+	if wreck_data.ID != int(slayer_id) and Data.players.has(wreck_data.ID):
+		Data.players[wreck_data.ID].Score.Kills += 1
 	var is_slayer_dead = false
 	if players_n.has_node(slayer_id):
 		players_n.get_node(slayer_id).kills += 1
@@ -68,7 +70,9 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	var spawn_rotation = position2d.global_rotation
 	bullet_inst.setup(player_id, spawn_point, spawn_rotation, ammo_type)
 	projectile_n.add_child(bullet_inst, true)
-	return bullet_inst.get_data()
+	var bullet_data = bullet_inst.get_data()
+	bullet_data["ST"] =  OS.get_ticks_msec()
+	return bullet_data
 
 
 func _on_wall_collided(bullet_stance_on_collision):

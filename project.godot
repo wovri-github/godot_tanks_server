@@ -680,7 +680,7 @@ _global_script_classes=[ {
 "path": "res://addons/gdUnit3/src/ui/parts/RichTextLabelExt.gd"
 }, {
 "base": "Reference",
-"class": "Shootable",
+"class": "Shootablex",
 "language": "GDScript",
 "path": "res://Code/Shootable/Shootable.gd"
 }, {
@@ -869,7 +869,7 @@ _global_script_class_icons={
 "Result": "",
 "RichTextEffectBackground": "",
 "RichTextLabelExt": "",
-"Shootable": "",
+"Shootablex": "",
 "SignalHandler": "",
 "StringFuzzer": "",
 "TimeUnit": "",

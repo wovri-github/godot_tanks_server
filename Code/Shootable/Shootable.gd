@@ -1,5 +1,5 @@
 extends Reference
-class_name Shootable
+class_name Shootablex
 
 
 

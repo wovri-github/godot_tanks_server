@@ -1,32 +1,29 @@
 extends Line2D
 
 var s = GameSettings.Dynamic.Ammunition[Ammunition.TYPES.LASER]
-var ammo_type
-var owner_id = NAN
 var point : Position2D = null
 var point_rotation = 0
 
+var general_info = preload("res://Code/Shootable/ShootableInfo.gd").new()
+onready var death_time = OS.get_ticks_msec() + 10_000
 onready var ray = $RayCast2D
 onready var main_n = $"/root/Main"
 
 
 func setup(_owner_id, _spawn_point, _spawn_rotation, _ammo_type):
-	owner_id = _owner_id
-	ammo_type = _ammo_type
+	general_info.set_info(_owner_id, name, _ammo_type)
 	position = _spawn_point
 	point_rotation = _spawn_rotation
 
 func get_data():
-	var pck = Shootable.get_data(
-			owner_id, 
-			name,
-			get_position(),
-			point_rotation,
-			null,
-			ammo_type,
-			OS.get_ticks_msec()
-	)
-	return pck
+	var projectile_info = {
+		"P": get_position(),
+		"R": point_rotation,
+		"DT": death_time 
+	}
+	projectile_info.merge(general_info.get_info())
+	return projectile_info
+
 
 func _ready():
 	cast_laser()
@@ -54,9 +51,7 @@ func cast_laser():
 		add_point(to_local(ray.get_collision_point()))
 		
 		if collider.is_in_group("Players"):
-			if owner_id != int(collider.name) and Data.players.has(owner_id):
-				Data.players[int(owner_id)].Score.Kills += 1
-			collider.die({"KillerID" : str(owner_id), "KilledID" : collider.name, "AT" : ammo_type, "PName" : null}) # name as null bcs we cant destroy it
+			collider.die({"KillerID" : str(general_info.get_info().PlayerID), "KilledID" : collider.name, "AT" : general_info.get_info().AT, "PName" : null}) # name as null bcs we cant destroy it
 			break
 		
 		if collider.is_in_group("Corpse"):

@@ -9,7 +9,7 @@ bounce = 1.0
 [sub_resource type="CircleShape2D" id=2]
 radius = 8.0
 
-[node name="Bullet" type="RigidBody2D" groups=["Projectile"]]
+[node name="Bullet" type="RigidBody2D"]
 physics_interpolation_mode = 2
 process_priority = -1
 collision_layer = 16

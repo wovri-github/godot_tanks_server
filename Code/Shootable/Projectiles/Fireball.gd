@@ -2,10 +2,9 @@ extends Projectile
 
 var s = GameSettings.Dynamic.Ammunition[Ammunition.TYPES.FIREBALL]
 
+
 func _ready():
-	position = spawn_point
-	var velocity = Vector2.UP.rotated(spawn_rotation) * s.Speed
-	set_linear_velocity(velocity)
+	start_movement(s.Speed)
 
 
 func _on_Fireball_body_entered(_body):
@@ -20,9 +19,7 @@ func kill(body):
 	if body.is_in_group("Players"): 
 		if !body.is_inside_tree():
 			return
-		if owner_id != int(body.name) and Data.players.has(owner_id):
-			Data.players[int(owner_id)].Score.Kills += 1
 		var _name = name
-		body.die({"KillerID" : str(owner_id), "KilledID" : body.name, "AT" : ammo_type, "PName" : _name})
-	if body.is_in_group("Projectile"):
+		body.die({"KillerID" : str(general_info.get_info().PlayerID), "KilledID" : body.name, "AT" : general_info.get_info().AT, "PName" : _name})
+	if body.is_in_group("Projectiles"):
 		body.die()
