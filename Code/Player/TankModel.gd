@@ -11,6 +11,18 @@ var player_color = Color.blue # defined when spawning
 var kills: int = 0
 
 
+func shoot_after_charging(ammo_type):
+	if ammo_type != Ammunition.TYPES.LASER:
+		call_shoot(ammo_type)
+		return
+	var timer = Timer.new()
+	timer.one_shot = true
+	add_child(timer)
+	timer.connect("timeout", self, "call_shoot", [ammo_type])
+	timer.start(1.5)
+
+func call_shoot(ammo_type):
+	get_node("/root/Main").call_deferred("player_shoot", Data.playerS_stance[int(name)], ammo_type)
 
 func setup(player_id, spawn_point, color):
 	name = str(player_id)
@@ -35,6 +47,9 @@ func subtract_ammo_type(ammo_type) -> int:
 	if arms[ammo_type] == 0:
 		arms.erase(ammo_type)
 	return OK
+
+func has_ammo_type(ammo_type) -> bool:
+	return arms.has(ammo_type)
 
 func set_stance(_position, _rotation):
 	position = _position

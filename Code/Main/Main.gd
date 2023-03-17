@@ -166,7 +166,16 @@ func player_shoot(player_stance, ammo_type):
 	var bullet_data = game_n.spawn_bullet(player_stance.ID, player_stance.TR, ammo_type)
 	if bullet_data != null:
 		Transfer.send_shoot(player_stance.ID, bullet_data)
+	else:
+		Transfer.send_shoot_fail(player_stance.ID)
 
+func player_charge_shoot(player_id, ammo_type):
+	if get_tree().is_paused(): 
+		return
+	if game_n.player_charge_shoot(player_id, ammo_type):
+		Transfer.send_player_charge(player_id, ammo_type)
+	else:
+		Transfer.send_shoot_fail(player_id)
 
 func _on_Button_pressed():
 	# [info] only for testing purposes

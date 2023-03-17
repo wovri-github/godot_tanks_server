@@ -48,8 +48,18 @@ remote func recive_shoot(player_stance: Dictionary, ammo_type: int):
 	player_stance.ID = player_id
 	main_n.player_shoot(player_stance, ammo_type)
 
+remote func recive_charge_shoot(ammo_type : int):
+	var player_id = get_tree().get_rpc_sender_id()
+	main_n.player_charge_shoot(player_id, ammo_type)
+
 func send_shoot(player_id, bullet_data):
 	rpc("recive_shoot", player_id, bullet_data, OS.get_ticks_msec())
+
+func send_shoot_fail(player_id):
+	rpc_id(player_id, "recive_shoot_fail", player_id)
+
+func send_player_charge(player_id, ammo_type):
+	rpc("recive_player_charge", player_id, ammo_type)
 
 func send_shoot_bounce_state(bulletS_state, time):
 	rpc_unreliable("recive_shoot_bounce_state", bulletS_state, time)

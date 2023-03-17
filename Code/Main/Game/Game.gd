@@ -70,6 +70,15 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	projectile_n.add_child(bullet_inst, true)
 	return bullet_inst.get_data()
 
+func player_charge_shoot(player_id, ammo_type):
+	if !is_player_alive(player_id):
+		return false
+	var player_n = players_n.get_node(str(player_id))
+	if !player_n.has_ammo_type(ammo_type):
+		return false
+	player_n.shoot_after_charging(ammo_type)
+	return true
+
 
 func _on_wall_collided(bullet_stance_on_collision):
 	bulletS_stance_on_collision.append(bullet_stance_on_collision)
