@@ -9,17 +9,40 @@ var arms= {
 var player_name = "Player" # defined when spawning
 var player_color = Color.blue # defined when spawning
 var kills: int = 0
+var shooting_locked : bool = false
+var slot_locked : bool = false
+var current_ammo_type = s.BaseAmmoType
 
 
-func shoot_after_charging(ammo_type):
-	if ammo_type != Ammunition.TYPES.LASER:
-		call_shoot(ammo_type)
-		return
+func reload_complete():
+	shooting_locked = false
+
+func change_ammo_type(ammo_type) -> bool:
+	if slot_locked or !has_ammo_type(ammo_type) or (ammo_type == current_ammo_type):
+		print("nie nie nie")
+		return false
+
+	var reload_time = GameSettings.Dynamic.Ammunition[ammo_type].Reload
+	var reload_of_prev_ammo = GameSettings.Dynamic.Ammunition[current_ammo_type].Reload
+	if !shooting_locked:
+		reload_time = max(0.5, reload_time - (reload_of_prev_ammo / 2))
+	$ReloadTimer.start(reload_time)
+	shooting_locked = true
+	current_ammo_type = ammo_type
+	return true
+
+func shoot_after_charging(ammo_type) -> bool:
+	if !GameSettings.Dynamic.Ammunition[ammo_type].has("ChargeTime") or shooting_locked:
+		print("[TankModel]: Player ", name, " want to shoot improper type or while reloading!")
+		return false
+	slot_locked = true
+	shooting_locked = true
 	var timer = Timer.new()
 	timer.one_shot = true
 	add_child(timer)
 	timer.connect("timeout", self, "call_shoot", [ammo_type])
-	timer.start(1.5)
+	timer.start(GameSettings.Dynamic.Ammunition[ammo_type].ChargeTime)
+	return true
 
 func call_shoot(ammo_type):
 	get_node("/root/Main").call_deferred("player_shoot", Data.playerS_stance[int(name)], ammo_type)
@@ -39,13 +62,19 @@ func pick_up_ammo_box(ammo_type) -> bool:
 		return true
 	return false
 
-func subtract_ammo_type(ammo_type) -> int:
+func shoot(ammo_type) -> int:
 	if !arms.has(ammo_type):
 		print("[TankModel]: Player ", name, " want to shoot without ammo!")
 		return FAILED
+	if shooting_locked and !slot_locked: # shoot while reloading
+		print("[TankModel]: Player ", name, " want to shoot while reloading!")
+		return FAILED
+	slot_locked = false
 	arms[ammo_type] -= 1
 	if arms[ammo_type] == 0:
 		arms.erase(ammo_type)
+	shooting_locked = true
+	$ReloadTimer.start(GameSettings.Dynamic.Ammunition[s.BaseAmmoType].Reload)
 	return OK
 
 func has_ammo_type(ammo_type) -> bool:

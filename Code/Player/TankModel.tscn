@@ -18,8 +18,9 @@ unique_name_in_owner = true
 
 [node name="BulletSpawn" type="Position2D" parent="Turret"]
 unique_name_in_owner = true
-position = Vector2( 0, -60 )
+position = Vector2( 0, -52 )
 
-[node name="LaserSpawn" type="Position2D" parent="Turret"]
-unique_name_in_owner = true
-position = Vector2( 0, -47 )
+[node name="ReloadTimer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="timeout" from="ReloadTimer" to="." method="reload_complete"]

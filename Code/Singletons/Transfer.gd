@@ -61,6 +61,13 @@ func send_shoot_fail(player_id):
 func send_player_charge(player_id, ammo_type):
 	rpc("recive_player_charge", player_id, ammo_type)
 
+remote func recive_ammo_type_change(ammo_type):
+	var player_id = get_tree().get_rpc_sender_id()
+	main_n.player_change_ammo_type(player_id, ammo_type)
+
+func send_player_turret_change(player_id, ammo_type):
+	rpc("recive_turret_change", player_id, ammo_type)
+
 func send_shoot_bounce_state(bulletS_state, time):
 	rpc_unreliable("recive_shoot_bounce_state", bulletS_state, time)
 

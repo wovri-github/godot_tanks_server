@@ -177,6 +177,12 @@ func player_charge_shoot(player_id, ammo_type):
 	else:
 		Transfer.send_shoot_fail(player_id)
 
+func player_change_ammo_type(player_id, ammo_type):
+	if get_tree().is_paused(): 
+		return
+	if game_n.player_change_ammo_type(player_id, ammo_type):
+		Transfer.send_player_turret_change(player_id, ammo_type)
+
 func _on_Button_pressed():
 	# [info] only for testing purposes
 	battle_timer_n.stop()
