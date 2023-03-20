@@ -887,7 +887,7 @@ _global_script_class_icons={
 config/name="Godot Tanks Server"
 run/main_scene="res://Code/Main/Main.tscn"
 config/icon="res://icon.png"
-other/available_versions=PoolStringArray( "0.2" )
+other/available_versions=PoolStringArray( "0.3" )
 
 [autoload]
 
@@ -961,6 +961,11 @@ left_click={
 [locale]
 
 locale_filter=[ 0, [  ] ]
+
+[logging]
+
+file_logging/enable_file_logging=true
+file_logging/log_path="./logs/server.log"
 
 [mono]
 
