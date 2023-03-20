@@ -57,16 +57,21 @@ const DEFAULT = {
 	["Tank", "RotationSpeed"]: 2.0,
 	["Tank", "MaxAmmo"]: 5,
 	["Tank", "MaxAmmoTypes"]: 3,
+	["Tank", "BaseAmmoClipSize"]: 4,
+	["Tank", "AutoloadTimeMultiplier"]: 2,
 	
 	["Wreck", "LifeTime"]: 20,
 	
 	["Ammunition", AT.BULLET, "Speed"]: 200,
+	["Ammunition", AT.BULLET, "Reload"]: 1,
 	
 	["Ammunition", AT.ROCKET, "Speed"]: 200,
 	["Ammunition", AT.ROCKET, "FollowSpeed"]: 150,
+	["Ammunition", AT.ROCKET, "Reload"]: 5,
 	
 	["Ammunition", AT.FRAG_BOMB, "Speed"]: 200,
 	["Ammunition", AT.FRAG_BOMB, "Count"]: 30,
+	["Ammunition", AT.FRAG_BOMB, "Reload"]: 3,
 	
 	["Ammunition", AT.FRAG_BOMB, "Frag", "Speed"]: 150,
 	["Ammunition", AT.FRAG_BOMB, "Frag", "Scale"]: 0.5,
@@ -75,12 +80,16 @@ const DEFAULT = {
 	["Ammunition", AT.LASER, "Length"]: 2000,
 	["Ammunition", AT.LASER, "MaxBounces"]: 15,
 	["Ammunition", AT.LASER, "MaxWidth"]: 5,
+	["Ammunition", AT.LASER, "Reload"]: 10,
+	["Ammunition", AT.LASER, "ChargeTime"]: 1.5,
 	
 	["Ammunition", AT.LASER_BULLET, "Speed"]: 200,
 	["Ammunition", AT.LASER_BULLET, "Length"]: 50,
 	["Ammunition", AT.LASER_BULLET, "MaxBounces"]: 15,
+	["Ammunition", AT.LASER_BULLET, "Reload"]: 2,
 	
 	["Ammunition", AT.FIREBALL, "Speed"]: 200,
+	["Ammunition", AT.FIREBALL, "Reload"]: 5,
 }
 
 
@@ -96,6 +105,8 @@ const Dynamic = {
 		"MaxAmmo" : null,
 		"BaseAmmoType" : null,
 		"MaxAmmoTypes" : null, # including default bullet
+		"BaseAmmoClipSize" : null,
+		"AutoloadTimeMultiplier" : null,
 	},
 	"Wreck": {
 		"LifeTime" : null,
@@ -103,14 +114,17 @@ const Dynamic = {
 	"Ammunition":{
 		AT.BULLET:{
 			"Speed" : null,
+			"Reload" : null,
 		},
 		AT.ROCKET: {
 			"Speed" : null,
 			"FollowSpeed" : null,
+			"Reload" : null,
 		},
 		AT.FRAG_BOMB: {
 			"Speed" : null,
 			"Count" : null,
+			"Reload" : null,
 			"Frag":{
 				"Speed" : null,
 				"Scale" : null,
@@ -122,14 +136,18 @@ const Dynamic = {
 			"Length" : null,
 			"MaxBounces" : null,
 			"MaxWidth" : null,
+			"Reload" : null,
+			"ChargeTime" : null,
 		},
 		AT.LASER_BULLET:{
 			"Speed" : null,
 			"Length" : null,
 			"MaxBounces" : null,
+			"Reload" : null,
 		},
 		AT.FIREBALL:{
 			"Speed" : null,
+			"Reload" : null,
 		},
 	},
 }

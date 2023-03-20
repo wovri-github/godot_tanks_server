@@ -56,16 +56,13 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	if !is_player_alive(player_id):
 		return null
 	var player_n = players_n.get_node(str(player_id))
-	if player_n.subtract_ammo_type(ammo_type) != OK:
+	if player_n.shoot(ammo_type) != OK:
 		return null
 	player_n.rotate_turret(turret_rotation)
 	var bullet_inst = shootable_tscn[ammo_type].instance()
-	var position2d 
 	if ammo_type != Ammunition.TYPES.LASER:
 		bullet_inst.connect("wall_collided", self, "_on_wall_collided")
-		position2d = player_n.get_node("%BulletSpawn")
-	else:
-		position2d = player_n.get_node("%LaserSpawn")
+	var position2d = player_n.get_node("%BulletSpawn")
 	var spawn_point = position2d.global_position
 	var spawn_rotation = position2d.global_rotation
 	bullet_inst.setup(player_id, spawn_point, spawn_rotation, ammo_type)
@@ -73,6 +70,18 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	var bullet_data = bullet_inst.get_data()
 	bullet_data["ST"] =  OS.get_ticks_msec()
 	return bullet_data
+
+func player_charge_shoot(player_id, ammo_type):
+	if !is_player_alive(player_id):
+		return false
+	var player_n = players_n.get_node(str(player_id))
+	return player_n.shoot_after_charging(ammo_type)
+
+func player_change_ammo_type(player_id, ammo_type):
+	if !is_player_alive(player_id):
+		return false
+	var player_n = players_n.get_node(str(player_id))
+	return player_n.change_ammo_type(ammo_type)
 
 
 func _on_wall_collided(bullet_stance_on_collision):
