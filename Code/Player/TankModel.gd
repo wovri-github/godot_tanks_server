@@ -4,7 +4,7 @@ signal player_destroyed(slayer_id, wreck_data)
 
 var s = GameSettings.Dynamic.Tank
 var arms= {
-		s.BaseAmmoType: INF,
+		s.BaseAmmoType: 0,
 }
 var player_name = "Player" # defined when spawning
 var player_color = Color.blue # defined when spawning
@@ -17,9 +17,18 @@ var current_ammo_type = s.BaseAmmoType
 func reload_complete():
 	shooting_locked = false
 
+func reset_autoload_timer():
+	var load_time = GameSettings.Dynamic.Ammunition[s.BaseAmmoType].Reload * 2
+	$BaseTypeAutoloadTimer.start(load_time)
+
+func _on_BaseTypeAutoload():
+	if arms[s.BaseAmmoType] < s.BaseAmmoClipSize - 1:
+		reset_autoload_timer()
+	if arms[s.BaseAmmoType] < s.BaseAmmoClipSize:
+		arms[s.BaseAmmoType] += 1
+
 func change_ammo_type(ammo_type) -> bool:
 	if slot_locked or !has_ammo_type(ammo_type) or (ammo_type == current_ammo_type):
-		print("nie nie nie")
 		return false
 
 	var reload_time = GameSettings.Dynamic.Ammunition[ammo_type].Reload
@@ -71,10 +80,12 @@ func shoot(ammo_type) -> int:
 		return FAILED
 	slot_locked = false
 	arms[ammo_type] -= 1
-	if arms[ammo_type] == 0:
+	if arms[ammo_type] == 0 and ammo_type != s.BaseAmmoType:
 		arms.erase(ammo_type)
 	shooting_locked = true
 	$ReloadTimer.start(GameSettings.Dynamic.Ammunition[s.BaseAmmoType].Reload)
+	if ammo_type == s.BaseAmmoType:
+		reset_autoload_timer()
 	return OK
 
 func has_ammo_type(ammo_type) -> bool:
@@ -100,3 +111,6 @@ func die(kill_event_data={"KillerID" : "", "KilledID" : "", "AT" : NAN, "PName" 
 	emit_signal("player_destroyed", kill_event_data.KillerID, wreck_data)
 	Transfer.send_player_destroyed(wreck_data, kill_event_data)
 	queue_free()
+
+
+
