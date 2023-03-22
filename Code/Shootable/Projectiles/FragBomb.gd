@@ -4,10 +4,6 @@ var s = GameSettings.Dynamic.Ammunition[Ammunition.TYPES.FRAG_BOMB]
 var frag_tscn = load(Ammunition.shootable[s.Frag.Type])
 
 
-func _ready():
-	start_movement(s.Speed)
-
-
 
 func explode():
 	for n in range(s.Count):

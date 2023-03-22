@@ -2,8 +2,9 @@ extends Node
 
 const DEFALUT_PORT = 42521
 const MAX_CLIENTS = 16
-const NEW_BATTLE_START_WAITING = 3500 # ms
-const BATTLE_END_WAITING = 8500 # ms
+#test
+const NEW_BATTLE_START_WAITING = 350 # ms
+const BATTLE_END_WAITING = 850 # ms
 
 #var network = NetworkedMultiplayerENet.new()
 var network = WebSocketServer.new()

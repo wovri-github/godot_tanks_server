@@ -8,10 +8,6 @@ var x = -0.5
 var s = GameSettings.Dynamic.Ammunition[Ammunition.TYPES.ROCKET]
 
 
-func _ready():
-	start_movement(s.Speed)
-
-
 func get_stance() -> Dictionary:
 	var stance = {
 		"ID": name,

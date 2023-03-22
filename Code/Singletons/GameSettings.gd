@@ -64,14 +64,17 @@ const DEFAULT = {
 	
 	["Ammunition", AT.BULLET, "Speed"]: 200,
 	["Ammunition", AT.BULLET, "Reload"]: 1,
+	["Ammunition", AT.BULLET, "LifeTime"]: 10,
 	
 	["Ammunition", AT.ROCKET, "Speed"]: 200,
 	["Ammunition", AT.ROCKET, "FollowSpeed"]: 150,
 	["Ammunition", AT.ROCKET, "Reload"]: 5,
+	["Ammunition", AT.ROCKET, "LifeTime"]: 20,
 	
 	["Ammunition", AT.FRAG_BOMB, "Speed"]: 200,
 	["Ammunition", AT.FRAG_BOMB, "Count"]: 30,
 	["Ammunition", AT.FRAG_BOMB, "Reload"]: 3,
+	["Ammunition", AT.FRAG_BOMB, "LifeTime"]: 5,
 	
 	["Ammunition", AT.FRAG_BOMB, "Frag", "Speed"]: 150,
 	["Ammunition", AT.FRAG_BOMB, "Frag", "Scale"]: 0.5,
@@ -87,18 +90,15 @@ const DEFAULT = {
 	["Ammunition", AT.LASER_BULLET, "Length"]: 50,
 	["Ammunition", AT.LASER_BULLET, "MaxBounces"]: 15,
 	["Ammunition", AT.LASER_BULLET, "Reload"]: 2,
+	["Ammunition", AT.LASER_BULLET, "LifeTime"]: 12,
 	
 	["Ammunition", AT.FIREBALL, "Speed"]: 200,
 	["Ammunition", AT.FIREBALL, "Reload"]: 5,
+	["Ammunition", AT.FIREBALL, "LifeTime"]: 5,
 }
 
 
-const Dynamic = {
-#	"Visibility": null,
-#	"Camera": {
-#		"CloseRange": null,
-#	}
-	
+const Dynamic = {	
 	"Tank": {
 		"Speed" : null,
 		"RotationSpeed" : null,
@@ -115,6 +115,7 @@ const Dynamic = {
 		AT.BULLET:{
 			"Speed" : null,
 			"Reload" : null,
+			"LifeTime": null,
 		},
 		AT.ROCKET: {
 			"Speed" : null,

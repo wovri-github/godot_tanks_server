@@ -3,10 +3,6 @@ extends Projectile
 var s = GameSettings.Dynamic.Ammunition[Ammunition.TYPES.FIREBALL]
 
 
-func _ready():
-	start_movement(s.Speed)
-
-
 func _on_Fireball_body_entered(_body):
 	explode()
 
