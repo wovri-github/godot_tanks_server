@@ -55,7 +55,6 @@ const SPECIAL_DEFAULT = {
 const DEFAULT = {
 	["Tank", "Speed"]: 100.0,
 	["Tank", "RotationSpeed"]: 2.0,
-	["Tank", "MaxAmmo"]: 5,
 	["Tank", "MaxAmmoTypes"]: 3,
 	["Tank", "BaseAmmoClipSize"]: 4,
 	["Tank", "AutoloadTimeMultiplier"]: 2,
@@ -102,7 +101,6 @@ const Dynamic = {
 	"Tank": {
 		"Speed" : null,
 		"RotationSpeed" : null,
-		"MaxAmmo" : null,
 		"BaseAmmoType" : null,
 		"MaxAmmoTypes" : null, # including default bullet
 		"BaseAmmoClipSize" : null,
