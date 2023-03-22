@@ -39,10 +39,9 @@ func add_first_playerS_stance(player_id, spawn_point):
 	}
 
 func add_player_stance(player_id, player_stance):
-	if !get_tree().is_paused(): 
-		# [info] This number [T] IS ONLY for making chronology. Don't use it
-		if playerS_stance.has(player_id) and playerS_last_time[player_id] < player_stance["T"]:
-			playerS_last_time[player_id] = player_stance["T"]
-			player_stance.erase("T")
-			player_stance.ID = player_id
-			playerS_stance[player_id] = player_stance
+	# [info] This number [T] IS ONLY for making chronology. Don't use it
+	if playerS_stance.has(player_id) and playerS_last_time[player_id] < player_stance["T"]:
+		playerS_last_time[player_id] = player_stance["T"]
+		player_stance.erase("T")
+		player_stance.ID = player_id
+		playerS_stance[player_id] = player_stance

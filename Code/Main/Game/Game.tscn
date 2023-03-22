@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Code/Main/Game/Game.gd" type="Script" id=1]
 [ext_resource path="res://Code/Main/Game/Map/Map.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Code/Main/Game/BattleTimer.gd" type="Script" id=3]
 
 [node name="Game" type="Node2D"]
 script = ExtResource( 1 )
@@ -15,9 +14,3 @@ unique_name_in_owner = true
 [node name="Projectiles" type="Node" parent="."]
 
 [node name="Players" type="Node" parent="."]
-
-[node name="BattleTimer" type="Timer" parent="."]
-one_shot = true
-script = ExtResource( 3 )
-
-[connection signal="timeout" from="BattleTimer" to="." method="_on_BattleTimer_timeout"]

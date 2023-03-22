@@ -21,9 +21,14 @@ var player_upgrade_points: Dictionary
 var bulletS_stance_on_collision: Array
 onready var projectile_n = $Projectiles
 onready var players_n = $Players
-onready var battle_timer_n = $BattleTimer
 
 
+func _ready():
+	var _err
+	Transfer.network.connect("peer_disconnected", self , "_on_peer_disconnected")
+	_err = Transfer.connect("recive_shoot", self, "_on_recive_shoot")
+	_err = Transfer.connect("recive_charge_shoot", self, "_on_recive_charge_shoot")
+	_err = Transfer.connect("recive_ammo_type_change", self, "_on_recive_ammo_type_change")
 
 
 func spawn_player(player_id, spawn_point, color):
@@ -35,7 +40,6 @@ func spawn_player(player_id, spawn_point, color):
 func _on_player_destroyed(slayer_id, wreck_data):
 	spawn_wreck(wreck_data)
 	var _err = Data.playerS_stance.erase(wreck_data.ID)
-	check_battle_timer()
 	if wreck_data.ID != int(slayer_id) and Data.players.has(wreck_data.ID):
 		Data.players[wreck_data.ID].Score.Kills += 1
 	var is_slayer_dead = false
@@ -51,6 +55,15 @@ func spawn_wreck(wreck_data):
 	var wreck_inst = WRECK_TSCN.instance()
 	wreck_inst.setup(wreck_data)
 	$Objects.call_deferred("add_child", wreck_inst)
+
+
+func _on_recive_shoot(player_stance, ammo_type):
+	update_player_position(player_stance)
+	var bullet_data = spawn_bullet(player_stance.ID, player_stance.TR, ammo_type)
+	if bullet_data != null:
+		Transfer.send_shoot(player_stance.ID, bullet_data)
+	else:
+		Transfer.send_shoot_fail(player_stance.ID)
 
 func spawn_bullet(player_id, turret_rotation, ammo_type):
 	if !is_player_alive(player_id):
@@ -71,11 +84,22 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	bullet_data["ST"] =  OS.get_ticks_msec()
 	return bullet_data
 
+func _on_recive_charge_shoot(player_id, ammo_type):
+	if player_charge_shoot(player_id, ammo_type):
+		Transfer.send_player_charge(player_id, ammo_type)
+	else:
+		Transfer.send_shoot_fail(player_id)
+
 func player_charge_shoot(player_id, ammo_type):
 	if !is_player_alive(player_id):
 		return false
 	var player_n = players_n.get_node(str(player_id))
 	return player_n.shoot_after_charging(ammo_type)
+
+
+func _on_recive_ammo_type_change(player_id, ammo_type):
+	if player_change_ammo_type(player_id, ammo_type):
+		Transfer.send_player_turret_change(player_id, ammo_type)
 
 func player_change_ammo_type(player_id, ammo_type):
 	if !is_player_alive(player_id):
@@ -106,10 +130,15 @@ func update_player_position(player_stance):
 	get_node("Players/" + str(player_stance.ID)).call_deferred(\
 			"set_stance", player_stance.P, player_stance.R)
 
+#---------Getters----------
+func get_alive_players() -> int: 
+	return players_n.get_child_count()
 
-func check_battle_timer():
-	var players_alive = players_n.get_child_count()
-	battle_timer_n.check_time(players_alive)
+func get_alived_players_id() -> Array:
+	var alived_players_id: Array = []
+	for player in players_n.get_children():
+		alived_players_id.append({"ID":int(player.name), "Kills":player.kills})
+	return alived_players_id
 
 
 #---------Verification----------
@@ -118,9 +147,16 @@ func is_player_alive(player_id) -> bool:
 		return true
 	return false
 
+	
+
 #-----------Signals----------
-func _on_BattleTimer_timeout():
-	var alived_players_id: Array = []
-	for player in players_n.get_children():
-		alived_players_id.append({"ID":int(player.name), "Kills":player.kills})
-	emit_signal("battle_over", alived_players_id)
+func _on_peer_disconnected(player_id):
+	yield(get_tree(), "idle_frame")
+	if is_player_alive(player_id):
+		players_n.get_node(str(player_id)).die()
+
+#func _on_BattleTimer_timeout():
+#	var alived_players_id: Array = []
+#	for player in players_n.get_children():
+#		alived_players_id.append({"ID":int(player.name), "Kills":player.kills})
+#	emit_signal("battle_over", alived_players_id)

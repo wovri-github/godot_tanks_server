@@ -1,20 +1,20 @@
 extends GDScript
 
 const MAX_UPGRADES = GameSettings.MAX_UPGRADES
+const MAX_POINTS = Transfer.MAX_CLIENTS
 var player_choosen_upgrades: Dictionary
 
 var winner = null
 var special_choosen_upgrades: Dictionary
 
-var max_points
 var temp_upgrades: Dictionary
 var settings_paths = GameSettings.DEFAULT.keys()
 var player_upgrade_points: Dictionary
 
 
-func _init(_max_points: int):
-	max_points = _max_points
+func _init():
 	set_random_special_upgrades()
+	var _err = Transfer.connect("recive_upgrade", self, "recive_upgrades")
 
 
 
@@ -74,8 +74,8 @@ func is_recive_upgrades_input_valid(player_id, upgrades) -> bool:
 		if typeof(val) != TYPE_INT:
 			printerr("[Main]: Values has to be integer! It only show how much points player spend on each upgrade")
 			val = 0
-		val = clamp(val, 0, max_points+1)
-		if val == 0 or val == max_points+1:
+		val = clamp(val, 0, MAX_POINTS+1)
+		if val == 0 or val == MAX_POINTS+1:
 			printerr("[Main]: Value out of range. Upgrades droped.")
 			return false
 		sum += val
