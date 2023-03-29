@@ -82,8 +82,9 @@ func shoot(ammo_type) -> int:
 	arms[ammo_type] -= 1
 	if arms[ammo_type] == 0 and ammo_type != s.BaseAmmoType:
 		arms.erase(ammo_type)
+		ammo_type = s.BaseAmmoType
 	shooting_locked = true
-	$ReloadTimer.start(GameSettings.Dynamic.Ammunition[s.BaseAmmoType].Reload)
+	$ReloadTimer.start(GameSettings.Dynamic.Ammunition[ammo_type].Reload)
 	if ammo_type == s.BaseAmmoType:
 		reset_autoload_timer()
 	return OK
