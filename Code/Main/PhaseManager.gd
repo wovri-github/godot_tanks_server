@@ -82,3 +82,5 @@ func _on_peer_disconnected(_player_id):
 func _on_PhaseManager_timeout():
 	set_next_phase()
 	phase_emiter()
+	if current_phase == "Battle":
+		battle_logic()
