@@ -12,6 +12,7 @@ const phase_time = {
 	"Upgrade": 10,
 }
 var game_n = null setget set_game_n # Setted by Main 
+var fast_time: bool = false
 export (String) var current_phase = "Battle"
 
 
@@ -36,7 +37,10 @@ func set_next_phase():
 	var current_phase_position = phase_list.find(current_phase)
 	var next_phase_position = (current_phase_position + 1) % phase_list.size()
 	current_phase = phase_list[next_phase_position]
-	start(phase_time[current_phase])
+	var time = phase_time[current_phase]
+	if fast_time:
+		time *= 0.1
+	start(time)
 
 func phase_emiter():
 	emit_signal("phase_changed", get_phase())
@@ -83,6 +87,8 @@ func _on_peer_disconnected(player_id):
 	battle_logic()
 
 
+func _on_CheckButton_toggled(button_pressed):
+	fast_time = button_pressed
 
 func _on_PhaseManager_timeout():
 	set_next_phase()

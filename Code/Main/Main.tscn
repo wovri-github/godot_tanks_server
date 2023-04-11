@@ -28,10 +28,17 @@ position = Vector2( 572, 383 )
 pause_mode = 2
 
 [node name="Button" type="Button" parent="CanvasLayer"]
-margin_right = 119.0
-margin_bottom = 33.0
+margin_right = 115.0
+margin_bottom = 35.0
 text = "End of battle"
+
+[node name="CheckButton" type="CheckButton" parent="CanvasLayer"]
+margin_left = 116.0
+margin_right = 192.0
+margin_bottom = 40.0
+text = "Fast Time"
 
 [connection signal="timeout" from="PhaseManager" to="PhaseManager" method="_on_PhaseManager_timeout"]
 [connection signal="timeout" from="StanceSender" to="StanceSender" method="_on_StanceSender_timeout"]
 [connection signal="pressed" from="CanvasLayer/Button" to="." method="_on_Button_pressed"]
+[connection signal="toggled" from="CanvasLayer/CheckButton" to="PhaseManager" method="_on_CheckButton_toggled"]
