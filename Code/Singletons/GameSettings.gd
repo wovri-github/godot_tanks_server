@@ -75,7 +75,7 @@ const DEFAULT = {
 	["Ammunition", AT.FRAG_BOMB, "Reload"]: 3,
 	["Ammunition", AT.FRAG_BOMB, "LifeTime"]: 5,
 	
-	["Ammunition", AT.FRAG_BOMB, "Frag", "Speed"]: 150,
+	["Ammunition", AT.FRAG_BOMB, "Frag", "Speed"]: 0.8,
 	["Ammunition", AT.FRAG_BOMB, "Frag", "Scale"]: 0.5,
 	["Ammunition", AT.FRAG_BOMB, "Frag", "LifetimeMultiplayer"]: 0.2,
 	

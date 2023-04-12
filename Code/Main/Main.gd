@@ -125,7 +125,7 @@ func end_of_battle():
 	start_new_game()
 
 func _on_phase_changed(phase):
-	print("[Main]: ", phase)
+	print("[Main]: ", phase.Name, " phase")
 	match phase.Name:
 		"Prepare":
 			end_of_battle()
