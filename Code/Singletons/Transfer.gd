@@ -36,10 +36,10 @@ func _process(_delta):
 
 
 #---- INIT DATA ----
-remote func recive_init_data(player_name, player_color, player_version, client_time):
+remote func recive_init_data(player_data, client_time):
 	var player_id = get_tree().get_rpc_sender_id()
 	clock_n.rec_determine_begining_time_diff(client_time)
-	emit_signal("recive_init_data", player_id, player_name, player_color, player_version)
+	emit_signal("recive_init_data", player_id, player_data)
 
 func send_old_version_info(player_id):
 	var available_versions = ProjectSettings.get_setting("application/other/available_versions")

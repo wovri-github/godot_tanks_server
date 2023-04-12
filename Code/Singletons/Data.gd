@@ -17,9 +17,9 @@ func get_merged_players_data() -> Array:
 		data.append(player_data_copy)
 	return data
 
-func add_new_player(data):
-	players[data.ID] = {
-			"ID": data.ID,
+func add_new_player(player_id, data):
+	players[player_id] = {
+			"ID": player_id,
 			"Nick": data.Nick,
 			"Color": data.Color,
 			"Score": {
@@ -28,7 +28,7 @@ func add_new_player(data):
 			},
 			"Upgrades": {}
 	}
-	playerS_last_time[data.ID] = -INF
+	playerS_last_time[player_id] = -INF
 
 func add_first_playerS_stance(player_id, spawn_point):
 	playerS_stance[player_id] = {

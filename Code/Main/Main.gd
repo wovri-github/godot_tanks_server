@@ -1,6 +1,5 @@
 extends Node
 
-var network = WebSocketServer.new()
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
 onready var stance_timer = $StanceSender
@@ -41,22 +40,32 @@ func get_init_data() -> Dictionary:
 	}
 	return init_data
 
-func player_initiation(player_id: int, player_name : String, player_color : Color, player_version):
-	var err = check_version(player_version)
+func player_initiation(player_id: int, player_data):
+	var err = verification_of_player_initiation(player_data)
 	if err == ERR_UNAUTHORIZED:
 		Transfer.send_old_version_info(player_id)
-		network.disconnect_peer(player_id)
-		print("[Main]: Old version detected. Connection droped")
+		Transfer.network.disconnect_peer(player_id)
+		print("[Main]: Old version detected. Connection droped.")
 		return
-	var player_data = {
-		"ID": player_id,
-		"Nick": player_name,
-		"Color": player_color,
-		"Version": player_version,
-	}
+	if err != OK:
+		Transfer.network.disconnect_peer(player_id)
+		print("[Main]: Data invalid. Connection droped.")
 	var init_data = get_init_data()
 	Transfer.send_init_data(player_id, init_data)
-	Data.add_new_player(player_data)
+	Data.add_new_player(player_id, player_data)
+
+static func verification_of_player_initiation(player_data: Dictionary):
+	if typeof(player_data) != TYPE_DICTIONARY: 
+		return FAILED
+	if player_data.size() != 3:
+		return FAILED
+	if !player_data.has("Nick") or !player_data.has("Color") or !player_data.has("Version"):
+		return FAILED
+	if typeof(player_data.Nick) != TYPE_STRING or \
+			typeof(player_data.Color) != TYPE_COLOR or \
+			!(typeof(player_data.Version) in [TYPE_STRING, TYPE_NIL]):
+		return FAILED
+	return check_version(player_data.Version)
 
 static func check_version(version) -> int:
 	if version == null:
