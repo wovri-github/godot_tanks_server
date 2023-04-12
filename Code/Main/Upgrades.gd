@@ -1,5 +1,7 @@
 extends GDScript
 
+signal updates_acknowledged()
+
 const MAX_UPGRADES = GameSettings.MAX_UPGRADES
 const MAX_POINTS = Transfer.MAX_CLIENTS
 var player_choosen_upgrades: Dictionary
@@ -10,11 +12,14 @@ var special_choosen_upgrades: Dictionary
 var temp_upgrades: Dictionary
 var settings_paths = GameSettings.DEFAULT.keys()
 var player_upgrade_points: Dictionary
+var player_acknowledge: Dictionary
 
 
 func _init():
 	set_random_special_upgrades()
 	var _err = Transfer.connect("recive_upgrade", self, "recive_upgrades")
+	_err = Transfer.network.connect("peer_disconnected", self, "_on_peer_disconnected")
+	_err = Transfer.connect("recive_update_acknowledge", self, "_on_update_acknowledge_recived")
 
 
 
@@ -118,12 +123,14 @@ func choose_player_upgrades(player_id):
 		if repetition_counter > MAX_UPGRADES * 2:
 			break
 	player_choosen_upgrades[player_id] = upgrades
+	player_acknowledge[player_id] = false
 
 
 func set_upgrade_points(player_id, kills):
 	player_upgrade_points[player_id] = kills
 
 func add_points_to_slayer(slayer_id):
+	player_acknowledge[slayer_id] = false
 	if player_upgrade_points.has(slayer_id):
 		player_upgrade_points[int(slayer_id)] += 1
 	else:
@@ -137,7 +144,6 @@ func add_points_to_slayer(slayer_id):
 
 func block_points(player_id):
 	player_upgrade_points[player_id] = -INF
-
 
 func make_upgrade(player_data, state):
 	var player_id = player_data.ID
@@ -156,6 +162,14 @@ func make_upgrade(player_data, state):
 		block_points(player_id)
 
 
+func _on_update_acknowledge_recived(player_id):
+	player_acknowledge[player_id] = true
+	for ack in player_acknowledge.values():
+		if ack == false:
+			return
+	emit_signal("updates_acknowledged")
+
+
 func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):
 	if slayer_id == 0:
 		return
@@ -165,3 +179,7 @@ func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):
 	if is_slayer_dead:
 		add_points_to_slayer(slayer_id)
 	make_upgrade(wreck_data, state)
+
+
+func _on_peer_disconnected(player_id):
+	player_acknowledge.erase(player_id)

@@ -5,6 +5,7 @@ signal recive_shoot(player_stance, ammo_type)
 signal recive_charge_shoot(player_id, ammo_type)
 signal recive_ammo_type_change(player_id, ammo_type)
 signal recive_upgrade(player_id, upgrades)
+signal recive_update_acknowledge(player_id)
 
 const DEFALUT_PORT = 42521
 const MAX_CLIENTS = 16
@@ -111,3 +112,8 @@ func send_player_possible_upgrades(player_id, data):
 remote func recive_upgrade(upgrades: Dictionary):
 	var player_id = get_tree().get_rpc_sender_id()
 	emit_signal("recive_upgrade", player_id, upgrades)
+
+remote func recive_update_acknowledge():
+	var player_id = get_tree().get_rpc_sender_id()
+	emit_signal("recive_update_acknowledge", player_id)
+	

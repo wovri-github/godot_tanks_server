@@ -4,10 +4,10 @@ var network = WebSocketServer.new()
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
 onready var stance_timer = $StanceSender
+onready var phase_manager = $PhaseManager
 onready var game_n = $Game
 onready var map_n = $Game/Map
 onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new()
-onready var phase_manager = $PhaseManager
 
 
 
@@ -20,6 +20,8 @@ func _ready():
 	update_game_n()
 
 func update_game_n():
+	upgrades_gd = load("res://Code/Main/Upgrades.gd").new()
+	upgrades_gd.connect("updates_acknowledged", self, "_on_updates_acknowledged")
 	game_n = $Game
 	map_n = $Game/Map
 	game_n.connect("battle_over", self, "_on_battle_over")
@@ -132,6 +134,9 @@ func _on_phase_changed(phase):
 		"Upgrade":
 			_on_battle_over()
 
+func _on_updates_acknowledged():
+	if phase_manager.current_phase == "Upgrade":
+		phase_manager._on_PhaseManager_timeout()
 
 func _on_Button_pressed():
 	# [info] only for testing purposes
