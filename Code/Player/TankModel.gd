@@ -12,6 +12,7 @@ var kills: int = 0
 var shooting_locked : bool = false
 var slot_locked : bool = false
 var current_ammo_type = s.BaseAmmoType
+onready var ray_cast_n = $"%RayCast2D"
 
 
 func reload_complete():
@@ -78,6 +79,9 @@ func shoot(ammo_type) -> int:
 	if shooting_locked and !slot_locked: # shoot while reloading
 		print("[TankModel]: Player ", name, " want to shoot while reloading!")
 		return FAILED
+	if is_barrel_in_wall():
+		print("[TankModel]: Player ", name, " want to shoot in wall")
+		return FAILED
 	slot_locked = false
 	arms[ammo_type] -= 1
 	if arms[ammo_type] == 0 and ammo_type != s.BaseAmmoType:
@@ -91,6 +95,12 @@ func shoot(ammo_type) -> int:
 
 func has_ammo_type(ammo_type) -> bool:
 	return arms.has(ammo_type)
+
+func is_barrel_in_wall() -> bool:
+	ray_cast_n.force_raycast_update()
+	if ray_cast_n.is_colliding():
+		return true
+	return false
 
 func set_stance(_position, _rotation):
 	position = _position

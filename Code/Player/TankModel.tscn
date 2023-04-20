@@ -20,6 +20,11 @@ unique_name_in_owner = true
 unique_name_in_owner = true
 position = Vector2( 0, -52 )
 
+[node name="RayCast2D" type="RayCast2D" parent="Turret"]
+unique_name_in_owner = true
+cast_to = Vector2( 0, -52 )
+collision_mask = 6
+
 [node name="ReloadTimer" type="Timer" parent="."]
 one_shot = true
 
