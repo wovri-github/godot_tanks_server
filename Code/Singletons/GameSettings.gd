@@ -34,6 +34,7 @@ static func set_base_value(path, value):
 	for step in path:
 		temp_dict = temp_dict[step]
 	path.append(last)
+	assert(temp_dict.has(last), str("[GameSettings] ", path, " doesn't have ", last, " value"))
 	temp_dict[last] = value
 
 static func add_value(path, value):
@@ -119,11 +120,13 @@ const Dynamic = {
 			"Speed" : null,
 			"FollowSpeed" : null,
 			"Reload" : null,
+			"LifeTime": null,
 		},
 		AT.FRAG_BOMB: {
 			"Speed" : null,
 			"Count" : null,
 			"Reload" : null,
+			"LifeTime": null,
 			"Frag":{
 				"Speed" : null,
 				"Scale" : null,
@@ -143,10 +146,12 @@ const Dynamic = {
 			"Length" : null,
 			"MaxBounces" : null,
 			"Reload" : null,
+			"LifeTime": null,
 		},
 		AT.FIREBALL:{
 			"Speed" : null,
 			"Reload" : null,
+			"LifeTime": null,
 		},
 	},
 }
