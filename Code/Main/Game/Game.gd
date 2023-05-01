@@ -67,9 +67,9 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	if !is_player_alive(player_id):
 		return null
 	var player_n = players_n.get_node(str(player_id))
+	player_n.rotate_turret(turret_rotation)
 	if player_n.shoot(ammo_type) != OK:
 		return null
-	player_n.rotate_turret(turret_rotation)
 	var bullet_inst = shootable_tscn[ammo_type].instance()
 	if ammo_type != Ammunition.TYPES.LASER:
 		bullet_inst.connect("wall_collided", self, "_on_wall_collided")
