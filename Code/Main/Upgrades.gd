@@ -176,7 +176,7 @@ func _on_player_destroyed(wreck_data, slayer_id, is_slayer_dead):
 	var state = "Normal"
 	if wreck_data.ID == slayer_id:
 		state = "SelfDestroyed"
-	if is_slayer_dead:
+	if is_slayer_dead && state != "SelfDestroyed":
 		add_points_to_slayer(slayer_id)
 	make_upgrade(wreck_data, state)
 

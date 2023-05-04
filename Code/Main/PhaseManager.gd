@@ -93,5 +93,5 @@ func _on_CheckButton_toggled(button_pressed):
 func _on_PhaseManager_timeout():
 	set_next_phase()
 	phase_emiter()
-	if current_phase == "Battle":
-		battle_logic()
+#	if current_phase == "Battle":
+#		battle_logic()
