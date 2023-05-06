@@ -55,7 +55,7 @@ func shoot_after_charging(ammo_type) -> bool:
 	return true
 
 func call_shoot(ammo_type):
-	get_node("/root/Main").call_deferred("player_shoot", Data.playerS_stance[int(name)], ammo_type)
+	get_node("/root/Main/Game").call_deferred("_on_recive_shoot", Data.playerS_stance[int(name)], ammo_type)
 
 func setup(player_id, spawn_point, color):
 	name = str(player_id)
