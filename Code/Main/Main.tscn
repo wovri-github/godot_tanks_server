@@ -22,7 +22,7 @@ script = ExtResource( 5 )
 
 [node name="Spectator" parent="." instance=ExtResource( 3 )]
 pause_mode = 2
-position = Vector2( 572, 383 )
+position = Vector2( 571, 383 )
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 pause_mode = 2

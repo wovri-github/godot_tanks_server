@@ -22,13 +22,13 @@ func _enter_tree() -> void:
 func _start_server() -> void:
 	network.listen(DEFALUT_PORT, PoolStringArray(), true)
 	get_tree().set_network_peer(network)
-	print("[Main]: Server started")
+	print("[Transfer]: Server started")
 
 func _peer_conected(player_id) -> void:
-	print("[Main]: Player " + str(player_id) + " connected")
+	print("[Transfer]: Player " + str(player_id) + " connected")
 
 func _peer_disconnected(player_id) -> void:
-	print("[Main]: Player " + str(player_id) + " disconnected")
+	print("[Transfer]: Player " + str(player_id) + " disconnected")
 	var _err = Data.players.erase(player_id)
 
 func _process(_delta):
