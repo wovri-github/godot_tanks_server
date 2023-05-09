@@ -21,6 +21,7 @@ var player_upgrade_points: Dictionary
 var bulletS_stance_on_collision: Array
 onready var projectile_n = $Projectiles
 onready var players_n = $Players
+var rng = RandomNumberGenerator.new()
 
 
 func _ready():
@@ -71,6 +72,7 @@ func spawn_bullet(player_id, turret_rotation, ammo_type):
 	if player_n.shoot(ammo_type) != OK:
 		return null
 	var bullet_inst = shootable_tscn[ammo_type].instance()
+	bullet_inst.name = str(rng.randi()) # just in case
 	if ammo_type != Ammunition.TYPES.LASER:
 		bullet_inst.connect("wall_collided", self, "_on_wall_collided")
 	var position2d = player_n.get_node("%BulletSpawn")

@@ -55,6 +55,8 @@ func shoot_after_charging(ammo_type) -> bool:
 	return true
 
 func call_shoot(ammo_type):
+	shooting_locked = false
+	slot_locked = false
 	get_node("/root/Main/Game").call_deferred("_on_recive_shoot", Data.playerS_stance[int(name)], ammo_type)
 
 func setup(player_id, spawn_point, color):
