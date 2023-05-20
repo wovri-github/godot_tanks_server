@@ -45,6 +45,42 @@ static func add_value(path, value):
 	path.append(last)
 	temp_dict[last] += value
 
+const ALLOWED_UPGRADES = [
+	["Tank", "Speed"],
+	["Tank", "RotationSpeed"],
+	["Tank", "MaxAmmoTypes"],
+	["Tank", "BaseAmmoClipSize"],
+	["Tank", "AutoloadTimeMultiplier"],
+	
+	["Wreck", "LifeTime"],
+	
+	["Ammunition", AT.BULLET, "Speed"],
+	["Ammunition", AT.BULLET, "LifeTime"],
+	
+	["Ammunition", AT.ROCKET, "Speed"],
+	["Ammunition", AT.ROCKET, "FollowSpeed"],
+	["Ammunition", AT.ROCKET, "LifeTime"],
+	
+	["Ammunition", AT.FRAG_BOMB, "Speed"],
+	["Ammunition", AT.FRAG_BOMB, "Count"],
+	["Ammunition", AT.FRAG_BOMB, "LifeTime"],
+	
+	["Ammunition", AT.FRAG_BOMB, "Frag", "Speed"],
+	["Ammunition", AT.FRAG_BOMB, "Frag", "Scale"],
+	["Ammunition", AT.FRAG_BOMB, "Frag", "LifetimeMultiplayer"],
+	
+	["Ammunition", AT.LASER, "MaxBounces"],
+	["Ammunition", AT.LASER, "ChargeTime"],
+	
+	["Ammunition", AT.LASER_BULLET, "Speed"],
+	["Ammunition", AT.LASER_BULLET, "MaxBounces"],
+	["Ammunition", AT.LASER_BULLET, "LifeTime"],
+	
+	["Ammunition", AT.FIREBALL, "Speed"],
+	["Ammunition", AT.FIREBALL, "LifeTime"],
+	
+]
+
 
 const SPECIAL_DEFAULT = {
 	["Tank", "BaseAmmoType"]:  Ammunition.TYPES.BULLET,
@@ -64,12 +100,12 @@ const DEFAULT = {
 	
 	["Ammunition", AT.BULLET, "Speed"]: 200,
 	["Ammunition", AT.BULLET, "Reload"]: 1,
-	["Ammunition", AT.BULLET, "LifeTime"]: 15,
+	["Ammunition", AT.BULLET, "LifeTime"]: 10,
 	
 	["Ammunition", AT.ROCKET, "Speed"]: 200,
 	["Ammunition", AT.ROCKET, "FollowSpeed"]: 105,
 	["Ammunition", AT.ROCKET, "Reload"]: 5,
-	["Ammunition", AT.ROCKET, "LifeTime"]: 12,
+	["Ammunition", AT.ROCKET, "LifeTime"]: 8,
 	
 	["Ammunition", AT.FRAG_BOMB, "Speed"]: 200,
 	["Ammunition", AT.FRAG_BOMB, "Count"]: 10,

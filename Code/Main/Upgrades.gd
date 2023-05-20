@@ -10,7 +10,7 @@ var winner = null
 var special_choosen_upgrades: Dictionary
 
 var temp_upgrades: Dictionary
-var settings_paths = GameSettings.DEFAULT.keys()
+var allowed_upgrades :Array = GameSettings.ALLOWED_UPGRADES
 var player_upgrade_points: Dictionary
 var player_acknowledge: Dictionary
 
@@ -111,11 +111,11 @@ func add_temp_upgrades_to_player_data():
 
 func choose_player_upgrades(player_id):
 	var upgrades: Array = []
-	var size = settings_paths.size()
+	var size = allowed_upgrades.size()
 	var repetition_counter = 0
 	while upgrades.size() < MAX_UPGRADES:
 		randomize()
-		var new_upgrade = settings_paths[randi() % size]
+		var new_upgrade = allowed_upgrades[randi() % size]
 		if !upgrades.has(new_upgrade):
 			upgrades.append(new_upgrade)
 			continue
