@@ -67,7 +67,7 @@ const DEFAULT = {
 	["Ammunition", AT.BULLET, "LifeTime"]: 15,
 	
 	["Ammunition", AT.ROCKET, "Speed"]: 200,
-	["Ammunition", AT.ROCKET, "FollowSpeed"]: 150,
+	["Ammunition", AT.ROCKET, "FollowSpeed"]: 105,
 	["Ammunition", AT.ROCKET, "Reload"]: 5,
 	["Ammunition", AT.ROCKET, "LifeTime"]: 12,
 	
