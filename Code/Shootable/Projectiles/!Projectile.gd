@@ -56,8 +56,6 @@ func set_movement():
 
 func _on_Projectile_body_entered(body):
 	if !body.is_in_group("Players"):
-		if general_info.is_frag:
-			return
 		var bullet_stance = {
 			"Name": name, 
 			"Pos": get_position(), 
