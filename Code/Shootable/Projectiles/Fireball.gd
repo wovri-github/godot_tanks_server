@@ -7,7 +7,9 @@ func _on_Fireball_body_entered(_body):
 	explode()
 
 func explode():
+	yield(get_tree(), "idle_frame")
 	for body in $ExplosionArea.get_overlapping_bodies():
+		print(body)
 		kill(body)
 	die()
 
