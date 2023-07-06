@@ -888,7 +888,7 @@ config/name="Godot Tanks Server"
 run/main_scene="res://Code/Main/Main.tscn"
 run/flush_stdout_on_print=true
 config/icon="res://icon.png"
-other/available_versions=PoolStringArray( "0.5" )
+other/available_versions=PoolStringArray( "0.6" )
 
 [autoload]
 

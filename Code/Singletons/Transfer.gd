@@ -9,19 +9,23 @@ signal recive_update_acknowledge(player_id)
 
 const DEFALUT_PORT = 42521
 const MAX_CLIENTS = 16
+var cert = load("res://cert/tanksgf.online.crt")
+var key = load("res://cert/tanksgf.online.key")
 
 var network = WebSocketServer.new()
 onready var clock_n = $Clock
 
 
 func _enter_tree() -> void:
+	network.set_private_key(key)
+	network.set_ssl_certificate(cert)
 	_start_server()
-	network.connect("peer_connected", self, "_peer_conected")
-	network.connect("peer_disconnected", self, "_peer_disconnected")
 
 func _start_server() -> void:
 	network.listen(DEFALUT_PORT, PoolStringArray(), true)
 	get_tree().set_network_peer(network)
+	network.connect("peer_connected", self, "_peer_conected")
+	network.connect("peer_disconnected", self, "_peer_disconnected")
 	print("[Transfer]: Server started")
 
 func _peer_conected(player_id) -> void:
