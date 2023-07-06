@@ -391,13 +391,6 @@ func fill_matrix_outer_wall(matrix, positions: Array, rows, cols):
 			matrix[pos.y][pos.x] = 1
 	return matrix
 
-func show_matrix(matrix):
-	for row in matrix:
-		var line = ""
-		for c in row:
-			line += str(c) + " "
-		print(line)
-
 
 
 const EXTEND_MOVMENT = [
@@ -534,7 +527,7 @@ func extended_go(pck, ref_tile, turn):
 	if turn == TURN.LEFT:
 		is_compleated = push_vertices(pck, mid_point)
 		if is_compleated:
-			print("[Map Generation]: Its not possible")
+			printerr("[Map Generation]: smth wrong happend")
 			return true
 
 	if turn == TURN.FOWARD:

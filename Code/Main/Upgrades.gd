@@ -39,10 +39,10 @@ func recive_upgrades(player_id: int, upgrades: Dictionary):
 	if player_id == winner:
 		var upgrade_path = upgrades.keys()[0]
 		if !special_choosen_upgrades.has(upgrade_path):
-			print("[Upgrades]: I dont have it")
+			Logger.sus("[Upgrades]: I dont have it")
 			return
 		if player_upgrade_points[player_id] <= 0:
-			print("[Upgrades]: Not enough points")
+			Logger.sus("[Upgrades]: Not enough points")
 			return 
 		var dict = {
 			"Val": special_choosen_upgrades[upgrade_path], 
@@ -60,33 +60,32 @@ func recive_upgrades(player_id: int, upgrades: Dictionary):
 		sum += val
 	var points_left = sum - available_upgrade_points
 	player_upgrade_points[player_id] = points_left
-	print(player_upgrade_points)
 	temp_upgrades[player_id] = upgrades
 
 func is_recive_upgrades_input_valid(player_id, upgrades) -> bool:
 	if !player_upgrade_points.has(player_id):
-		printerr("[Main]: Plyayer do not exist on list of awaiting upgrade. New upgrades droped.")
+		Logger.sus("[Upgrades]: Plyayer do not exist on list of awaiting upgrade. New upgrades droped.")
 		return false
 	var available_upgrade_points = player_upgrade_points[player_id]
 	var sum = 0
 	for upgrade in upgrades:
 		if !player_choosen_upgrades.has(player_id):
-			printerr("[Main]: There is no player in choosen upgrades. Upgrades droped.")
+			Logger.sus("[Upgrades]: There is no player in choosen upgrades. Upgrades droped.")
 			return false
 		if !upgrade in player_choosen_upgrades[player_id]:
-			printerr("[Main]: There is no upgrade in choosen upgrades. Upgrades droped.")
+			Logger.sus("[Upgrades]: There is no upgrade in choosen upgrades. Upgrades droped.")
 			return false
 		var val = upgrades[upgrade]
 		if typeof(val) != TYPE_INT:
-			printerr("[Main]: Values has to be integer! It only show how much points player spend on each upgrade")
+			Logger.sus("[Upgrades]: Values has to be integer! It only show how much points player spend on each upgrade")
 			val = 0
 		val = clamp(val, 0, MAX_POINTS+1)
 		if val == 0 or val == MAX_POINTS+1:
-			printerr("[Main]: Value out of range. Upgrades droped.")
+			Logger.sus("[Upgrades]: Value out of range. Upgrades droped.")
 			return false
 		sum += val
 	if sum > available_upgrade_points:
-		printerr("[Main]: More spended points than kills. Upgrades droped.")
+		Logger.sus("[Upgrades]: More spended points than kills. Upgrades droped.")
 		return false
 	return true
 

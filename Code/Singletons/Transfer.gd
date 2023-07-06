@@ -15,7 +15,6 @@ var key = load("res://cert/tanksgf.online.key")
 var network = WebSocketServer.new()
 onready var clock_n = $Clock
 
-
 func _enter_tree() -> void:
 	network.set_private_key(key)
 	network.set_ssl_certificate(cert)
@@ -26,13 +25,13 @@ func _start_server() -> void:
 	get_tree().set_network_peer(network)
 	network.connect("peer_connected", self, "_peer_conected")
 	network.connect("peer_disconnected", self, "_peer_disconnected")
-	print("[Transfer]: Server started")
+	Logger.info("[Transfer]: Server started")
 
 func _peer_conected(player_id) -> void:
-	print("[Transfer]: Player " + str(player_id) + " connected")
+	Logger.info("[Transfer]: Player " + str(player_id) + " connected")
 
 func _peer_disconnected(player_id) -> void:
-	print("[Transfer]: Player " + str(player_id) + " disconnected")
+	Logger.info("[Transfer]: Player " + str(player_id) + " disconnected")
 	var _err = Data.players.erase(player_id)
 
 func _process(_delta):

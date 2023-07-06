@@ -45,11 +45,11 @@ func player_initiation(player_id: int, player_data):
 	if err == ERR_UNAUTHORIZED:
 		Transfer.send_old_version_info(player_id)
 		Transfer.network.disconnect_peer(player_id)
-		print("[Main]: Old version detected. Connection droped.")
+		Logger.info("[Main]: Old version detected. Connection droped.")
 		return
 	if err != OK:
 		Transfer.network.disconnect_peer(player_id)
-		print("[Main]: Data invalid. Connection droped.")
+		Logger.sus("[Main]: Data invalid. Connection droped.")
 	var init_data = get_init_data()
 	Transfer.send_init_data(player_id, init_data)
 	Data.add_new_player(player_id, player_data)
@@ -134,7 +134,7 @@ func end_of_battle():
 	start_new_game()
 
 func _on_phase_changed(phase):
-	print("[Main]: ", phase.Name, " phase")
+	Logger.info("[Main]: " + phase.Name + " phase")
 	match phase.Name:
 		"Prepare":
 			end_of_battle()

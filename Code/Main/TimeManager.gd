@@ -12,6 +12,3 @@ const phase_time = {
 }
 export (String) var phase = null
 
-#func _ready():
-#	print(BegBattle)
-

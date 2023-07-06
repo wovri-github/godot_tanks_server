@@ -43,7 +43,7 @@ func change_ammo_type(ammo_type) -> bool:
 
 func shoot_after_charging(ammo_type) -> bool:
 	if !GameSettings.Dynamic.Ammunition[ammo_type].has("ChargeTime") or shooting_locked:
-		print("[TankModel]: Player ", name, " want to shoot improper type or while reloading!")
+		Logger.sus("[TankModel]: Player "+ name +" want to shoot improper type or while reloading!")
 		return false
 	slot_locked = true
 	shooting_locked = true
@@ -76,13 +76,13 @@ func pick_up_ammo_box(ammo_type) -> bool:
 
 func shoot(ammo_type) -> int:
 	if !arms.has(ammo_type):
-		print("[TankModel]: Player ", name, " want to shoot without ammo!")
+		Logger.sus("[TankModel]: Player " + name + " want to shoot without ammo!")
 		return FAILED
 	if shooting_locked and !slot_locked: # shoot while reloading
-		print("[TankModel]: Player ", name, " want to shoot while reloading!")
+		Logger.sus("[TankModel]: Player " + name + " want to shoot while reloading!")
 		return FAILED
 	if is_barrel_in_wall():
-		print("[TankModel]: Player ", name, " want to shoot in wall")
+		Logger.sus("[TankModel]: Player " + name + " want to shoot in wall")
 		return FAILED
 	slot_locked = false
 	arms[ammo_type] -= 1

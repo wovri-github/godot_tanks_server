@@ -620,6 +620,11 @@ _global_script_classes=[ {
 "path": "res://addons/gdUnit3/src/core/LocalTime.gd"
 }, {
 "base": "Reference",
+"class": "Logger",
+"language": "GDScript",
+"path": "res://Code/Singletons/Logger.gd"
+}, {
+"base": "Reference",
 "class": "MapGlobal",
 "language": "GDScript",
 "path": "res://Code/Main/Game/Map/map_global.gd"
@@ -857,6 +862,7 @@ _global_script_class_icons={
 "IntFuzzer": "",
 "JUnitXmlReport": "",
 "LocalTime": "",
+"Logger": "",
 "MapGlobal": "",
 "Projectile": "",
 "RPC": "",
