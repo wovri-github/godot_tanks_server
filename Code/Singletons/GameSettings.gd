@@ -69,11 +69,11 @@ const ALLOWED_UPGRADES = [
 	["Ammunition", AT.FRAG_BOMB, "Frag", "Scale"],
 	["Ammunition", AT.FRAG_BOMB, "Frag", "LifetimeMultiplayer"],
 	
-	["Ammunition", AT.LASER, "MaxBounces"],
+	["Ammunition", AT.LASER, "MaxWidth"],
 	["Ammunition", AT.LASER, "ChargeTime"],
 	
 	["Ammunition", AT.LASER_BULLET, "Speed"],
-	["Ammunition", AT.LASER_BULLET, "MaxBounces"],
+	["Ammunition", AT.LASER_BULLET, "Length"],
 	["Ammunition", AT.LASER_BULLET, "LifeTime"],
 	
 	["Ammunition", AT.FIREBALL, "Speed"],
