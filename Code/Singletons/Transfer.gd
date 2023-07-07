@@ -16,8 +16,9 @@ var network = WebSocketServer.new()
 onready var clock_n = $Clock
 
 func _enter_tree() -> void:
-	network.set_private_key(key)
-	network.set_ssl_certificate(cert)
+	if OS.is_debug_build() == false:
+		network.set_private_key(key)
+		network.set_ssl_certificate(cert)
 	_start_server()
 
 func _start_server() -> void:

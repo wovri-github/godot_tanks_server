@@ -8,7 +8,7 @@ static func info(message):
 
 # el suspect
 static func sus(message):
-	var time = get_formatted_datetime("[hh:mm:ss DD.MM] ")
+	var time = get_formatted_datetime("[DD.MM hh:mm:ss] ")
 	print("[!SUS] ", time, message)
 
 static func get_formatted_datetime(time_format):
