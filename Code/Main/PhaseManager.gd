@@ -7,7 +7,7 @@ const SECONDS_PER_PLAYER = 30
 const SECONDS_ON_LAST_ALIVE = 5
 const phase_list: Array = ["Prepare", "Battle", "Upgrade"]
 const phase_time = {
-	"Prepare": 7,
+	"Prepare": 3,
 	"Battle": INF,
 	"Upgrade": 10,
 }

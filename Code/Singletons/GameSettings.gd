@@ -90,7 +90,7 @@ const SPECIAL_DEFAULT = {
 }
 
 const DEFAULT = {
-	["Tank", "Speed"]: 100.0,
+	["Tank", "Speed"]: 120.0,
 	["Tank", "RotationSpeed"]: 2.0,
 	["Tank", "MaxAmmoTypes"]: 3,
 	["Tank", "BaseAmmoClipSize"]: 4,
@@ -102,8 +102,8 @@ const DEFAULT = {
 	["Ammunition", AT.BULLET, "Reload"]: 1,
 	["Ammunition", AT.BULLET, "LifeTime"]: 10,
 	
-	["Ammunition", AT.ROCKET, "Speed"]: 200,
-	["Ammunition", AT.ROCKET, "FollowSpeed"]: 105,
+	["Ammunition", AT.ROCKET, "Speed"]: 100,
+	["Ammunition", AT.ROCKET, "FollowSpeed"]: 150,
 	["Ammunition", AT.ROCKET, "Reload"]: 5,
 	["Ammunition", AT.ROCKET, "LifeTime"]: 8,
 	
