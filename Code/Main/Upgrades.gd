@@ -3,7 +3,7 @@ extends GDScript
 signal updates_acknowledged()
 
 const MAX_UPGRADES = GameSettings.MAX_UPGRADES
-const MAX_POINTS = Transfer.MAX_CLIENTS
+const MAX_POINTS = Data.MAX_PLAYERS
 var player_choosen_upgrades: Dictionary
 
 var winner = null

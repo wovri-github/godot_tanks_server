@@ -3,8 +3,6 @@ extends Node2D
 signal player_destroyed(player_id, slayer_id, is_slayer_dead)
 signal battle_over(alived_players)
 
-
-#const VALUE_PER_POINT = GameSettings.PERCENTAGE_OF_BASE_VALUE_PER_POINT
 const WRECK_TSCN = preload("res://Code/Objects/Wreck.tscn")
 const TANK_TSCN = preload("res://Code/Player/TankModel.tscn")
 const AMMO_TYPES = Ammunition.TYPES

@@ -8,7 +8,6 @@ signal recive_upgrade(player_id, upgrades)
 signal recive_update_acknowledge(player_id)
 
 const DEFALUT_PORT = 42521
-const MAX_CLIENTS = 16
 var cert = load("res://cert/tanksgf.online.crt")
 var key = load("res://cert/tanksgf.online.key")
 
@@ -29,11 +28,11 @@ func _start_server() -> void:
 	Logger.info("[Transfer]: Server started")
 
 func _peer_conected(player_id) -> void:
-	Logger.info("[Transfer]: Player " + str(player_id) + " connected")
+	Logger.info("[Transfer]: Peer " + str(player_id) + " connected")
 
 func _peer_disconnected(player_id) -> void:
-	Logger.info("[Transfer]: Player " + str(player_id) + " disconnected")
-	var _err = Data.players.erase(player_id)
+	Logger.info("[Transfer]: Peer " + str(player_id) + " disconnected")
+	var _err = Data.peer_left(player_id)
 
 func _process(_delta):
 	network.poll()

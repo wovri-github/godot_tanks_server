@@ -1,5 +1,7 @@
 extends Node
 
+signal player_initialized()
+
 var game_tscn = preload("res://Code/Main/Game/Game.tscn")
 
 onready var stance_timer = $StanceSender
@@ -31,6 +33,7 @@ func get_init_data() -> Dictionary:
 	var init_data = {
 		"PlayerSData": Data.get_merged_players_data(),
 		"PlayerSCorpses": get_playerS_corpses(),
+		"Spectators": Data.spectators_queue,
 		"BulletsStances": get_bullets_stances(),
 		"MapData": map_n.get_map_data(),
 		"SpecialUpgrades": Data.current_special_upgrades,
@@ -50,7 +53,9 @@ func player_initiation(player_id: int, player_data):
 		Logger.sus("[Main]: Data invalid. Connection droped.")
 	var init_data = get_init_data()
 	Transfer.send_init_data(player_id, init_data)
-	Data.add_new_player(player_id, player_data)
+	Data.manage_new_player(player_id, player_data)
+	emit_signal("player_initialized")
+	
 
 static func verification_of_player_initiation(player_data: Dictionary):
 	if typeof(player_data) != TYPE_DICTIONARY: 
@@ -132,7 +137,6 @@ func end_of_battle():
 	start_new_game()
 
 func _on_phase_changed(phase):
-	Logger.info("[Main]: " + phase.Name + " phase")
 	match phase.Name:
 		"Prepare":
 			end_of_battle()

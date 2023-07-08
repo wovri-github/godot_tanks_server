@@ -1,5 +1,9 @@
 extends Node
 
+const MAX_PLAYERS = 2
+
+var spectators_data: Dictionary
+var spectators_queue: Array
 var players: Dictionary
 
 var playerS_stance: Dictionary
@@ -17,6 +21,16 @@ func get_merged_players_data() -> Array:
 		data.append(player_data_copy)
 	return data
 
+func manage_new_player(player_id, data):
+	if players.size() < MAX_PLAYERS and spectators_queue.empty():
+		add_new_player(player_id, data)
+	else:
+		add_new_spectator(player_id, data)
+
+func add_new_spectator(player_id, data):
+	spectators_queue.append(player_id)
+	spectators_data[player_id] = data
+
 func add_new_player(player_id, data):
 	players[player_id] = {
 			"ID": player_id,
@@ -29,6 +43,18 @@ func add_new_player(player_id, data):
 			"Upgrades": {}
 	}
 	playerS_last_time[player_id] = -INF
+
+func peer_left(peer_id):
+	var was_player = players.erase(peer_id)
+	if not spectators_queue.empty() and was_player:
+		var spectator_id = spectators_queue.pop_front()
+		add_new_player(spectator_id, spectators_data[spectator_id])
+		spectators_data.erase(spectator_id)
+	elif not was_player:
+		spectators_data.erase(peer_id)
+		spectators_queue.erase(peer_id)
+		
+
 
 func add_first_playerS_stance(player_id, spawn_point):
 	playerS_stance[player_id] = {

@@ -13,6 +13,7 @@ const phase_time = {
 }
 var game_n = null setget set_game_n # Setted by Main 
 var fast_time: bool = false
+var last_alive_started = false
 export (String) var current_phase = "Battle"
 
 
@@ -24,7 +25,8 @@ func set_game_n(_game_n):
 func _ready():
 	var _err
 	Transfer.network.connect("peer_disconnected", self , "_on_peer_disconnected")
-	Transfer.network.connect("peer_connected", self, "_on_peer_conected")
+	#Transfer.network.connect("peer_connected", self, "_on_peer_conected")
+	get_parent().connect("player_initialized", self, "_on_player_initialized")
 
 func get_phase():
 	var phase = {
@@ -43,20 +45,23 @@ func set_next_phase():
 	start(time)
 
 func phase_emiter():
-	emit_signal("phase_changed", get_phase())
-	Transfer.send_phase(get_phase())
+	var phase = get_phase()
+	Logger.info("[Phase Manager]: " + phase.Name + " phase")
+	emit_signal("phase_changed", phase)
+	Transfer.send_phase(phase)
 
 func battle_logic():
 	if current_phase != "Battle":
 		return
 	var players_alive = game_n.get_alive_players()
-	if get_tree().multiplayer.get_network_connected_peers().size() == players_alive:
+	if Data.players.size() == players_alive:
 		start(INF)
 		Transfer.send_phase(get_phase())
 		return
 	var left_sec = calculate_time(players_alive)
-	if players_alive == 1:
+	if players_alive == 1 and not last_alive_started:
 		start(SECONDS_ON_LAST_ALIVE)
+		last_alive_started = true
 		Transfer.send_phase(get_phase())
 		return
 	if players_alive == 0:
@@ -76,7 +81,7 @@ func calculate_time(players_alive) -> int:
 
 
 
-func _on_peer_conected(_player_id):
+func _on_player_initialized():
 	battle_logic()
 func _on_player_destroyed(_wreck_data, _slayer_id, _is_slayer_dead):
 	battle_logic()
@@ -91,5 +96,6 @@ func _on_CheckButton_toggled(button_pressed):
 	fast_time = button_pressed
 
 func _on_PhaseManager_timeout():
+	last_alive_started = false
 	set_next_phase()
 	phase_emiter()
