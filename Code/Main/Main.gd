@@ -11,8 +11,7 @@ onready var upgrades_gd = load("res://Code/Main/Upgrades.gd").new()
 
 
 func _enter_tree() -> void:
-	var _err
-	_err = Transfer.connect("recive_init_data", self, "player_initiation")
+	var _err = Transfer.connect("recive_init_data", self, "player_initiation")
 
 func _ready():
 	phase_manager.connect("phase_changed", self, "_on_phase_changed")
@@ -26,7 +25,6 @@ func update_game_n():
 	game_n.connect("battle_over", self, "_on_battle_over")
 	game_n.connect("player_destroyed", upgrades_gd, "_on_player_destroyed")
 	phase_manager.game_n = game_n
-	
 
 
 func get_init_data() -> Dictionary:

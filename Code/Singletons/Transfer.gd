@@ -53,14 +53,14 @@ func send_init_data(player_id, init_data):
 	rpc_id(player_id, "recive_data_during_game", init_data)
 
 func send_new_battle(new_game_data):
-	rpc("recive_new_battle", new_game_data)
+	rpc("recive_new_battle", OS.get_ticks_msec(), new_game_data)
 #---- CORE GAME MECHANIC -----
 
 func send_phase(phase):
-	rpc("recive_phase", phase)
+	rpc("recive_phase", OS.get_ticks_msec(), phase)
 
 func send_player_destroyed(corpse_data, kill_event_data):
-	rpc("recive_player_destroyed", corpse_data, kill_event_data)
+	rpc("recive_player_destroyed", OS.get_ticks_msec(), corpse_data, kill_event_data)
 
 func send_ammobox_destroyed(name):
 	rpc("recive_ammobox_destroyed", name)
@@ -111,7 +111,7 @@ func send_shoot_bounce_state(bulletS_state, time):
 
 
 func send_player_possible_upgrades(player_id, data):
-	rpc_id(player_id, "recive_player_possible_upgrades", data)
+	rpc_id(player_id, "recive_player_possible_upgrades", OS.get_ticks_msec(), data)
 
 remote func recive_upgrade(upgrades: Dictionary):
 	var player_id = get_tree().get_rpc_sender_id()
