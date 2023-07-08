@@ -28,10 +28,12 @@ func _start_server() -> void:
 	Logger.info("[Transfer]: Server started")
 
 func _peer_conected(player_id) -> void:
-	Logger.info("[Transfer]: Peer " + str(player_id) + " connected")
+	var peers = str(get_tree().multiplayer.get_network_connected_peers().size())
+	Logger.info("[Transfer]: Peer " + str(player_id) + " connected. Total: " + peers)
 
 func _peer_disconnected(player_id) -> void:
-	Logger.info("[Transfer]: Peer " + str(player_id) + " disconnected")
+	var peers = str(get_tree().multiplayer.get_network_connected_peers().size())
+	Logger.info("[Transfer]: Peer " + str(player_id) + " disconnected. Total: " + peers)
 	var _err = Data.peer_left(player_id)
 
 func _process(_delta):

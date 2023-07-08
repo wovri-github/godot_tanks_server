@@ -1,6 +1,6 @@
 extends Node
 
-const MAX_PLAYERS = 2
+const MAX_PLAYERS = 16
 
 var spectators_data: Dictionary
 var spectators_queue: Array
